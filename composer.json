@@ -1,0 +1,20 @@
+{
+  "name": "aternos/php-model",
+  "description": "PHP Library for simple and complex database models",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Matthias Neid",
+      "email": "matthias@aternos.org"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Aternos\\Model\\": "src/"
+    }
+  }
+}
