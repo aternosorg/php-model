@@ -2,23 +2,27 @@
 
 namespace Aternos\Model\Driver;
 
+use Aternos\Model\Driver\Cache\CacheDriverInterface;
+use Aternos\Model\Driver\NoSQL\NoSQLDriverInterface;
+use Aternos\Model\Driver\Relational\RelationalDriverInterface;
+use Aternos\Model\Driver\Search\SearchDriverInterface;
+
 /**
  * Class DriverFactory
  *
  * @author Matthias Neid
  * @package Aternos\Model
  */
-class DriverFactory
+class DriverFactory implements DriverFactoryInterface
 {
     /**
      * Registered drivers
      *
      * @var array
      */
-    private $drivers = [
+    protected $drivers = [
         "Cache" => "\\Aternos\\Model\\Driver\\Cache\\Redis",
         "NoSQL" => "\\Aternos\\Model\\Driver\\NoSQL\\Cassandra",
-        "Registry" => "\\Aternos\\Model\\Driver\\Registry\\Property",
         "Relational" => "\\Aternos\\Model\\Driver\\Relational\\Mysqli",
         "Search" => "\\Aternos\\Model\\Driver\\Search\\Elasticsearch"
     ];
@@ -26,17 +30,20 @@ class DriverFactory
     /**
      * @var array
      */
-    private $driverInstances = [];
+    protected $driverInstances = [];
 
     /**
      * Register a driver in the factory
      *
      * @param string $driver
      * @param string $class \Aternos\Model\DriverInterface
+     * @return bool
      */
-    public function register($driver, $class)
+    public function registerDriver($driver, $class): bool
     {
         $this->drivers[$driver] = $class;
+
+        return true;
     }
 
     /**
@@ -57,12 +64,12 @@ class DriverFactory
     /**
      * Assemble a cache driver
      *
-     * @return Cache\CacheDriverInterface
+     * @return CacheDriverInterface
      */
-    public function assembleCacheDriver()
+    public function assembleCacheDriver(): CacheDriverInterface
     {
         /**
-         * @var Cache\CacheDriverInterface $cacheDriver
+         * @var CacheDriverInterface $cacheDriver
          */
         $cacheDriver = $this->assembleDriver("Cache");
 
@@ -72,12 +79,12 @@ class DriverFactory
     /**
      * Assemble a nosql driver
      *
-     * @return NoSQL\NoSQLDriverInterface
+     * @return NoSQLDriverInterface
      */
-    public function assembleNoSQLDriver()
+    public function assembleNoSQLDriver(): NoSQLDriverInterface
     {
         /**
-         * @var NoSQL\NoSQLDriverInterface $nosqlDriver
+         * @var NoSQLDriverInterface $nosqlDriver
          */
         $nosqlDriver = $this->assembleDriver("NoSQL");
 
@@ -85,29 +92,14 @@ class DriverFactory
     }
 
     /**
-     * Assemble a registry driver
-     *
-     * @return Registry\RegistryDriverInterface
-     */
-    public function assembleRegistryDriver()
-    {
-        /**
-         * @var Registry\RegistryDriverInterface $registryDriver
-         */
-        $registryDriver = $this->assembleDriver("Registry");
-
-        return $registryDriver;
-    }
-
-    /**
      * Assemble a relational driver
      *
-     * @return Relational\RelationalDriverInterface
+     * @return RelationalDriverInterface
      */
-    public function assembleRelationalDriver()
+    public function assembleRelationalDriver(): RelationalDriverInterface
     {
         /**
-         * @var Relational\RelationalDriverInterface $relationalDriver
+         * @var RelationalDriverInterface $relationalDriver
          */
         $relationalDriver = $this->assembleDriver("Relational");
 
@@ -117,12 +109,12 @@ class DriverFactory
     /**
      * Assemble a search driver
      *
-     * @return Search\SearchDriverInterface
+     * @return SearchDriverInterface
      */
-    public function assembleSearchDriver()
+    public function assembleSearchDriver(): SearchDriverInterface
     {
         /**
-         * @var Search\SearchDriverInterface $searchDriver
+         * @var SearchDriverInterface $searchDriver
          */
         $searchDriver = $this->assembleDriver("Search");
 
@@ -137,7 +129,7 @@ class DriverFactory
     /**
      * @return DriverFactory
      */
-    public static function getInstance()
+    public static function getInstance(): DriverFactory
     {
         if (self::$instance === null) {
             self::$instance = new self;
@@ -146,6 +138,17 @@ class DriverFactory
         return self::$instance;
     }
 
-    protected function __clone() {}
-    protected function __construct() {}
+    /**
+     * Prohibited for singleton
+     */
+    protected function __clone()
+    {
+    }
+
+    /**
+     * Prohibited for singleton
+     */
+    protected function __construct()
+    {
+    }
 }
