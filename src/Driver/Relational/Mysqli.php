@@ -3,7 +3,6 @@
 namespace Aternos\Model\Driver\Relational;
 
 use Aternos\Model\ModelInterface;
-use mysql_xdevapi\Exception;
 
 /**
  * Class Mysqli
@@ -73,7 +72,7 @@ class Mysqli implements RelationalDriverInterface
         if (!$this->connection || !@mysqli_ping($this->connection)) {
             $this->connection = mysqli_connect($this->host, $this->username, $this->password, $this->database, $this->port, $this->socket);
             if (!$this->connection) {
-                throw new Exception("Could not connect to Mysqli database. Error: " . mysqli_error($this->connection));
+                throw new \Exception("Could not connect to Mysqli database. Error: " . mysqli_error($this->connection));
             }
         }
     }
@@ -83,6 +82,7 @@ class Mysqli implements RelationalDriverInterface
      *
      * @param string $query
      * @return bool|\mysqli_result
+     * @throws \Exception
      */
     protected function query(string $query)
     {
@@ -95,6 +95,7 @@ class Mysqli implements RelationalDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Exception
      */
     public function save(ModelInterface $model): bool
     {
@@ -128,6 +129,7 @@ class Mysqli implements RelationalDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Exception
      */
     public function get(ModelInterface $model): bool
     {
@@ -152,6 +154,7 @@ class Mysqli implements RelationalDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Exception
      */
     public function delete(ModelInterface $model): bool
     {
