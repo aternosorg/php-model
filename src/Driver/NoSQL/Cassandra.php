@@ -8,6 +8,7 @@ use Aternos\Model\ModelInterface;
  * Class Cassandra
  *
  * Inherit this class, overwrite the connect function
+ * and/or the protected connection specific properties
  * and register the new class in the driver factory
  * for other credentials or connect specifics
  *
@@ -16,6 +17,43 @@ use Aternos\Model\ModelInterface;
  */
 class Cassandra implements NoSQLDriverInterface
 {
+    /**
+     * Host address (localhost by default)
+     *
+     * Can actually be one or multiple comma separated hosts (contact points)
+     *
+     * @var bool|string
+     */
+    protected $host = false;
+
+    /**
+     * Host port
+     *
+     * @var bool|int
+     */
+    protected $port = false;
+
+    /**
+     * Authentication username
+     *
+     * @var bool|string
+     */
+    protected $user = false;
+
+    /**
+     * Authentication password
+     *
+     * @var bool|string
+     */
+    protected $password = false;
+
+    /**
+     * Keyspace name
+     *
+     * @var string
+     */
+    protected $keyspace = "data";
+
     /**
      * @var \Cassandra\Session
      */
@@ -27,8 +65,22 @@ class Cassandra implements NoSQLDriverInterface
     protected function connect()
     {
         if (!$this->connection) {
+            $builder = \Cassandra::cluster();
+
+            if ($this->host) {
+                $builder->withContactPoints($this->host);
+            }
+
+            if ($this->port) {
+                $builder->withPort($this->port);
+            }
+
+            if ($this->user && $this->password) {
+                $builder->withCredentials($this->user, $this->password);
+            }
+
             $cluster = \Cassandra::cluster()->build();
-            $this->connection = $cluster->connect("data");
+            $this->connection = $cluster->connect($this->keyspace);
         }
     }
 
@@ -54,6 +106,7 @@ class Cassandra implements NoSQLDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Cassandra\Exception
      */
     public function save(ModelInterface $model): bool
     {
@@ -73,6 +126,7 @@ class Cassandra implements NoSQLDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Cassandra\Exception
      */
     public function get(ModelInterface $model): bool
     {
@@ -97,6 +151,7 @@ class Cassandra implements NoSQLDriverInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws \Cassandra\Exception
      */
     public function delete(ModelInterface $model): bool
     {

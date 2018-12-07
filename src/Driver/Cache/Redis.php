@@ -8,6 +8,7 @@ use Aternos\Model\ModelInterface;
  * Class Redis
  *
  * Inherit this class, overwrite the connect function
+ * and/or the protected connection specific properties
  * and register the new class in the driver factory
  * for other credentials or connect specifics
  *
@@ -17,9 +18,32 @@ use Aternos\Model\ModelInterface;
 class Redis implements CacheDriverInterface
 {
     /**
+     * Host address
+     *
+     * @var string
+     */
+    protected $host = '127.0.0.1';
+
+    /**
+     * Host port
+     *
+     * @var int
+     */
+    protected $port = 6379;
+
+    /**
+     * Socket path
+     *
+     * If this is set, host and port are ignored
+     *
+     * @var bool
+     */
+    protected $socket = false;
+
+    /**
      * @var \Redis
      */
-    private $connection;
+    protected $connection;
 
     /**
      * Connect to redis
@@ -28,7 +52,11 @@ class Redis implements CacheDriverInterface
     {
         if (!$this->connection) {
             $this->connection = new \Redis();
-            $this->connection->connect('127.0.0.1');
+            if (!$this->socket) {
+                $this->connection->connect($this->host, $this->port);
+            } else {
+                $this->connection->connect($this->socket);
+            }
         }
     }
 

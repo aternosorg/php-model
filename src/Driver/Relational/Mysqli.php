@@ -9,6 +9,7 @@ use mysql_xdevapi\Exception;
  * Class Mysqli
  *
  * Inherit this class, overwrite the connect function
+ * and/or the protected connection specific properties
  * and register the new class in the driver factory
  * for other credentials or connect specifics
  *
@@ -17,6 +18,48 @@ use mysql_xdevapi\Exception;
  */
 class Mysqli implements RelationalDriverInterface
 {
+    /**
+     * Host address
+     *
+     * @var string
+     */
+    protected $host = "";
+
+    /**
+     * Host port
+     *
+     * @var string
+     */
+    protected $port = "";
+
+    /**
+     * Authentication username
+     *
+     * @var string
+     */
+    protected $username = "";
+
+    /**
+     * Authentication password
+     *
+     * @var string
+     */
+    protected $password = "";
+
+    /**
+     * Socket path or pipe
+     *
+     * @var string
+     */
+    protected $socket = "";
+
+    /**
+     * Database name
+     *
+     * @var string
+     */
+    protected $database = "data";
+
     /**
      * @var \mysqli
      */
@@ -28,12 +71,10 @@ class Mysqli implements RelationalDriverInterface
     protected function connect()
     {
         if (!$this->connection || !@mysqli_ping($this->connection)) {
-            $this->connection = mysqli_connect();
+            $this->connection = mysqli_connect($this->host, $this->username, $this->password, $this->database, $this->port, $this->socket);
             if (!$this->connection) {
                 throw new Exception("Could not connect to Mysqli database. Error: " . mysqli_error($this->connection));
             }
-
-            mysqli_select_db($this->connection, "data");
         }
     }
 
