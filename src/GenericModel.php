@@ -5,18 +5,17 @@ namespace Aternos\Model;
 use Aternos\Model\Driver\DriverFactory;
 
 /**
- * Class Model
+ * Class GenericModel
+ *
+ * Generic model using all drivers optionally, enable/disable them by
+ * overwriting the protected static properties. Good start for small to
+ * medium complexity.
  *
  * @author Matthias Neid
  * @package Aternos\Model
  */
 abstract class GenericModel extends BaseModel
 {
-    /**
-     * @var string
-     */
-    protected $id;
-
     /**
      * Should the model registry be used for this model
      *
@@ -53,13 +52,6 @@ abstract class GenericModel extends BaseModel
     protected static $search = false;
 
     /**
-     * Length of the random generated unique identifier
-     *
-     * @var int
-     */
-    protected static $idLength = 16;
-
-    /**
      * Get the driver factory for the current model
      *
      * @return Driver\DriverFactory
@@ -76,7 +68,7 @@ abstract class GenericModel extends BaseModel
      *
      * @param string $id
      * @param bool $update
-     * @return Model|bool
+     * @return GenericModel|bool
      */
     public static function get(string $id, bool $update = false)
     {
@@ -85,7 +77,7 @@ abstract class GenericModel extends BaseModel
         $factory = self::getDriverFactory();
 
         /**
-         * @var Model $model
+         * @var GenericModel $model
          */
         $model = new $class($id);
 
@@ -139,36 +131,6 @@ abstract class GenericModel extends BaseModel
         }
 
         return false;
-    }
-
-    /**
-     * Model constructor.
-     *
-     * @param null|string $id
-     */
-    public function __construct($id = null)
-    {
-        $this->setId($id);
-    }
-
-    /**
-     * Get the unique identifier of the model
-     *
-     * @return string
-     */
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set the unique identifier
-     *
-     * @param $id
-     */
-    public function setId(string $id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -262,19 +224,12 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
-     * Generate an unique identifier for the model
+     * Return the cache time
+     *
+     * @return int
      */
-    protected function generateId()
+    public function getCacheTime(): int
     {
-        $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $charactersLength = strlen($characters);
-        do {
-            $id = '';
-            for ($i = 0; $i < self::$idLength; $i++) {
-                $id .= $characters[rand(0, $charactersLength - 1)];
-            }
-        } while (self::get($id));
-
-        $this->setId($id);
+        return self::$cache ?: 0;
     }
 }

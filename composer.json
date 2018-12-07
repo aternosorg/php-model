@@ -10,11 +10,18 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">=7.0.0"
+    "php": ">=7.0.0",
+    "ext-xml": "*"
   },
   "autoload": {
     "psr-4": {
       "Aternos\\Model\\": "src/"
     }
+  },
+  "suggest": {
+    "ext-redis": "To use the Redis Cache driver",
+    "ext-cassandra": "To use the Cassandra NoSQL driver",
+    "ext-mysqli": "To use the Mysqli Relational driver",
+    "elasticsearch/elasticsearch": "To use the Elasticsearch Search driver"
   }
 }

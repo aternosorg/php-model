@@ -18,6 +18,13 @@ interface ModelInterface
     public static function getName(): string;
 
     /**
+     * Return the caching time for the model (in seconds)
+     *
+     * @return int
+     */
+    public function getCacheTime(): int;
+
+    /**
      * Get the id of the model
      *
      * @return string
@@ -31,6 +38,13 @@ interface ModelInterface
      * @return void
      */
     public function setId(string $id);
+
+    /**
+     * Get the name of the id field
+     *
+     * @return string
+     */
+    public function getIdField(): string;
 
     /**
      * Get a model by id
