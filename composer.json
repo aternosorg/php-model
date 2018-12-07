@@ -1,6 +1,6 @@
 {
   "name": "aternos/php-model",
-  "description": "PHP Library for simple and complex database models",
+  "description": "PHP library for simple and complex database models",
   "type": "library",
   "authors": [
     {
