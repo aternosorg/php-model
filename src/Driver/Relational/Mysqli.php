@@ -29,7 +29,7 @@ class Mysqli implements RelationalDriverInterface
      *
      * @var string
      */
-    protected $port = "";
+    protected $port = 3306;
 
     /**
      * Authentication username
@@ -87,7 +87,13 @@ class Mysqli implements RelationalDriverInterface
     protected function query(string $query)
     {
         $this->connect();
-        return mysqli_query($this->connection, $query);
+        $result = mysqli_query($this->connection, $query);
+
+        if (mysqli_error($this->connection)) {
+            throw new \Exception("MySQLi Error #" . mysqli_errno($this->connection) . ": " . mysqli_error($this->connection));
+        }
+
+        return $result;
     }
 
     /**
@@ -109,13 +115,17 @@ class Mysqli implements RelationalDriverInterface
             if (is_numeric($value)) {
                 $values[] = $value;
             } else {
-                $values[] = "'" . $value . "'";
+                $values[] = "'" . mysqli_real_escape_string($this->connection, $value) . "'";
             }
         }
 
         $updates = [];
         foreach ($modelValues as $column => $modelValue) {
-            $updates[] = $columns . "=" . $modelValue;
+            if (is_numeric($modelValue)) {
+                $updates[] = $column . "=" . $modelValue;
+            } else {
+                $updates[] = $column . "='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
+            }
         }
 
         $query = "INSERT INTO " . $table . " (" . implode(",", $columns) . ") VALUES (" . implode(",", $values) . ") ON DUPLICATE KEY UPDATE " . implode(",", $updates);
@@ -137,7 +147,7 @@ class Mysqli implements RelationalDriverInterface
 
         $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
         $result = $this->query($query);
-        if (!$result) {
+        if (!$result || mysqli_num_rows($result) === 0) {
             return false;
         }
 

@@ -29,7 +29,7 @@ interface ModelInterface
      *
      * @return string
      */
-    public function getId(): string;
+    public function getId();
 
     /**
      * Set the id of the model
@@ -37,7 +37,7 @@ interface ModelInterface
      * @param string $id
      * @return void
      */
-    public function setId(string $id);
+    public function setId($id);
 
     /**
      * Get the name of the id field
