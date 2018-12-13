@@ -1,7 +1,7 @@
 # PHP Model
-PHP library for simple and complex database models
+*PHP library for simple and complex database models.*
 
-## About
+### About
 This library was created to provide a flexible, but yet easy to use Model system, 
 which can be used for new projects but also integrated into existing projects.
 Every part of the library can be overwritten and replaced separately for custom logic.
@@ -9,7 +9,7 @@ Every part of the library can be overwritten and replaced separately for custom 
 **Note: This library is still in development and some features especially regarding more
 driver functions will be added in the future.** 
 
-## Installation
+### Installation
 ```
 composer require aternos/model
 ```
@@ -32,6 +32,7 @@ password, but for most use cases you have to use different credentials. To
 do that with the included drivers, you have to create a new driver class
 extending the library driver and overwrite the protected credential properties 
 (either in the class itself or in the constructor), e.g.:
+
 ```php
 <?php
 
@@ -51,6 +52,7 @@ class Mysqli extends \Aternos\Model\Driver\Relational\Mysqli
 
 After that you have to register the class in the [DriverFactory](src/Driver/DriverFactory.php) 
 (or create your own DriverFactory overwriting the $drivers property):
+
 ```php
 <?php
 
@@ -66,8 +68,8 @@ easier:
 * [SimpleModel](src/SimpleModel.php) - Minimal implementation for the NoSQL driver, mainly for demonstration purposes
 * [GenericModel](src/GenericModel.php) - Optional implementation of all drivers and registry, by default only the relational driver is enabled
 
-It's recommended to start with the [GenericModel](src/GenericModel.php) since it's already implements
-all drivers and you can enable whatever you need (e.g. caching, searching) for every model or for
+It's recommended to start with the [GenericModel](src/GenericModel.php) since it already implements
+all drivers and you can enable whatever you need (e.g. caching, searching) for each model or for
 all models (by using your own parent model for all your models).
 
 This is an example implementation of a Model using the [GenericModel](src/GenericModel.php) with a NoSQL database
@@ -76,7 +78,8 @@ as backend and caching:
 ```php
 <?php
 
-class User extends \Aternos\Model\GenericModel {
+class User extends \Aternos\Model\GenericModel 
+{
     // configure the generic model drivers
     // enable nosql driver
     protected static $nosql = true; 
