@@ -106,6 +106,33 @@ class User extends \Aternos\Model\GenericModel
 If you want to implement your own driver logic in your model take a look at the [SimpleModel](src/SimpleModel.php), 
 which should give you a good idea of the minimal requirements.
 
+### Use your model
+You can now use your model in your code:
+
+```php
+<?php
+
+// create new user
+$user = new User();
+$user->username = "username";
+$user->email = "mail@example.org";
+$user->save();
+
+// get a user by id
+$user = User::get($id);
+echo $user->username;
+
+// you can force to skip the registry and the cache
+$user = User::get($id, true);
+
+// update a user
+$user->email = "othermail@example.org";
+$user->save();
+
+// delete a user
+$user->delete();
+```
+
 ## Advanced usage
 *More information about more advanced usage, such as writing your own drivers, driver factory or models
 will be added in the future, in the meantime just take a look at the source code.*
