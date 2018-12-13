@@ -79,7 +79,7 @@ class Cassandra implements NoSQLDriverInterface
                 $builder->withCredentials($this->user, $this->password);
             }
 
-            $cluster = \Cassandra::cluster()->build();
+            $cluster = $builder->build();
             $this->connection = $cluster->connect($this->keyspace);
         }
     }
