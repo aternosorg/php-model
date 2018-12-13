@@ -27,7 +27,7 @@ Currently included drivers are:
 * [Relational\Mysqli](src/Driver/Relational/Mysqli.php)
 * [Search\Elasticsearch](src/Driver/Search/Elasticsearch.php)
 
-*All of these drivers require additional extensions or packages, see "suggest" in [composer.json](composer.json)*
+*All of these drivers require additional extensions or packages, see "suggest" in [composer.json](composer.json).*
 
 Most drivers will work out of the box with a local database set up without
 password, but for most use cases you have to use different credentials. To
@@ -74,7 +74,7 @@ It's recommended to start with the [GenericModel](src/GenericModel.php) since it
 all drivers and you can enable whatever you need (e.g. caching, searching) for each model or for
 all models (by using your own parent model for all your models).
 
-This is an example implementation of a Model using the [GenericModel](src/GenericModel.php) with a NoSQL database
+This is an example implementation of a model using the [GenericModel](src/GenericModel.php) with a NoSQL database
 as backend and caching:
 
 ```php
