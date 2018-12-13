@@ -35,6 +35,8 @@ extending the library driver and overwrite the protected credential properties
 ```php
 <?php
 
+namespace MyModel;
+
 class Mysqli extends \Aternos\Model\Driver\Relational\Mysqli 
 {
     protected $user = 'username';
@@ -52,7 +54,7 @@ After that you have to register the class in the [DriverFactory](src/Driver/Driv
 ```php
 <?php
 
-\Aternos\Model\Driver\DriverFactory::getInstance()->registerDriver('relational', '\\Mysqli');
+\Aternos\Model\Driver\DriverFactory::getInstance()->registerDriver('Relational', '\\MyModel\\Mysqli');
 ```
 
 ### Model
