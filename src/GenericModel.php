@@ -11,7 +11,6 @@ use Aternos\Model\Driver\DriverFactory;
  * overwriting the protected static properties. Good start for small to
  * medium complexity.
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 abstract class GenericModel extends BaseModel

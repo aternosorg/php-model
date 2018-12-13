@@ -9,7 +9,6 @@ namespace Aternos\Model;
  * changed fields, use this to build models with custom driver
  * logic, but without writing everything from scratch
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 abstract class BaseModel implements ModelInterface

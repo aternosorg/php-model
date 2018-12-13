@@ -12,7 +12,6 @@ use Aternos\Model\ModelInterface;
  * and register the new class in the driver factory
  * for other credentials or connect specifics
  *
- * @author Matthias Neid
  * @package Aternos\Model\Driver
  */
 class Mysqli implements RelationalDriverInterface

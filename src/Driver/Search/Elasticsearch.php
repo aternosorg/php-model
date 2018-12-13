@@ -11,7 +11,6 @@ use Aternos\Model\ModelInterface;
  * and register the new class in the driver factory
  * for other credentials or connect specifics
  *
- * @author Matthias Neid
  * @package Aternos\Model\Driver\Search
  */
 class Elasticsearch implements SearchDriverInterface

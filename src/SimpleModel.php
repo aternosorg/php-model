@@ -10,7 +10,6 @@ use Aternos\Model\Driver\DriverFactory;
  * Very basic model implementing only the nosql driver (not even registry).
  * Can be used for simple tasks, but is more of a demonstration.
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 abstract class SimpleModel extends BaseModel
