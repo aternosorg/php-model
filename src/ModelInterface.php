@@ -5,7 +5,6 @@ namespace Aternos\Model;
 /**
  * Interface ModelInterface
  *
- * @author Matthias Neid
  * @package Aternos\Model\Driver
  */
 interface ModelInterface

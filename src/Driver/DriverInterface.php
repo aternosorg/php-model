@@ -7,7 +7,6 @@ use \Aternos\Model\ModelInterface;
 /**
  * Interface DriverInterface
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 interface DriverInterface

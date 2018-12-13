@@ -10,7 +10,6 @@ use Aternos\Model\Driver\Search\SearchDriverInterface;
 /**
  * Class DriverFactory
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 class DriverFactory implements DriverFactoryInterface

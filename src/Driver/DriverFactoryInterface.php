@@ -5,7 +5,6 @@ namespace Aternos\Model\Driver;
 /**
  * Interface DriverFactoryInterface
  *
- * @author Matthias Neid
  * @package Aternos\Model\Driver
  */
 interface DriverFactoryInterface

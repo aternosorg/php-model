@@ -5,7 +5,6 @@ namespace Aternos\Model;
 /**
  * Class ModelRegistry
  *
- * @author Matthias Neid
  * @package Aternos\Model
  */
 class ModelRegistry
