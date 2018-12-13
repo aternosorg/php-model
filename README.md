@@ -27,6 +27,8 @@ Currently included drivers are:
 * [Relational\Mysqli](src/Driver/Relational/Mysqli.php)
 * [Search\Elasticsearch](src/Driver/Search/Elasticsearch.php)
 
+*All of these drivers require additional extensions or packages, see "suggest" in [composer.json](composer.json)*
+
 Most drivers will work out of the box with a local database set up without
 password, but for most use cases you have to use different credentials. To
 do that with the included drivers, you have to create a new driver class
