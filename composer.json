@@ -2,6 +2,7 @@
   "name": "aternos/php-model",
   "description": "PHP library for simple and complex database models",
   "type": "library",
+  "license": "MIT",
   "authors": [
     {
       "name": "Matthias Neid",
