@@ -6,6 +6,11 @@ This library was created to provide a flexible, but yet easy to use Model system
 which can be used for new projects but also integrated into existing projects.
 Every part of the library can be overwritten and replaced separately for custom logic.
 
+In contrary to other model libraries, this library is not tied to any specific database
+backend, instead every model can contain custom logic for accessing different databases, 
+e.g. for a different cache or search backend. Therefore this library does not provide
+any provisioning functionality.
+
 **Note: This library is still in development and some features especially regarding more
 driver functions will be added in the future.** 
 
