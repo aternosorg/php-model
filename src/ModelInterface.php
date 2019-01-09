@@ -2,6 +2,9 @@
 
 namespace Aternos\Model;
 
+use Aternos\Model\Query\Query;
+use Aternos\Model\Query\QueryResult;
+
 /**
  * Interface ModelInterface
  *
@@ -53,6 +56,14 @@ interface ModelInterface
      * @return ModelInterface|bool
      */
     public static function get(string $id, bool $update = false);
+
+    /**
+     * Query a model
+     *
+     * @param Query $query
+     * @return mixed
+     */
+    public static function query(Query $query): QueryResult;
 
     /**
      * Save a model

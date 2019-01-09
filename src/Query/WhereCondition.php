@@ -5,7 +5,6 @@ namespace Aternos\Model\Query;
 /**
  * Class WhereCondition
  *
- * @author Matthias Neid
  * @package Aternos\Model\Query
  */
 class WhereCondition
@@ -22,7 +21,7 @@ class WhereCondition
      *
      * @var string
      */
-    public $operator;
+    public $operator = "=";
 
     /**
      * Field value
