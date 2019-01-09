@@ -3,6 +3,9 @@
 namespace Aternos\Model;
 
 use Aternos\Model\Driver\DriverFactory;
+use Aternos\Model\Driver\QueryableDriverInterface;
+use Aternos\Model\Query\Query;
+use Aternos\Model\Query\QueryResult;
 
 /**
  * Class GenericModel
@@ -130,6 +133,29 @@ abstract class GenericModel extends BaseModel
         }
 
         return false;
+    }
+
+    /**
+     * Query the model
+     *
+     * @param Query $query
+     * @return QueryResult
+     */
+    public static function query(Query $query): QueryResult
+    {
+        $class = get_called_class();
+        $factory = self::getDriverFactory();
+
+        $query->modelClassName = $class;
+
+        /** @var QueryableDriverInterface $driver */
+        $driver = $factory->assembleRelationalDriver();
+
+        if ($class::$relational) {
+            return $driver->query($query);
+        } else {
+            throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
+        }
     }
 
     /**

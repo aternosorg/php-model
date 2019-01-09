@@ -2,7 +2,14 @@
 
 namespace Aternos\Model\Driver\Relational;
 
+use Aternos\Model\Driver\QueryableDriverInterface;
 use Aternos\Model\ModelInterface;
+use Aternos\Model\Query\OrderField;
+use Aternos\Model\Query\Query;
+use Aternos\Model\Query\QueryResult;
+use Aternos\Model\Query\SelectQuery;
+use Aternos\Model\Query\WhereCondition;
+use Aternos\Model\Query\WhereGroup;
 
 /**
  * Class Mysqli
@@ -14,7 +21,7 @@ use Aternos\Model\ModelInterface;
  *
  * @package Aternos\Model\Driver
  */
-class Mysqli implements RelationalDriverInterface
+class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
 {
     /**
      * Host address
@@ -83,7 +90,7 @@ class Mysqli implements RelationalDriverInterface
      * @return bool|\mysqli_result
      * @throws \Exception
      */
-    protected function query(string $query)
+    protected function rawQuery(string $query)
     {
         $this->connect();
         $result = mysqli_query($this->connection, $query);
@@ -128,7 +135,7 @@ class Mysqli implements RelationalDriverInterface
         }
 
         $query = "INSERT INTO " . $table . " (" . implode(",", $columns) . ") VALUES (" . implode(",", $values) . ") ON DUPLICATE KEY UPDATE " . implode(",", $updates);
-        $this->query($query);
+        $this->rawQuery($query);
 
         return true;
     }
@@ -145,7 +152,7 @@ class Mysqli implements RelationalDriverInterface
         $table = $model::getName();
 
         $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
-        $result = $this->query($query);
+        $result = $this->rawQuery($query);
         if (!$result || mysqli_num_rows($result) === 0) {
             return false;
         }
@@ -170,8 +177,125 @@ class Mysqli implements RelationalDriverInterface
         $table = $model::getName();
 
         $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
-        $this->query($query);
+        $this->rawQuery($query);
 
         return true;
+    }
+
+    /**
+     * Execute a SELECT, UPDATE or DELETE query
+     *
+     * @param Query $query
+     * @return QueryResult
+     * @throws \Exception
+     */
+    public function query(Query $query): QueryResult
+    {
+        $queryString = "";
+        if ($query instanceof SelectQuery) {
+            $queryString .= "SELECT ";
+            if ($fields = $query->getFields()) {
+                $queryString .= implode(", ", $fields);
+            } else {
+                $queryString .= "*";
+            }
+
+            $queryString .= " FROM " . $query->modelClassName::getName();
+        }
+
+        if ($where = $query->getWhere()) {
+            $queryString .= " WHERE " . $this->generateWhere($where);
+        }
+
+        if ($orderFields = $query->getOrder()) {
+            $queryString .= " " . $this->generateOrder($orderFields);
+        }
+
+        if ($limit = $query->getLimit()) {
+            $queryString .= " LIMIT " . $limit->start . ", " . $limit->length;
+        }
+
+        $rawQueryResult = $this->rawQuery($queryString);
+
+        $result = new QueryResult((bool)$rawQueryResult);
+        while ($row = mysqli_fetch_assoc($rawQueryResult)) {
+            /** @var ModelInterface $model */
+            $model = new $query->modelClassName();
+            foreach ($row as $key => $value) {
+                $model->{$key} = $value;
+            }
+            $result->add($model);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate query from where conditions and groups
+     *
+     * @param WhereGroup|WhereCondition $where
+     * @return string
+     */
+    private function generateWhere($where)
+    {
+        if ($where instanceof WhereCondition) {
+            $value = mysqli_real_escape_string($this->connection, $where->value);
+
+            if (!is_numeric($value)) {
+                $value = "'" . $value . "'";
+            }
+
+            return "`" . $where->field . "` " . $where->operator . " " . $value;
+        } elseif ($where instanceof WhereGroup) {
+            switch ($where->conjunction) {
+                case WhereGroup:: AND:
+                    $conjunction = " AND ";
+                    break;
+                case WhereGroup:: OR:
+                    $conjunction = " OR ";
+                    break;
+                default:
+                    throw new \UnexpectedValueException("Invalid conjunction: " . $where->conjunction);
+            }
+
+            $whereStrings = [];
+            foreach ($where as $wherePart) {
+                $whereStrings[] = $this->generateWhere($wherePart);
+            }
+
+            return "(" . implode($conjunction, $whereStrings) . ")";
+        }
+    }
+
+    /**
+     * Generate query from order field definitions
+     *
+     * @param array $orderFields
+     * @return string
+     */
+    private function generateOrder($orderFields)
+    {
+        $return = "ORDER BY";
+
+        $formattedOrderFields = [];
+        foreach ($orderFields as $orderField) {
+            /** @var OrderField $orderField */
+            switch ($orderField->direction) {
+                case OrderField::ASCENDING:
+                    $direction = "ASC";
+                    break;
+                case OrderField::DESCENDING:
+                    $direction = "DESC";
+                    break;
+                default:
+                    throw new \UnexpectedValueException("Invalid direction: " . $orderField->direction);
+            }
+
+            $formattedOrderFields[] = "`" . $orderField->field . "` " . $direction;
+        }
+
+        $return .= " " . implode(", ", $formattedOrderFields);
+
+        return $return;
     }
 }
