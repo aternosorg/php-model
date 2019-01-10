@@ -130,9 +130,9 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
         $updates = [];
         foreach ($modelValues as $column => $modelValue) {
             if (is_numeric($modelValue)) {
-                $updates[] = $column . "=" . $modelValue;
+                $updates[] = "`" . $column . "`=" . $modelValue;
             } else {
-                $updates[] = $column . "='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
+                $updates[] = "`" . $column . "`='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
             }
         }
 
