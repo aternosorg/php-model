@@ -162,6 +162,8 @@ abstract class GenericModel extends BaseModel
                     }
                 }
             }
+
+            return $result;
         } else {
             throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
         }
