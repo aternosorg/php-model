@@ -46,6 +46,16 @@ class QueryResult implements \Iterator, \Countable
     }
 
     /**
+     * Check if the query was successful
+     *
+     * @return bool
+     */
+    public function wasSuccessful(): bool
+    {
+        return (bool) $this->success;
+    }
+
+    /**
      * Add a model to the result set
      *
      * @param ModelInterface $model

@@ -195,12 +195,12 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
         if ($query instanceof SelectQuery) {
             $queryString .= "SELECT ";
             if ($fields = $query->getFields()) {
-                $queryString .= implode(", ", $fields);
+                $queryString .= "`" . implode("`, `", $fields) . "`";
             } else {
                 $queryString .= "*";
             }
 
-            $queryString .= " FROM " . $query->modelClassName::getName();
+            $queryString .= " FROM `" . $query->modelClassName::getName() . "`";
         }
 
         if ($where = $query->getWhere()) {
