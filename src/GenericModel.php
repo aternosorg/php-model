@@ -152,7 +152,16 @@ abstract class GenericModel extends BaseModel
         $driver = $factory->assembleRelationalDriver();
 
         if ($class::$relational) {
-            return $driver->query($query);
+            /** @var QueryResult $result */
+            $result = $driver->query($query);
+
+            if ($class::$registry) {
+                if ($result->wasSuccessful() && count($result) > 0) {
+                    foreach ($result as $model) {
+                        ModelRegistry::getInstance()->save($model);
+                    }
+                }
+            }
         } else {
             throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
         }
