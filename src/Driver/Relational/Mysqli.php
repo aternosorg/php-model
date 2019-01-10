@@ -111,6 +111,8 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
      */
     public function save(ModelInterface $model): bool
     {
+        $this->connect();
+
         $table = $model::getName();
 
         $modelValues = get_object_vars($model);
@@ -191,6 +193,8 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
      */
     public function query(Query $query): QueryResult
     {
+        $this->connect();
+
         $queryString = "";
         if ($query instanceof SelectQuery) {
             $queryString .= "SELECT ";
