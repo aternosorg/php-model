@@ -10,7 +10,7 @@ use Aternos\Model\ModelInterface;
  * @author Matthias Neid
  * @package Aternos\Model\Query
  */
-class QueryResult implements \Iterator, \Countable
+class QueryResult implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * Success state of the query
@@ -52,7 +52,7 @@ class QueryResult implements \Iterator, \Countable
      */
     public function wasSuccessful(): bool
     {
-        return (bool) $this->success;
+        return (bool)$this->success;
     }
 
     /**
@@ -123,5 +123,48 @@ class QueryResult implements \Iterator, \Countable
     public function count()
     {
         return count($this->result);
+    }
+
+    /**
+     * Whether a offset exists
+     *
+     * @param mixed $offset
+     * @return bool
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->result[$offset]);
+    }
+
+    /**
+     * Offset to retrieve
+     *
+     * @param mixed $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->result[$offset];
+    }
+
+    /**
+     * Offset to set
+     *
+     * @param $offset
+     * @param $value
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->result[$offset] = $value;
+    }
+
+    /**
+     * Offset to unset
+     *
+     * @param $offset
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->result[$offset]);
     }
 }
