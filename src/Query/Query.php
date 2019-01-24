@@ -12,22 +12,22 @@ abstract class Query
     /**
      * @var WhereGroup
      */
-    private $where;
+    protected $where;
 
     /**
      * @var array
      */
-    private $order;
+    protected $order;
 
     /**
      * @var array
      */
-    private $fields;
+    protected $fields;
 
     /**
      * @var Limit
      */
-    private $limit;
+    protected $limit;
 
     /**
      * @var string
@@ -44,8 +44,9 @@ abstract class Query
      * MIXED:    ['field' => 'value', ['anotherField', '>', 'anotherValue']]
      *
      * @param array|WhereCondition|WhereGroup $where
+     * @return Query
      */
-    public function setWhere($where)
+    public function where($where)
     {
         if (is_array($where)) {
             $group = new WhereGroup();
@@ -68,6 +69,8 @@ abstract class Query
         } else if ($where instanceof WhereGroup) {
             $this->where = $where;
         }
+
+        return $this;
     }
 
     /**
@@ -91,9 +94,10 @@ abstract class Query
      *
      * ['field' => 'ASC', 'anotherField' => 'DESC', 'usingConstantsField' => OrderField::ASCENDING]
      *
-     * @param $order
+     * @param array $order
+     * @return Query
      */
-    public function setOrder($order)
+    public function orderBy($order)
     {
         if (!is_array($order)) {
             throw new \InvalidArgumentException('Argument $order is not an array.');
@@ -123,6 +127,8 @@ abstract class Query
 
             $this->order[] = new OrderField($key, $value);
         }
+
+        return $this;
     }
 
     /**
@@ -145,14 +151,17 @@ abstract class Query
      * ['field', 'anotherField']
      *
      * @param $fields
+     * @return Query
      */
-    public function setFields($fields)
+    public function fields($fields)
     {
         if (!is_array($fields)) {
             throw new \InvalidArgumentException('Argument $fields is not an array.');
         }
 
         $this->fields = $fields;
+
+        return $this;
     }
 
     /**
@@ -178,8 +187,9 @@ abstract class Query
      * Array sets both [start, length] (e.g. [5, 10])
      *
      * @param int|array|Limit $limit
+     * @return Query
      */
-    public function setLimit($limit)
+    public function limit($limit)
     {
         if (is_int($limit)) {
             $this->limit = new Limit($limit);
@@ -190,6 +200,8 @@ abstract class Query
         } else {
             throw new \InvalidArgumentException('Argument $limit has an invalid type.');
         }
+
+        return $this;
     }
 
     /**
@@ -199,7 +211,7 @@ abstract class Query
      */
     public function getLimit()
     {
-        if($this->limit) {
+        if ($this->limit) {
             return $this->limit;
         }
 
