@@ -3,8 +3,12 @@
 namespace Aternos\Model\Driver;
 
 use Aternos\Model\Driver\Cache\CacheDriverInterface;
+use Aternos\Model\Driver\Cache\Redis;
+use Aternos\Model\Driver\NoSQL\Cassandra;
 use Aternos\Model\Driver\NoSQL\NoSQLDriverInterface;
+use Aternos\Model\Driver\Relational\Mysqli;
 use Aternos\Model\Driver\Relational\RelationalDriverInterface;
+use Aternos\Model\Driver\Search\Elasticsearch;
 use Aternos\Model\Driver\Search\SearchDriverInterface;
 
 /**
@@ -20,10 +24,10 @@ class DriverFactory implements DriverFactoryInterface
      * @var array
      */
     protected $drivers = [
-        "Cache" => "\\Aternos\\Model\\Driver\\Cache\\Redis",
-        "NoSQL" => "\\Aternos\\Model\\Driver\\NoSQL\\Cassandra",
-        "Relational" => "\\Aternos\\Model\\Driver\\Relational\\Mysqli",
-        "Search" => "\\Aternos\\Model\\Driver\\Search\\Elasticsearch"
+        CacheDriverInterface::class => Redis::class,
+        NoSQLDriverInterface::class => Cassandra::class,
+        RelationalDriverInterface::class => Mysqli::class,
+        SearchDriverInterface::class => Elasticsearch::class
     ];
 
     /**
@@ -70,7 +74,7 @@ class DriverFactory implements DriverFactoryInterface
         /**
          * @var CacheDriverInterface $cacheDriver
          */
-        $cacheDriver = $this->assembleDriver("Cache");
+        $cacheDriver = $this->assembleDriver(CacheDriverInterface::class);
 
         return $cacheDriver;
     }
@@ -85,7 +89,7 @@ class DriverFactory implements DriverFactoryInterface
         /**
          * @var NoSQLDriverInterface $nosqlDriver
          */
-        $nosqlDriver = $this->assembleDriver("NoSQL");
+        $nosqlDriver = $this->assembleDriver(NoSQLDriverInterface::class);
 
         return $nosqlDriver;
     }
@@ -100,7 +104,7 @@ class DriverFactory implements DriverFactoryInterface
         /**
          * @var RelationalDriverInterface $relationalDriver
          */
-        $relationalDriver = $this->assembleDriver("Relational");
+        $relationalDriver = $this->assembleDriver(RelationalDriverInterface::class);
 
         return $relationalDriver;
     }
@@ -115,7 +119,7 @@ class DriverFactory implements DriverFactoryInterface
         /**
          * @var SearchDriverInterface $searchDriver
          */
-        $searchDriver = $this->assembleDriver("Search");
+        $searchDriver = $this->assembleDriver(SearchDriverInterface::class);
 
         return $searchDriver;
     }
