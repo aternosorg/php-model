@@ -4,8 +4,12 @@ namespace Aternos\Model;
 
 use Aternos\Model\Driver\DriverFactory;
 use Aternos\Model\Driver\QueryableDriverInterface;
+use Aternos\Model\Query\Limit;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
+use Aternos\Model\Query\SelectQuery;
+use Aternos\Model\Query\WhereCondition;
+use Aternos\Model\Query\WhereGroup;
 
 /**
  * Class GenericModel
@@ -167,6 +171,24 @@ abstract class GenericModel extends BaseModel
         } else {
             throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
         }
+    }
+
+    /**
+     * Shorter or more readable way to write a select query
+     *
+     * GenericModel::select("a"=>"b");
+     *   which is the same as
+     * GenericModel::query((new SelectQuery())->where("a"=>"b"));
+     *
+     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|null $order
+     * @param array|null $fields
+     * @param array|null|int|Limit $limit
+     * @return QueryResult
+     */
+    public static function select($where = null, $order = null, $fields = null, $limit = null): QueryResult
+    {
+        return self::query(new SelectQuery($where, $order, $fields, $limit));
     }
 
     /**

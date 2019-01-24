@@ -20,19 +20,19 @@ class SelectQuery extends Query
     public function __construct($where = null, $order = null, $fields = null, $limit = null)
     {
         if ($where) {
-            $this->setWhere($where);
+            $this->where($where);
         }
 
         if ($order) {
-            $this->setOrder($order);
+            $this->orderBy($order);
         }
 
         if ($fields) {
-            $this->setFields($fields);
+            $this->fields($fields);
         }
 
         if ($limit) {
-            $this->setLimit($limit);
+            $this->limit($limit);
         }
     }
 }
