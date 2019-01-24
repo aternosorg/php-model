@@ -63,7 +63,10 @@ After that you have to register the class in the [DriverFactory](src/Driver/Driv
 ```php
 <?php
 
-\Aternos\Model\Driver\DriverFactory::getInstance()->registerDriver('Relational', '\\MyModel\\Mysqli');
+\Aternos\Model\Driver\DriverFactory::getInstance()->registerDriver(
+    \Aternos\Model\Driver\Relational\RelationalDriverInterface::class, 
+    \MyModel\Mysqli::class
+);
 ```
 
 ### Model
@@ -138,6 +141,76 @@ $user->save();
 
 // delete a user
 $user->delete();
+```
+
+### Query
+You can query the model using a [Query](src/Query/Query.php) object, e.g. [SelectQuery](src/Query/SelectQuery.php).
+It allows different syntax possibilities such as simple array/string/int values directly passed to the constructor or
+building all parameters as objects based on the [Query/...](src/Query) classes. All queries return a [QueryResult](src/Query/QueryResult.php)
+object, which is iterable and countable.
+
+```php
+<?php
+
+// the following lines are all the same
+User::select(["email" => "mail@example.org"]); // ::select() is only a helper function of GenericModel
+User::query(new \Aternos\Model\Query\SelectQuery(["email" => "mail@example.org"]));
+User::query((new \Aternos\Model\Query\SelectQuery())->where(["email" => "mail@example.org"]));
+User::query(new \Aternos\Model\Query\SelectQuery(
+    new \Aternos\Model\Query\WhereCondition("email", "mail@example.org")
+));
+User::query(new \Aternos\Model\Query\SelectQuery(
+    new \Aternos\Model\Query\WhereGroup([
+        new \Aternos\Model\Query\WhereCondition("email", "mail@example.org")
+    ])
+));
+
+// use the result
+$userQueryResult = User::select(["email" => "mail@example.org"]);
+
+if (!$userQueryResult->wasSuccessful()) {
+    echo "Query failed";
+}
+
+echo "Found " . count($userQueryResult) . " users";
+
+foreach($userQueryResult as $user) {
+    /** @var User $user */
+    echo $user->username;
+}
+
+// another query example
+User::select(
+    ["field" => "value", "hello" => "world", "foo" => "bar"],
+    ["field" => "ASC", "hello" => "DESC", "foo" => "ASC"],
+    ["field", "hello", "foo"],
+    [100, 10]
+);
+// can also be written as
+User::query((new \Aternos\Model\Query\SelectQuery)
+    ->where(["field" => "value", "hello" => "world", "foo" => "bar"])
+    ->orderBy(["field" => "ASC", "hello" => "DESC", "foo" => "ASC"])
+    ->fields(["field", "hello", "foo"])
+    ->limit([100, 10])
+); 
+
+// a more complex query with nested where groups using the query parameter classes
+User::query(new \Aternos\Model\Query\SelectQuery(
+    new \Aternos\Model\Query\WhereGroup([
+        new \Aternos\Model\Query\WhereCondition("field", "value", "<>"),
+        new \Aternos\Model\Query\WhereGroup([
+            new \Aternos\Model\Query\WhereCondition("hello", "world"),
+            new \Aternos\Model\Query\WhereCondition("foo", "bar")
+        ], \Aternos\Model\Query\WhereGroup:: OR)
+    ]),
+    [
+        new \Aternos\Model\Query\OrderField("field", \Aternos\Model\Query\OrderField::DESCENDING),
+        new \Aternos\Model\Query\OrderField("hello", \Aternos\Model\Query\OrderField::ASCENDING),
+        new \Aternos\Model\Query\OrderField("foo", \Aternos\Model\Query\OrderField::DESCENDING)
+    ],
+    ["field", "hello", "foo"],
+    new \Aternos\Model\Query\Limit(10, 100)
+));
 ```
 
 ## Advanced usage
