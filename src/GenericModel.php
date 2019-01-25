@@ -74,22 +74,21 @@ abstract class GenericModel extends BaseModel
      *
      * @param string $id
      * @param bool $update
-     * @return GenericModel|bool
+     * @return static|bool
      */
     public static function get(string $id, bool $update = false)
     {
-        $class = get_called_class();
         $registry = ModelRegistry::getInstance();
-        $factory = self::getDriverFactory();
+        $factory = static::getDriverFactory();
 
         /**
-         * @var GenericModel $model
+         * @var static $model
          */
-        $model = new $class($id);
+        $model = new static($id);
 
         // try to get the model from the registry
-        if ($class::$registry) {
-            if ($registryModel = $registry->get($class::getName(), $id)) {
+        if (static::$registry) {
+            if ($registryModel = $registry->get(static::getName(), $id)) {
                 $model = $registryModel;
                 if (!$update) {
                     return $model;
@@ -98,8 +97,8 @@ abstract class GenericModel extends BaseModel
         }
 
         // try to get the model from cache
-        if ($class::$cache && !$update && $factory->assembleCacheDriver()->get($model)) {
-            if ($class::$registry) {
+        if (static::$cache && !$update && $factory->assembleCacheDriver()->get($model)) {
+            if (static::$registry) {
                 $registry->save($model);
             }
 
@@ -107,12 +106,12 @@ abstract class GenericModel extends BaseModel
         }
 
         // try to get the model from nosql database
-        if ($class::$nosql && $factory->assembleNoSQLDriver()->get($model)) {
-            if ($class::$registry) {
+        if (static::$nosql && $factory->assembleNoSQLDriver()->get($model)) {
+            if (static::$registry) {
                 $registry->save($model);
             }
 
-            if ($class::$cache) {
+            if (static::$cache) {
                 $factory->assembleCacheDriver()->save($model);
             }
 
@@ -120,16 +119,16 @@ abstract class GenericModel extends BaseModel
         }
 
         // try to get the model from relational database
-        if ($class::$relational && $factory->assembleRelationalDriver()->get($model)) {
-            if ($class::$registry) {
+        if (static::$relational && $factory->assembleRelationalDriver()->get($model)) {
+            if (static::$registry) {
                 $registry->save($model);
             }
 
-            if ($class::$cache) {
+            if (static::$cache) {
                 $factory->assembleCacheDriver()->save($model);
             }
 
-            if ($class::$nosql) {
+            if (static::$nosql) {
                 $factory->assembleNoSQLDriver()->save($model);
             }
 
@@ -147,19 +146,18 @@ abstract class GenericModel extends BaseModel
      */
     public static function query(Query $query): QueryResult
     {
-        $class = get_called_class();
-        $factory = self::getDriverFactory();
+        $factory = static::getDriverFactory();
 
-        $query->modelClassName = $class;
+        $query->modelClassName = static::class;
 
         /** @var QueryableDriverInterface $driver */
         $driver = $factory->assembleRelationalDriver();
 
-        if ($class::$relational) {
+        if (static::$relational) {
             /** @var QueryResult $result */
             $result = $driver->query($query);
 
-            if ($class::$registry) {
+            if (static::$registry) {
                 if ($result->wasSuccessful() && count($result) > 0) {
                     foreach ($result as $model) {
                         ModelRegistry::getInstance()->save($model);
@@ -188,7 +186,7 @@ abstract class GenericModel extends BaseModel
      */
     public static function select($where = null, $order = null, $fields = null, $limit = null): QueryResult
     {
-        return self::query(new SelectQuery($where, $order, $fields, $limit));
+        return static::query(new SelectQuery($where, $order, $fields, $limit));
     }
 
     /**
@@ -198,41 +196,40 @@ abstract class GenericModel extends BaseModel
      */
     public function save(): bool
     {
-        $class = get_called_class();
-        $factory = self::getDriverFactory();
+        $factory = static::getDriverFactory();
 
         // new model, generate id and save in registry
         if (!$this->getId()) {
             $this->generateId();
 
-            if ($class::$registry) {
+            if (static::$registry) {
                 ModelRegistry::getInstance()->save($this);
             }
         }
 
         // save in relational database
-        if ($class::$relational) {
+        if (static::$relational) {
             if (!$factory->assembleRelationalDriver()->save($this)) {
                 return false;
             }
         }
 
         // save in nosql database
-        if ($class::$nosql) {
+        if (static::$nosql) {
             if (!$factory->assembleNoSQLDriver()->save($this)) {
                 return false;
             }
         }
 
         // save in search database
-        if ($class::$search) {
+        if (static::$search) {
             if (!$factory->assembleSearchDriver()->save($this)) {
                 return false;
             }
         }
 
         // save in cache
-        if ($class::$cache) {
+        if (static::$cache) {
             if (!$factory->assembleCacheDriver()->save($this)) {
                 return false;
             }
@@ -248,33 +245,32 @@ abstract class GenericModel extends BaseModel
      */
     public function delete(): bool
     {
-        $class = get_called_class();
-        $factory = self::getDriverFactory();
+        $factory = static::getDriverFactory();
         $success = true;
 
         // delete in relational database
-        if ($class::$relational) {
+        if (static::$relational) {
             if (!$factory->assembleRelationalDriver()->delete($this)) {
                 $success = false;
             }
         }
 
         // delete in nosql database
-        if ($class::$nosql) {
+        if (static::$nosql) {
             if (!$factory->assembleNoSQLDriver()->delete($this)) {
                 $success = false;
             }
         }
 
         // delete in search database
-        if ($class::$search) {
+        if (static::$search) {
             if (!$factory->assembleSearchDriver()->delete($this)) {
                 $success = false;
             }
         }
 
         // delete in cache
-        if ($class::$cache) {
+        if (static::$cache) {
             if (!$factory->assembleCacheDriver()->delete($this)) {
                 $success = false;
             }
@@ -290,7 +286,6 @@ abstract class GenericModel extends BaseModel
      */
     public function getCacheTime(): int
     {
-        $class = get_called_class();
-        return $class::$cache ?: 0;
+        return static::$cache ?: 0;
     }
 }

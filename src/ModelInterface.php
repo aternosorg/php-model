@@ -53,7 +53,7 @@ interface ModelInterface
      *
      * @param string $id
      * @param bool $update
-     * @return ModelInterface|bool
+     * @return static|bool
      */
     public static function get(string $id, bool $update = false);
 
