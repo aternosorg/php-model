@@ -56,7 +56,7 @@ abstract class BaseModel implements ModelInterface
      */
     public function getId()
     {
-        return $this->{self::$idField};
+        return $this->{static::$idField};
     }
 
     /**
@@ -66,7 +66,7 @@ abstract class BaseModel implements ModelInterface
      */
     public function setId($id)
     {
-        $this->{self::$idField} = $id;
+        $this->{static::$idField} = $id;
     }
 
     /**
@@ -76,7 +76,7 @@ abstract class BaseModel implements ModelInterface
      */
     public function getIdField(): string
     {
-        return self::$idField;
+        return static::$idField;
     }
 
     /**
@@ -84,15 +84,14 @@ abstract class BaseModel implements ModelInterface
      */
     protected function generateId()
     {
-        $class = get_called_class();
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $charactersLength = strlen($characters);
         do {
             $id = '';
-            for ($i = 0; $i < $class::$idLength; $i++) {
+            for ($i = 0; $i < static::$idLength; $i++) {
                 $id .= $characters[rand(0, $charactersLength - 1)];
             }
-        } while ($class::get($id));
+        } while (static::get($id));
 
         $this->setId($id);
     }

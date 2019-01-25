@@ -21,7 +21,7 @@ abstract class SimpleModel extends BaseModel
      */
     public static function get(string $id, bool $update = false)
     {
-        $model = new (get_called_class())($id);
+        $model = new static($id);
         if (DriverFactory::getInstance()->assembleNoSQLDriver()->get($model)) {
             return $model;
         }
