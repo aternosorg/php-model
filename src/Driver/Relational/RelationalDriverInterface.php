@@ -2,14 +2,14 @@
 
 namespace Aternos\Model\Driver\Relational;
 
-use Aternos\Model\Driver\DriverInterface;
+use Aternos\Model\Driver\QueryableDriverInterface;
 
 /**
  * Interface RelationalDriverInterface
  *
  * @package Aternos\Model\Driver\Relational
  */
-interface RelationalDriverInterface extends DriverInterface
+interface RelationalDriverInterface extends QueryableDriverInterface
 {
 
 }

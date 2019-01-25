@@ -4,10 +4,13 @@ namespace Aternos\Model\Driver\Relational;
 
 use Aternos\Model\Driver\QueryableDriverInterface;
 use Aternos\Model\ModelInterface;
+use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\Field;
 use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
 use Aternos\Model\Query\SelectQuery;
+use Aternos\Model\Query\UpdateQuery;
 use Aternos\Model\Query\WhereCondition;
 use Aternos\Model\Query\WhereGroup;
 
@@ -21,7 +24,7 @@ use Aternos\Model\Query\WhereGroup;
  *
  * @package Aternos\Model\Driver
  */
-class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
+class Mysqli implements RelationalDriverInterface
 {
     /**
      * Host address
@@ -198,21 +201,27 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
         $queryString = "";
         if ($query instanceof SelectQuery) {
             $queryString .= "SELECT ";
-            if ($fields = $query->getFields()) {
-                $queryString .= "`" . implode("`, `", $fields) . "`";
+
+            if ($query->getFields()) {
+                $queryString .= " " . $this->generateFields($query);
             } else {
-                $queryString .= "*";
+                $queryString .= " *";
             }
 
             $queryString .= " FROM `" . $query->modelClassName::getName() . "`";
+        } else if ($query instanceof UpdateQuery) {
+            $queryString .= "UPDATE `" . $query->modelClassName::getName() . "` SET";
+            $queryString .= $this->generateFields($query);
+        } else if ($query instanceof DeleteQuery) {
+            $queryString .= "DELETE  FROM `" . $query->modelClassName::getName() . "`";
         }
 
-        if ($where = $query->getWhere()) {
-            $queryString .= " WHERE " . $this->generateWhere($where);
+        if ($query->getWhere()) {
+            $queryString .= " WHERE " . $this->generateWhere($query);
         }
 
-        if ($orderFields = $query->getOrder()) {
-            $queryString .= " " . $this->generateOrder($orderFields);
+        if ($query->getOrder()) {
+            $queryString .= " " . $this->generateOrder($query);
         }
 
         if ($limit = $query->getLimit()) {
@@ -237,17 +246,16 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
     /**
      * Generate query from where conditions and groups
      *
-     * @param WhereGroup|WhereCondition $where
+     * @param Query $query
      * @return string
      */
-    private function generateWhere($where)
+    private function generateWhere(Query $query)
     {
+        $where = $query->getWhere();
         if ($where instanceof WhereCondition) {
             $value = mysqli_real_escape_string($this->connection, $where->value);
 
-            if (!is_numeric($value)) {
-                $value = "'" . $value . "'";
-            }
+            $value = $this->generateValue($value);
 
             return "`" . $where->field . "` " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
@@ -274,11 +282,13 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
     /**
      * Generate query from order field definitions
      *
-     * @param array $orderFields
+     * @param Query $query
      * @return string
      */
-    private function generateOrder($orderFields)
+    private function generateOrder(Query $query)
     {
+        $orderFields = $query->getOrder();
+
         $return = "ORDER BY";
 
         $formattedOrderFields = [];
@@ -301,5 +311,47 @@ class Mysqli implements RelationalDriverInterface, QueryableDriverInterface
         $return .= " " . implode(", ", $formattedOrderFields);
 
         return $return;
+    }
+
+    /**
+     * Generate fields for select or update queries
+     *
+     * @param Query $query
+     * @return string
+     */
+    private function generateFields(Query $query)
+    {
+        $fields = $query->getFields();
+
+        $fieldStrings = [];
+        foreach ($fields as $field) {
+            /** @var Field $field */
+            if ($query instanceof SelectQuery) {
+                $fieldStrings[] = "`" . $field->key . "`";
+            } else if ($query instanceof UpdateQuery) {
+                $fieldStrings[] = "`" . $field->key . "`=" . $this->generateValue($field->value);
+            }
+        }
+
+        return implode(", ", $fieldStrings);
+    }
+
+    /**
+     * Generate value for where ore field usage
+     *
+     * @param $value
+     * @return string
+     */
+    private function generateValue($value)
+    {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if (is_null($value)) {
+            return "NULL";
+        }
+
+        return "'" . $value . "'";
     }
 }

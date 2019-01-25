@@ -35,4 +35,22 @@ class SelectQuery extends Query
             $this->limit($limit);
         }
     }
+
+    /**
+     * Set fields
+     *
+     * @param array $fields
+     * @return Query|void
+     */
+    public function fields($fields)
+    {
+        parent::fields($fields);
+
+        foreach ($this->getFields() as $field) {
+            /** @var Field $field */
+            if ($field->value !== null) {
+                throw new \InvalidArgumentException("Fields in select queries must not have any value.");
+            }
+        }
+    }
 }

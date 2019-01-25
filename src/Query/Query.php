@@ -148,15 +148,30 @@ abstract class Query
     /**
      * Set the SELECT fields of the query
      *
-     * ['field', 'anotherField']
+     * Can be either an array of keys, of key value pairs or of Field objects
      *
-     * @param $fields
+     * ['field', 'anotherfield']
+     * ['field' => 'value', 'anotherfield' => 'anothervalue']
+     * [new Field('field'), new Field('anotherfield', 'anothervalue')]
+     *
+     * @param array $fields
      * @return Query
      */
     public function fields($fields)
     {
         if (!is_array($fields)) {
             throw new \InvalidArgumentException('Argument $fields is not an array.');
+        }
+
+        $this->fields = [];
+        foreach ($fields as $key => $field) {
+            if ($field instanceof Field) {
+                $this->fields[] = $field;
+            } else if (is_string($key)) {
+                $this->fields = new Field($key, $field);
+            } else {
+                $this->fields = new Field($field);
+            }
         }
 
         $this->fields = $fields;
