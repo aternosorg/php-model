@@ -10,7 +10,7 @@ use Aternos\Model\Query\QueryResult;
  *
  * @package Aternos\Model\Driver
  */
-interface QueryableDriverInterface
+interface QueryableDriverInterface extends DriverInterface
 {
     /**
      * Execute a SELECT, UPDATE or DELETE query
