@@ -2,14 +2,8 @@
 
 namespace Aternos\Model;
 
-use Aternos\Model\Driver\DriverFactory;
-use Aternos\Model\Driver\QueryableDriverInterface;
-use Aternos\Model\Query\Limit;
-use Aternos\Model\Query\Query;
-use Aternos\Model\Query\QueryResult;
-use Aternos\Model\Query\SelectQuery;
-use Aternos\Model\Query\WhereCondition;
-use Aternos\Model\Query\WhereGroup;
+use Aternos\Model\Driver\{DriverFactory, QueryableDriverInterface};
+use Aternos\Model\Query\{Limit, Query, QueryResult, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
 
 /**
  * Class GenericModel
@@ -151,24 +145,27 @@ abstract class GenericModel extends BaseModel
         $query->modelClassName = static::class;
 
         /** @var QueryableDriverInterface $driver */
-        $driver = $factory->assembleRelationalDriver();
-
-        if (static::$relational) {
-            /** @var QueryResult $result */
-            $result = $driver->query($query);
-
-            if (static::$registry) {
-                if ($result->wasSuccessful() && count($result) > 0) {
-                    foreach ($result as $model) {
-                        ModelRegistry::getInstance()->save($model);
-                    }
-                }
-            }
-
-            return $result;
+        $driver = null;
+        if (static::$nosql) {
+            $driver = $factory->assembleNoSQLDriver();
+        } else if (static::$relational) {
+            $driver = $factory->assembleRelationalDriver();
         } else {
             throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
         }
+
+        /** @var QueryResult $result */
+        $result = $driver->query($query);
+
+        if (static::$registry) {
+            if ($result->wasSuccessful() && count($result) > 0) {
+                foreach ($result as $model) {
+                    ModelRegistry::getInstance()->save($model);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -187,6 +184,20 @@ abstract class GenericModel extends BaseModel
     public static function select($where = null, $order = null, $fields = null, $limit = null): QueryResult
     {
         return static::query(new SelectQuery($where, $order, $fields, $limit));
+    }
+
+    /**
+     * Shorter or more readable way to write an update query
+     *
+     * @param array|null $fields
+     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|null $order
+     * @param array|null|int|Limit $limit
+     * @return QueryResult
+     */
+    public static function update($fields = null, $where = null, $order = null, $limit = null)
+    {
+        return static::query(new UpdateQuery($fields, $where, $order, $limit));
     }
 
     /**

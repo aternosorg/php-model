@@ -3,6 +3,9 @@
 namespace Aternos\Model\Driver\NoSQL;
 
 use Aternos\Model\ModelInterface;
+use Aternos\Model\Query\Generator\SQL;
+use Aternos\Model\Query\Query;
+use Aternos\Model\Query\QueryResult;
 
 /**
  * Class Cassandra
@@ -90,7 +93,7 @@ class Cassandra implements NoSQLDriverInterface
      * @return \Cassandra\Rows
      * @throws \Cassandra\Exception
      */
-    protected function query(string $query)
+    protected function rawQuery(string $query)
     {
         $this->connect();
 
@@ -115,7 +118,7 @@ class Cassandra implements NoSQLDriverInterface
         $data = str_replace("'", "''", $data);
 
         $query = "INSERT INTO " . $table . " JSON '" . $data . "';";
-        $this->query($query);
+        $this->rawQuery($query);
 
         return true;
     }
@@ -132,7 +135,7 @@ class Cassandra implements NoSQLDriverInterface
         $table = $model::getName();
 
         $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
-        $rows = $this->query($query);
+        $rows = $this->rawQuery($query);
         if ($rows->count() === 0) {
             return false;
         }
@@ -157,7 +160,42 @@ class Cassandra implements NoSQLDriverInterface
         $table = $model::getName();
 
         $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
-        $this->query($query);
+        $this->rawQuery($query);
         return true;
+    }
+
+    /**
+     * Execute a SELECT, UPDATE or DELETE query
+     *
+     * @param Query $query
+     * @return QueryResult
+     * @throws \Cassandra\Exception
+     */
+    public function query(Query $query): QueryResult
+    {
+        $this->connect();
+
+        $generator = new SQL(function ($value) {
+            return str_replace("'", "''", $value);
+        });
+
+        $generator->columnEnclosure = "";
+        $generator->tableEnclosure = "";
+
+        $queryString = $generator->generate($query);
+
+        $rawQueryResult = $this->rawQuery($queryString);
+
+        $result = new QueryResult((bool)$rawQueryResult);
+        foreach ($rawQueryResult as $resultRow) {
+            /** @var ModelInterface $model */
+            $model = new ($query->modelClassName)();
+            foreach ($resultRow as $key => $value) {
+                $model->{$key} = $value;
+            }
+            $result->add($model);
+        }
+
+        return $result;
     }
 }

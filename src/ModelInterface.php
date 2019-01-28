@@ -2,8 +2,7 @@
 
 namespace Aternos\Model;
 
-use Aternos\Model\Query\Query;
-use Aternos\Model\Query\QueryResult;
+use Aternos\Model\Query\{Query, QueryResult};
 
 /**
  * Interface ModelInterface

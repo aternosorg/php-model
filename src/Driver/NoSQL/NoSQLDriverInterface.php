@@ -2,14 +2,14 @@
 
 namespace Aternos\Model\Driver\NoSQL;
 
-use Aternos\Model\Driver\DriverInterface;
+use Aternos\Model\Driver\QueryableDriverInterface;
 
 /**
  * Interface NoSQLDriverInterface
  *
  * @package Aternos\Model\Driver\NoSQL
  */
-interface NoSQLDriverInterface extends DriverInterface
+interface NoSQLDriverInterface extends QueryableDriverInterface
 {
 
 }

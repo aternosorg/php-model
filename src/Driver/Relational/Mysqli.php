@@ -2,17 +2,7 @@
 
 namespace Aternos\Model\Driver\Relational;
 
-use Aternos\Model\Driver\QueryableDriverInterface;
-use Aternos\Model\ModelInterface;
-use Aternos\Model\Query\DeleteQuery;
-use Aternos\Model\Query\Field;
-use Aternos\Model\Query\OrderField;
-use Aternos\Model\Query\Query;
-use Aternos\Model\Query\QueryResult;
-use Aternos\Model\Query\SelectQuery;
-use Aternos\Model\Query\UpdateQuery;
-use Aternos\Model\Query\WhereCondition;
-use Aternos\Model\Query\WhereGroup;
+use Aternos\Model\{ModelInterface, Query\Generator\SQL, Query\Query, Query\QueryResult};
 
 /**
  * Class Mysqli
@@ -198,42 +188,18 @@ class Mysqli implements RelationalDriverInterface
     {
         $this->connect();
 
-        $queryString = "";
-        if ($query instanceof SelectQuery) {
-            $queryString .= "SELECT ";
+        $generator = new SQL(function ($value) {
+            return mysqli_real_escape_string($this->connection, $value);
+        });
 
-            if ($query->getFields()) {
-                $queryString .= " " . $this->generateFields($query);
-            } else {
-                $queryString .= " *";
-            }
-
-            $queryString .= " FROM `" . $query->modelClassName::getName() . "`";
-        } else if ($query instanceof UpdateQuery) {
-            $queryString .= "UPDATE `" . $query->modelClassName::getName() . "` SET";
-            $queryString .= $this->generateFields($query);
-        } else if ($query instanceof DeleteQuery) {
-            $queryString .= "DELETE  FROM `" . $query->modelClassName::getName() . "`";
-        }
-
-        if ($query->getWhere()) {
-            $queryString .= " WHERE " . $this->generateWhere($query);
-        }
-
-        if ($query->getOrder()) {
-            $queryString .= " " . $this->generateOrder($query);
-        }
-
-        if ($limit = $query->getLimit()) {
-            $queryString .= " LIMIT " . $limit->start . ", " . $limit->length;
-        }
+        $queryString = $generator->generate($query);
 
         $rawQueryResult = $this->rawQuery($queryString);
 
         $result = new QueryResult((bool)$rawQueryResult);
         while ($row = mysqli_fetch_assoc($rawQueryResult)) {
             /** @var ModelInterface $model */
-            $model = new $query->modelClassName();
+            $model = new ($query->modelClassName)();
             foreach ($row as $key => $value) {
                 $model->{$key} = $value;
             }
@@ -241,117 +207,5 @@ class Mysqli implements RelationalDriverInterface
         }
 
         return $result;
-    }
-
-    /**
-     * Generate query from where conditions and groups
-     *
-     * @param Query $query
-     * @return string
-     */
-    private function generateWhere(Query $query)
-    {
-        $where = $query->getWhere();
-        if ($where instanceof WhereCondition) {
-            $value = mysqli_real_escape_string($this->connection, $where->value);
-
-            $value = $this->generateValue($value);
-
-            return "`" . $where->field . "` " . $where->operator . " " . $value;
-        } elseif ($where instanceof WhereGroup) {
-            switch ($where->conjunction) {
-                case WhereGroup:: AND:
-                    $conjunction = " AND ";
-                    break;
-                case WhereGroup:: OR:
-                    $conjunction = " OR ";
-                    break;
-                default:
-                    throw new \UnexpectedValueException("Invalid conjunction: " . $where->conjunction);
-            }
-
-            $whereStrings = [];
-            foreach ($where as $wherePart) {
-                $whereStrings[] = $this->generateWhere($wherePart);
-            }
-
-            return "(" . implode($conjunction, $whereStrings) . ")";
-        }
-    }
-
-    /**
-     * Generate query from order field definitions
-     *
-     * @param Query $query
-     * @return string
-     */
-    private function generateOrder(Query $query)
-    {
-        $orderFields = $query->getOrder();
-
-        $return = "ORDER BY";
-
-        $formattedOrderFields = [];
-        foreach ($orderFields as $orderField) {
-            /** @var OrderField $orderField */
-            switch ($orderField->direction) {
-                case OrderField::ASCENDING:
-                    $direction = "ASC";
-                    break;
-                case OrderField::DESCENDING:
-                    $direction = "DESC";
-                    break;
-                default:
-                    throw new \UnexpectedValueException("Invalid direction: " . $orderField->direction);
-            }
-
-            $formattedOrderFields[] = "`" . $orderField->field . "` " . $direction;
-        }
-
-        $return .= " " . implode(", ", $formattedOrderFields);
-
-        return $return;
-    }
-
-    /**
-     * Generate fields for select or update queries
-     *
-     * @param Query $query
-     * @return string
-     */
-    private function generateFields(Query $query)
-    {
-        $fields = $query->getFields();
-
-        $fieldStrings = [];
-        foreach ($fields as $field) {
-            /** @var Field $field */
-            if ($query instanceof SelectQuery) {
-                $fieldStrings[] = "`" . $field->key . "`";
-            } else if ($query instanceof UpdateQuery) {
-                $fieldStrings[] = "`" . $field->key . "`=" . $this->generateValue($field->value);
-            }
-        }
-
-        return implode(", ", $fieldStrings);
-    }
-
-    /**
-     * Generate value for where ore field usage
-     *
-     * @param $value
-     * @return string
-     */
-    private function generateValue($value)
-    {
-        if (is_numeric($value)) {
-            return $value;
-        }
-
-        if (is_null($value)) {
-            return "NULL";
-        }
-
-        return "'" . $value . "'";
     }
 }

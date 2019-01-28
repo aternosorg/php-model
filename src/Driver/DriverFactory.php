@@ -2,14 +2,10 @@
 
 namespace Aternos\Model\Driver;
 
-use Aternos\Model\Driver\Cache\CacheDriverInterface;
-use Aternos\Model\Driver\Cache\Redis;
-use Aternos\Model\Driver\NoSQL\Cassandra;
-use Aternos\Model\Driver\NoSQL\NoSQLDriverInterface;
-use Aternos\Model\Driver\Relational\Mysqli;
-use Aternos\Model\Driver\Relational\RelationalDriverInterface;
-use Aternos\Model\Driver\Search\Elasticsearch;
-use Aternos\Model\Driver\Search\SearchDriverInterface;
+use Aternos\Model\Driver\Cache\{CacheDriverInterface, Redis};
+use Aternos\Model\Driver\NoSQL\{Cassandra, NoSQLDriverInterface};
+use Aternos\Model\Driver\Relational\{Mysqli, RelationalDriverInterface};
+use Aternos\Model\Driver\Search\{Elasticsearch, SearchDriverInterface};
 
 /**
  * Class DriverFactory
