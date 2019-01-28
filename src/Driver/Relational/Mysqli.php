@@ -199,7 +199,7 @@ class Mysqli implements RelationalDriverInterface
         $result = new QueryResult((bool)$rawQueryResult);
         while ($row = mysqli_fetch_assoc($rawQueryResult)) {
             /** @var ModelInterface $model */
-            $model = new ($query->modelClassName)();
+            $model = new $query->modelClassName();
             foreach ($row as $key => $value) {
                 $model->{$key} = $value;
             }
