@@ -168,13 +168,11 @@ abstract class Query
             if ($field instanceof Field) {
                 $this->fields[] = $field;
             } else if (is_string($key)) {
-                $this->fields = new Field($key, $field);
+                $this->fields[] = new Field($key, $field);
             } else {
-                $this->fields = new Field($field);
+                $this->fields[] = new Field($field);
             }
         }
-
-        $this->fields = $fields;
 
         return $this;
     }
