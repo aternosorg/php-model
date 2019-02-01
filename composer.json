@@ -18,7 +18,7 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=7.0.0",
-    "ext-xml": "*"
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
