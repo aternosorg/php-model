@@ -134,7 +134,8 @@ class Cassandra implements NoSQLDriverInterface
     {
         $table = $model::getName();
 
-        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
+        $id = str_replace("'", "''", $model->getId());
+        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
         $rows = $this->rawQuery($query);
         if ($rows->count() === 0) {
             return false;
@@ -159,7 +160,8 @@ class Cassandra implements NoSQLDriverInterface
     {
         $table = $model::getName();
 
-        $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
+        $id = str_replace("'", "''", $model->getId());
+        $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
         $this->rawQuery($query);
         return true;
     }

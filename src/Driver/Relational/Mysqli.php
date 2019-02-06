@@ -146,7 +146,8 @@ class Mysqli implements RelationalDriverInterface
     {
         $table = $model::getName();
 
-        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
+        $id = mysqli_real_escape_string($this->connection, $model->getId());
+        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
         $result = $this->rawQuery($query);
         if (!$result || mysqli_num_rows($result) === 0) {
             return false;
@@ -171,7 +172,8 @@ class Mysqli implements RelationalDriverInterface
     {
         $table = $model::getName();
 
-        $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $model->getId() . "'";
+        $id = mysqli_real_escape_string($this->connection, $model->getId());
+        $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
         $this->rawQuery($query);
 
         return true;
