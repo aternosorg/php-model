@@ -149,6 +149,7 @@ It allows different syntax possibilities such as simple array/string/int values 
 building all parameters as objects based on the [Query/...](src/Query) classes. All queries return a [QueryResult](src/Query/QueryResult.php)
 object, which is iterable and countable.
 
+#### Select
 ```php
 <?php
 
@@ -210,6 +211,44 @@ User::query(new \Aternos\Model\Query\SelectQuery(
     ],
     ["field", "hello", "foo"],
     new \Aternos\Model\Query\Limit(10, 100)
+));
+```
+
+#### Update
+```php
+<?php
+
+// update mail to "mail@example.org" where username is "username"
+User::query(new \Aternos\Model\Query\UpdateQuery(["email" => "mail@example.org"], ["username" => "username"]));
+User::query((new \Aternos\Model\Query\UpdateQuery())
+    ->fields(["email" => "mail@example.org"])
+    ->where(["username" => "username"]));
+User::query(new \Aternos\Model\Query\UpdateQuery(
+    new \Aternos\Model\Query\Field("email", "mail@example.org"),
+    new \Aternos\Model\Query\WhereCondition("username", "username")
+));
+User::query(new \Aternos\Model\Query\UpdateQuery(
+    [new \Aternos\Model\Query\Field("email", "mail@example.org")],
+    new \Aternos\Model\Query\WhereGroup([
+        new \Aternos\Model\Query\WhereCondition("username", "username")
+    ])
+));
+```
+
+#### Delete
+```php
+<?php
+
+// delete where email is mail@example.org
+User::query(new \Aternos\Model\Query\DeleteQuery(["email" => "mail@example.org"]));
+User::query((new \Aternos\Model\Query\DeleteQuery())->where(["email" => "mail@example.org"]));
+User::query(new \Aternos\Model\Query\DeleteQuery(
+    new \Aternos\Model\Query\WhereCondition("email", "mail@example.org")
+));
+User::query(new \Aternos\Model\Query\DeleteQuery(
+    new \Aternos\Model\Query\WhereGroup([
+        new \Aternos\Model\Query\WhereCondition("email", "mail@example.org")
+    ])
 ));
 ```
 
