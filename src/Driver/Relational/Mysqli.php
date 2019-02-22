@@ -199,6 +199,10 @@ class Mysqli implements RelationalDriverInterface
         $rawQueryResult = $this->rawQuery($queryString);
 
         $result = new QueryResult((bool)$rawQueryResult);
+        if (is_bool($rawQueryResult)) {
+            return $result;
+        }
+
         while ($row = mysqli_fetch_assoc($rawQueryResult)) {
             /** @var ModelInterface $model */
             $model = new $query->modelClassName();
