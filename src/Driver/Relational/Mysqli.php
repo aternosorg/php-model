@@ -144,6 +144,7 @@ class Mysqli implements RelationalDriverInterface
      */
     public function get(ModelInterface $model): bool
     {
+        $this->connect();
         $table = $model::getName();
 
         $id = mysqli_real_escape_string($this->connection, $model->getId());
@@ -170,6 +171,7 @@ class Mysqli implements RelationalDriverInterface
      */
     public function delete(ModelInterface $model): bool
     {
+        $this->connect();
         $table = $model::getName();
 
         $id = mysqli_real_escape_string($this->connection, $model->getId());
