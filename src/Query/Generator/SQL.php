@@ -2,7 +2,7 @@
 
 namespace Aternos\Model\Query\Generator;
 
-use Aternos\Model\Query\{Field, OrderField, Query, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
+use Aternos\Model\Query\{DeleteQuery, Field, OrderField, Query, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
 
 /**
  * Class SQL
