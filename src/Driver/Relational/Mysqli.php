@@ -113,7 +113,7 @@ class Mysqli implements RelationalDriverInterface
         $values = [];
         foreach ($modelValues as $key => $value) {
             $columns[] = "`" . $key . "`";
-            if (is_numeric($value)) {
+            if (is_int($modelValue) || is_float($modelValue)) {
                 $values[] = $value;
             } else {
                 $values[] = "'" . mysqli_real_escape_string($this->connection, $value) . "'";
@@ -122,7 +122,7 @@ class Mysqli implements RelationalDriverInterface
 
         $updates = [];
         foreach ($modelValues as $column => $modelValue) {
-            if (is_numeric($modelValue)) {
+            if (is_int($modelValue) || is_float($modelValue)) {
                 $updates[] = "`" . $column . "`=" . $modelValue;
             } else {
                 $updates[] = "`" . $column . "`='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
