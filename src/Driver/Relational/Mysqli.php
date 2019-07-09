@@ -113,7 +113,7 @@ class Mysqli implements RelationalDriverInterface
         $values = [];
         foreach ($modelValues as $key => $value) {
             $columns[] = "`" . $key . "`";
-            if (is_int($modelValue) || is_float($modelValue)) {
+            if (is_int($value) || is_float($value)) {
                 $values[] = $value;
             } else {
                 $values[] = "'" . mysqli_real_escape_string($this->connection, $value) . "'";
