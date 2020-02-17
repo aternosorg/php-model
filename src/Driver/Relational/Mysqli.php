@@ -115,6 +115,8 @@ class Mysqli implements RelationalDriverInterface
             $columns[] = "`" . $key . "`";
             if (is_int($value) || is_float($value)) {
                 $values[] = $value;
+            } else if (is_null($value)) {
+                $values[] = "NULL";
             } else {
                 $values[] = "'" . mysqli_real_escape_string($this->connection, $value) . "'";
             }
