@@ -192,8 +192,6 @@ class SQL implements QueryGeneratorInterface
      */
     private function generateValue($value)
     {
-        $value = ($this->escapeFunction)($value);
-
         if (is_int($value) || is_float($value)) {
             return $value;
         }
@@ -201,6 +199,8 @@ class SQL implements QueryGeneratorInterface
         if (is_null($value)) {
             return "NULL";
         }
+
+        $value = ($this->escapeFunction)($value);
 
         return $this->stringEnclosure . $value . $this->stringEnclosure;
     }
