@@ -203,6 +203,7 @@ class Mysqli implements RelationalDriverInterface
         $rawQueryResult = $this->rawQuery($queryString);
 
         $result = new QueryResult((bool)$rawQueryResult);
+        $result->setQueryString($queryString);
         if (is_bool($rawQueryResult)) {
             return $result;
         }

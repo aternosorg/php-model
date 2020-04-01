@@ -189,6 +189,7 @@ class Cassandra implements NoSQLDriverInterface
         $rawQueryResult = $this->rawQuery($queryString);
 
         $result = new QueryResult((bool)$rawQueryResult);
+        $result->setQueryString($queryString);
         foreach ($rawQueryResult as $resultRow) {
             /** @var ModelInterface $model */
             $model = new $query->modelClassName();

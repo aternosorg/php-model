@@ -17,29 +17,40 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
      *
      * @var bool
      */
-    private $success;
+    protected $success;
 
     /**
      * @var array
      */
-    private $result = [];
+    protected $result = [];
 
     /**
      * Iterator for $result
      *
      * @var int
      */
-    private $iterator = 0;
+    protected $iterator = 0;
+
+    /**
+     * Raw query string that was executed
+     *
+     * (mainly for debugging/logging reasons)
+     *
+     * @var string|null
+     */
+    protected $queryString = null;
 
     /**
      * QueryResult constructor.
      *
      * @param bool $success
      * @param array $result Containing models (ModelInterface)
+     * @param string|null $queryString
      */
-    public function __construct(bool $success, $result = [])
+    public function __construct(bool $success, $result = [], ?string $queryString = null)
     {
         $this->success = $success;
+        $this->queryString = $queryString;
         if (is_array($result)) {
             $this->result = $result;
         }
@@ -166,5 +177,27 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->result[$offset]);
+    }
+
+    /**
+     * Get the executed query string
+     *
+     * @return string
+     */
+    public function getQueryString(): ?string
+    {
+        return $this->queryString;
+    }
+
+    /**
+     * @param string|null $queryString
+     * @return QueryResult
+     */
+    public function setQueryString(?string $queryString): QueryResult
+    {
+        if ($this->queryString === null) {
+            $this->queryString = $queryString;
+        }
+        return $this;
     }
 }
