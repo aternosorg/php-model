@@ -160,6 +160,9 @@ abstract class GenericModel extends BaseModel
         if (static::$registry) {
             if ($result->wasSuccessful() && count($result) > 0) {
                 foreach ($result as $model) {
+                    if ($model->getId() === null) {
+                        continue;
+                    }
                     ModelRegistry::getInstance()->save($model);
                 }
             }

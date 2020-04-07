@@ -67,6 +67,27 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
     }
 
     /**
+     * Get values from the current model
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        if ($this->valid()) {
+            $model = $this->current();
+        } else {
+            $model = $this->result[0];
+        }
+
+        if (isset($model->{$key})) {
+            return $model->{$key};
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Add a model to the result set
      *
      * @param ModelInterface $model
