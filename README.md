@@ -209,7 +209,11 @@ User::query(new \Aternos\Model\Query\SelectQuery(
         new \Aternos\Model\Query\OrderField("hello", \Aternos\Model\Query\OrderField::ASCENDING),
         new \Aternos\Model\Query\OrderField("foo", \Aternos\Model\Query\OrderField::DESCENDING)
     ],
-    ["field", "hello", "foo"],
+    [
+        new \Aternos\Model\Query\SelectField("field"), 
+        new \Aternos\Model\Query\SelectField("hello"), 
+        new \Aternos\Model\Query\SelectField("foo")
+    ],
     new \Aternos\Model\Query\Limit(10, 100)
 ));
 ```
@@ -224,11 +228,11 @@ User::query((new \Aternos\Model\Query\UpdateQuery())
     ->fields(["email" => "mail@example.org"])
     ->where(["username" => "username"]));
 User::query(new \Aternos\Model\Query\UpdateQuery(
-    new \Aternos\Model\Query\Field("email", "mail@example.org"),
+    new \Aternos\Model\Query\UpdateField("email", "mail@example.org"),
     new \Aternos\Model\Query\WhereCondition("username", "username")
 ));
 User::query(new \Aternos\Model\Query\UpdateQuery(
-    [new \Aternos\Model\Query\Field("email", "mail@example.org")],
+    [new \Aternos\Model\Query\UpdateField("email", "mail@example.org")],
     new \Aternos\Model\Query\WhereGroup([
         new \Aternos\Model\Query\WhereCondition("username", "username")
     ])

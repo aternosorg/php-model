@@ -5,10 +5,9 @@ namespace Aternos\Model\Query;
 /**
  * Class Field
  *
- * @author Matthias Neid
  * @package Aternos\Model\Query
  */
-class Field
+abstract class Field
 {
     /**
      * Field key
@@ -18,21 +17,22 @@ class Field
     public $key;
 
     /**
-     * Field value
-     *
-     * @var string|null
-     */
-    public $value;
-
-    /**
      * Field constructor.
      *
      * @param string|null $key
-     * @param string|null $value
      */
-    public function __construct($key = null, $value = null)
+    public function __construct($key = null)
     {
         $this->key = $key;
-        $this->value = $value;
+    }
+
+    /**
+     * @param string|null $key
+     * @return Field
+     */
+    public function setKey(?string $key): Field
+    {
+        $this->key = $key;
+        return $this;
     }
 }

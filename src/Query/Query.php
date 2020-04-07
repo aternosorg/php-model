@@ -20,7 +20,7 @@ abstract class Query
     protected $order;
 
     /**
-     * @var array
+     * @var Field[]
      */
     protected $fields;
 
@@ -146,7 +146,7 @@ abstract class Query
     }
 
     /**
-     * Set the SELECT fields of the query
+     * Set the fields of the query
      *
      * Can be either an array of keys, of key value pairs or of Field objects
      *
@@ -161,17 +161,6 @@ abstract class Query
     {
         if (!is_array($fields)) {
             throw new \InvalidArgumentException('Argument $fields is not an array.');
-        }
-
-        $this->fields = [];
-        foreach ($fields as $key => $field) {
-            if ($field instanceof Field) {
-                $this->fields[] = $field;
-            } else if (is_string($key)) {
-                $this->fields[] = new Field($key, $field);
-            } else {
-                $this->fields[] = new Field($field);
-            }
         }
 
         return $this;

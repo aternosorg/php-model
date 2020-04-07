@@ -10,6 +10,11 @@ namespace Aternos\Model\Query;
 class UpdateQuery extends Query
 {
     /**
+     * @var UpdateField[]
+     */
+    protected $fields;
+
+    /**
      * UpdateQuery constructor.
      *
      * @param array|null $fields
@@ -33,6 +38,26 @@ class UpdateQuery extends Query
 
         if ($limit) {
             $this->limit($limit);
+        }
+    }
+
+    /**
+     * Set fields
+     *
+     * @param array $fields
+     * @return Query|void
+     */
+    public function fields($fields)
+    {
+        parent::fields($fields);
+
+        $this->fields = [];
+        foreach ($fields as $key => $field) {
+            if ($field instanceof UpdateField) {
+                $this->fields[] = $field;
+            } else if (is_string($key)) {
+                $this->fields[] = new UpdateField($key, $field);
+            }
         }
     }
 }

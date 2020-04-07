@@ -10,6 +10,11 @@ namespace Aternos\Model\Query;
 class SelectQuery extends Query
 {
     /**
+     * @var SelectField[]
+     */
+    protected $fields;
+
+    /**
      * SelectQuery constructor.
      *
      * @param array|null|WhereCondition|WhereGroup $where
@@ -46,10 +51,12 @@ class SelectQuery extends Query
     {
         parent::fields($fields);
 
-        foreach ($this->getFields() as $field) {
-            /** @var Field $field */
-            if ($field->value !== null) {
-                throw new \InvalidArgumentException("Fields in select queries must not have any value.");
+        $this->fields = [];
+        foreach ($fields as $key => $field) {
+            if ($field instanceof SelectField) {
+                $this->fields[] = $field;
+            } else if (is_string($field)) {
+                $this->fields[] = new SelectField($field);
             }
         }
     }

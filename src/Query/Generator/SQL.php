@@ -2,7 +2,17 @@
 
 namespace Aternos\Model\Query\Generator;
 
-use Aternos\Model\Query\{DeleteQuery, Field, OrderField, Query, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
+use Aternos\Model\Query\{DeleteQuery,
+    Field,
+    OrderField,
+    Query,
+    SelectField,
+    SelectQuery,
+    UpdateField,
+    UpdateQuery,
+    WhereCondition,
+    WhereGroup
+};
 
 /**
  * Class SQL
@@ -173,10 +183,38 @@ class SQL implements QueryGeneratorInterface
 
         $fieldStrings = [];
         foreach ($fields as $field) {
-            /** @var Field $field */
-            if ($query instanceof SelectQuery) {
-                $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure;
-            } else if ($query instanceof UpdateQuery) {
+            if ($field instanceof SelectField) {
+                if ($field->raw === true) {
+                    $fieldStrings[] = $field->key;
+                } else {
+                    $fieldString = "";
+                    if ($field->function !== null) {
+                        switch ($field->function) {
+                            case SelectField::COUNT:
+                                $fieldString .= "COUNT(";
+                                break;
+                            case SelectField::SUM:
+                                $fieldString .= "SUM(";
+                                break;
+                            case SelectField::AVERAGE:
+                                $fieldString .= "AVG(";
+                                break;
+                        }
+                    }
+
+                    $fieldString .= $this->columnEnclosure . $field->key . $this->columnEnclosure;
+
+                    if ($field->function !== null) {
+                        $fieldString .= ")";
+                    }
+
+                    if ($field->alias !== null) {
+                        $fieldString .= " AS " . $this->columnEnclosure . $field->alias . $this->columnEnclosure;
+                    }
+                    $fieldStrings[] = $fieldString;
+                }
+
+            } else if ($field instanceof UpdateField) {
                 $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure . "=" . $this->generateValue($field->value);
             }
         }
