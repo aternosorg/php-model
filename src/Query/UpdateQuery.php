@@ -45,7 +45,7 @@ class UpdateQuery extends Query
      * Set fields
      *
      * @param array $fields
-     * @return Query|void
+     * @return UpdateQuery
      */
     public function fields($fields)
     {
@@ -59,5 +59,7 @@ class UpdateQuery extends Query
                 $this->fields[] = new UpdateField($key, $field);
             }
         }
+
+        return $this;
     }
 }

@@ -45,7 +45,7 @@ class SelectQuery extends Query
      * Set fields
      *
      * @param array $fields
-     * @return Query|void
+     * @return SelectQuery
      */
     public function fields($fields)
     {
@@ -59,5 +59,7 @@ class SelectQuery extends Query
                 $this->fields[] = new SelectField($field);
             }
         }
+
+        return $this;
     }
 }
