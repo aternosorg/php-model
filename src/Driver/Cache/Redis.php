@@ -126,6 +126,6 @@ class Redis implements CacheDriverInterface
         }
 
         $this->connect();
-        return $this->connection->delete($this->generateCacheKey($model));
+        return $this->connection->del($this->generateCacheKey($model));
     }
 }
