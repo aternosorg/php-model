@@ -163,7 +163,12 @@ class SQL implements QueryGeneratorInterface
                     throw new \UnexpectedValueException("Invalid direction: " . $orderField->direction);
             }
 
-            $formattedOrderFields[] = $this->columnEnclosure . $orderField->field . $this->columnEnclosure . " " . $direction;
+            if ($orderField->raw) {
+                $formattedOrderFields[] = $orderField->field . " " . $direction;
+            } else {
+                $formattedOrderFields[] = $this->columnEnclosure . $orderField->field . $this->columnEnclosure . " " . $direction;
+            }
+
         }
 
         $return .= " " . implode(", ", $formattedOrderFields);

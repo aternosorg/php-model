@@ -23,6 +23,11 @@ class OrderField
     public $field;
 
     /**
+     * @var bool
+     */
+    public $raw = false;
+
+    /**
      * Order direction
      *
      * @var int
@@ -39,5 +44,35 @@ class OrderField
     {
         $this->field = $field;
         $this->direction = $direction;
+    }
+
+    /**
+     * @param bool $raw
+     * @return OrderField
+     */
+    public function setRaw(bool $raw): OrderField
+    {
+        $this->raw = $raw;
+        return $this;
+    }
+
+    /**
+     * @param int $direction
+     * @return OrderField
+     */
+    public function setDirection(int $direction): OrderField
+    {
+        $this->direction = $direction;
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @return OrderField
+     */
+    public function setField(string $field): OrderField
+    {
+        $this->field = $field;
+        return $this;
     }
 }
