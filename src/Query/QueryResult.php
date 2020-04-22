@@ -2,7 +2,7 @@
 
 namespace Aternos\Model\Query;
 
-use Aternos\Model\ModelInterface;
+use Aternos\Model\ModelCollection;
 
 /**
  * Class QueryResult
@@ -10,7 +10,7 @@ use Aternos\Model\ModelInterface;
  * @author Matthias Neid
  * @package Aternos\Model\Query
  */
-class QueryResult implements \Iterator, \Countable, \ArrayAccess
+class QueryResult extends ModelCollection
 {
     /**
      * Success state of the query
@@ -18,18 +18,6 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
      * @var bool
      */
     protected $success;
-
-    /**
-     * @var array
-     */
-    protected $result = [];
-
-    /**
-     * Iterator for $result
-     *
-     * @var int
-     */
-    protected $iterator = 0;
 
     /**
      * Raw query string that was executed
@@ -52,7 +40,7 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
         $this->success = $success;
         $this->queryString = $queryString;
         if (is_array($result)) {
-            $this->result = $result;
+            $this->models = $result;
         }
     }
 
@@ -77,7 +65,7 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
         if ($this->valid()) {
             $model = $this->current();
         } else {
-            $model = $this->result[0];
+            $model = $this->models[0];
         }
 
         if (isset($model->{$key})) {
@@ -85,119 +73,6 @@ class QueryResult implements \Iterator, \Countable, \ArrayAccess
         } else {
             return null;
         }
-    }
-
-    /**
-     * Add a model to the result set
-     *
-     * @param ModelInterface $model
-     */
-    public function add(ModelInterface $model)
-    {
-        $this->result[] = $model;
-    }
-
-    /**
-     * Return the current element
-     *
-     * @return ModelInterface
-     */
-    public function current()
-    {
-        return $this->result[$this->iterator];
-    }
-
-    /**
-     * Move forward to next element
-     *
-     * @return void
-     */
-    public function next()
-    {
-        $this->iterator++;
-    }
-
-    /**
-     * Return the key of the current element
-     *
-     * @return int
-     */
-    public function key()
-    {
-        return $this->iterator;
-    }
-
-    /**
-     * Checks if current position is valid
-     *
-     * @return boolean
-     */
-    public function valid()
-    {
-        return array_key_exists($this->iterator, $this->result);
-    }
-
-    /**
-     * Rewind the Iterator to the first element
-     *
-     * @return void
-     */
-    public function rewind()
-    {
-        $this->iterator = 0;
-    }
-
-    /**
-     * Count elements of an object
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->result);
-    }
-
-    /**
-     * Whether a offset exists
-     *
-     * @param mixed $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return isset($this->result[$offset]);
-    }
-
-    /**
-     * Offset to retrieve
-     *
-     * @param mixed $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->result[$offset];
-    }
-
-    /**
-     * Offset to set
-     *
-     * @param $offset
-     * @param $value
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->result[$offset] = $value;
-    }
-
-    /**
-     * Offset to unset
-     *
-     * @param $offset
-     */
-    public function offsetUnset($offset)
-    {
-        unset($this->result[$offset]);
     }
 
     /**
