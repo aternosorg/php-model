@@ -136,7 +136,7 @@ abstract class GenericModel extends BaseModel
      * Query the model
      *
      * @param Query $query
-     * @return QueryResult
+     * @return QueryResult|static[]
      */
     public static function query(Query $query): QueryResult
     {
@@ -182,7 +182,7 @@ abstract class GenericModel extends BaseModel
      * @param array|null $order
      * @param array|null $fields
      * @param array|null|int|Limit $limit
-     * @return QueryResult
+     * @return QueryResult|static[]
      */
     public static function select($where = null, $order = null, $fields = null, $limit = null): QueryResult
     {
