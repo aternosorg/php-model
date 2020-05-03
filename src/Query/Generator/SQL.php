@@ -69,7 +69,7 @@ class SQL implements QueryGeneratorInterface
     {
         $queryString = "";
         if ($query instanceof SelectQuery) {
-            $queryString .= "SELECT ";
+            $queryString .= "SELECT";
 
             if ($query->getFields()) {
                 $queryString .= " " . $this->generateFields($query);
@@ -82,7 +82,7 @@ class SQL implements QueryGeneratorInterface
             $queryString .= "UPDATE " . $this->tableEnclosure . $query->modelClassName::getName() . $this->tableEnclosure . " SET";
             $queryString .= " " . $this->generateFields($query);
         } else if ($query instanceof DeleteQuery) {
-            $queryString .= "DELETE  FROM " . $this->tableEnclosure . $query->modelClassName::getName() . $this->tableEnclosure;
+            $queryString .= "DELETE FROM " . $this->tableEnclosure . $query->modelClassName::getName() . $this->tableEnclosure;
         }
 
         if ($query->getWhere()) {
