@@ -131,7 +131,7 @@ class Mysqli implements RelationalDriverInterface
             }
         }
 
-        $query = "INSERT INTO " . $table . " (" . implode(",", $columns) . ") VALUES (" . implode(",", $values) . ") ON DUPLICATE KEY UPDATE " . implode(",", $updates);
+        $query = "INSERT INTO `" . $table . "` (" . implode(",", $columns) . ") VALUES (" . implode(",", $values) . ") ON DUPLICATE KEY UPDATE " . implode(",", $updates);
         $this->rawQuery($query);
 
         return true;
@@ -150,7 +150,7 @@ class Mysqli implements RelationalDriverInterface
         $table = $model::getName();
 
         $id = mysqli_real_escape_string($this->connection, $model->getId());
-        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
+        $query = "SELECT * FROM `" . $table . "` WHERE `" . $model->getIdField() . "` = '" . $id . "'";
         $result = $this->rawQuery($query);
         if (!$result || mysqli_num_rows($result) === 0) {
             return false;
