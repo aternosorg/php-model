@@ -177,7 +177,7 @@ class Mysqli implements RelationalDriverInterface
         $table = $model::getName();
 
         $id = mysqli_real_escape_string($this->connection, $model->getId());
-        $query = "DELETE FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
+        $query = "DELETE FROM `" . $table . "` WHERE `" . $model->getIdField() . "` = '" . $id . "'";
         $this->rawQuery($query);
 
         return true;
