@@ -113,8 +113,10 @@ class SQL implements QueryGeneratorInterface
             $where = $query->getWhere();
         }
         if ($where instanceof WhereCondition) {
+            if ($where->value === null && $where->operator === "=") {
+                $where->operator = "IS";
+            }
             $value = $this->generateValue($where->value);
-
             return $this->columnEnclosure . $where->field . $this->columnEnclosure . " " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
             switch ($where->conjunction) {
