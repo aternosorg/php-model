@@ -116,8 +116,18 @@ class SQL implements QueryGeneratorInterface
             if ($where->value === null && $where->operator === "=") {
                 $where->operator = "IS";
             }
-            $value = $this->generateValue($where->value);
-            return $this->columnEnclosure . $where->field . $this->columnEnclosure . " " . $where->operator . " " . $value;
+
+            $value = $where->value;
+            if (!$where->valueRaw) {
+                $value = $this->generateValue($value);
+            }
+
+            $field = $where->field;
+            if (!$where->fieldRaw) {
+                $field = $this->columnEnclosure . $field . $this->columnEnclosure;
+            }
+
+            return $field . " " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
             switch ($where->conjunction) {
                 case WhereGroup:: AND:
