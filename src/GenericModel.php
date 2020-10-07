@@ -290,6 +290,11 @@ abstract class GenericModel extends BaseModel
             }
         }
 
+        // delete in registry
+        if (static::$registry) {
+            ModelRegistry::getInstance()->delete($this);
+        }
+
         return $success;
     }
 
