@@ -126,6 +126,8 @@ class Mysqli implements RelationalDriverInterface
         foreach ($modelValues as $column => $modelValue) {
             if (is_int($modelValue) || is_float($modelValue)) {
                 $updates[] = "`" . $column . "`=" . $modelValue;
+            } else if (is_null($modelValue)) {
+                $updates[] = "`" . $column . "`=NULL";
             } else {
                 $updates[] = "`" . $column . "`='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
             }
