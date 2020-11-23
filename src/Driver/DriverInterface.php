@@ -2,8 +2,6 @@
 
 namespace Aternos\Model\Driver;
 
-use \Aternos\Model\ModelInterface;
-
 /**
  * Interface DriverInterface
  *
@@ -12,26 +10,9 @@ use \Aternos\Model\ModelInterface;
 interface DriverInterface
 {
     /**
-     * Save the model
+     * Get a unique ID for this driver
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @return string
      */
-    public function save(ModelInterface $model): bool;
-
-    /**
-     * Get the model
-     *
-     * @param ModelInterface $model
-     * @return bool
-     */
-    public function get(ModelInterface $model): bool;
-
-    /**
-     * Delete the model
-     *
-     * @param ModelInterface $model
-     * @return bool
-     */
-    public function delete(ModelInterface $model): bool;
+    public function getId(): string;
 }

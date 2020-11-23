@@ -12,7 +12,7 @@ class UpdateQuery extends Query
     /**
      * @var UpdateField[]
      */
-    protected $fields;
+    protected ?array $fields = null;
 
     /**
      * UpdateQuery constructor.
@@ -47,7 +47,7 @@ class UpdateQuery extends Query
      * @param array $fields
      * @return UpdateQuery
      */
-    public function fields($fields)
+    public function fields(array $fields)
     {
         parent::fields($fields);
 

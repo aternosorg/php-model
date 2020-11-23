@@ -12,16 +12,16 @@ class WhereCondition
     /**
      * Name of the field
      *
-     * @var string
+     * @var string|null
      */
-    public $field;
+    public ?string $field = null;
 
     /**
      * Operator between field and value
      *
      * @var string
      */
-    public $operator = "=";
+    public string $operator = "=";
 
     /**
      * Field value
@@ -33,21 +33,21 @@ class WhereCondition
     /**
      * @var bool
      */
-    public $fieldRaw = false;
+    public bool $fieldRaw = false;
 
     /**
      * @var bool
      */
-    public $valueRaw = false;
+    public bool $valueRaw = false;
 
     /**
      * WhereCondition constructor.
      *
-     * @param string $field
+     * @param string|null $field
      * @param mixed $value
      * @param string $operator
      */
-    public function __construct(string $field = null, $value = null, string $operator = "=")
+    public function __construct(?string $field = null, $value = null, string $operator = "=")
     {
         $this->field = $field;
         $this->value = $value;

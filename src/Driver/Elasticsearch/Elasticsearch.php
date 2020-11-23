@@ -1,8 +1,12 @@
 <?php
 
-namespace Aternos\Model\Driver\Search;
+namespace Aternos\Model\Driver\Elasticsearch;
 
+use Aternos\Model\Driver\Driver;
+use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\ModelInterface;
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 
 /**
  * Class Elasticsearch
@@ -13,12 +17,15 @@ use Aternos\Model\ModelInterface;
  *
  * @package Aternos\Model\Driver\Search
  */
-class Elasticsearch implements SearchDriverInterface
+class Elasticsearch extends Driver implements CRUDAbleInterface
 {
+    public const ID = "elasticsearch";
+    protected string $id = self::ID;
+
     /**
-     * @var \Elasticsearch\Client
+     * @var Client|null
      */
-    protected $client;
+    protected ?Client $client = null;
 
     /**
      * Connect to the elasticsearch cluster
@@ -26,7 +33,7 @@ class Elasticsearch implements SearchDriverInterface
     protected function connect()
     {
         if (!$this->client) {
-            $this->client = \Elasticsearch\ClientBuilder::create()->build();
+            $this->client = ClientBuilder::create()->build();
         }
     }
 

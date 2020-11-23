@@ -14,14 +14,14 @@ abstract class Field
      *
      * @var string|null
      */
-    public $key;
+    public ?string $key;
 
     /**
      * Field constructor.
      *
      * @param string|null $key
      */
-    public function __construct($key = null)
+    public function __construct(?string $key = null)
     {
         $this->key = $key;
     }

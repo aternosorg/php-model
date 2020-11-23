@@ -16,17 +16,17 @@ class SelectField extends Field
     /**
      * @var string|null
      */
-    public $alias;
+    public ?string $alias = null;
 
     /**
      * @var int|null
      */
-    public $function;
+    public ?int $function = null;
 
     /**
      * @var bool
      */
-    public $raw = false;
+    public bool $raw = false;
 
     /**
      * @param string|null $alias

@@ -17,7 +17,7 @@ class QueryResult extends ModelCollection
      *
      * @var bool
      */
-    protected $success;
+    protected bool $success;
 
     /**
      * Raw query string that was executed
@@ -26,7 +26,7 @@ class QueryResult extends ModelCollection
      *
      * @var string|null
      */
-    protected $queryString = null;
+    protected ?string $queryString = null;
 
     /**
      * QueryResult constructor.

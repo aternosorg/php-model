@@ -1,7 +1,10 @@
 <?php
 
-namespace Aternos\Model\Driver\Cache;
+namespace Aternos\Model\Driver\Redis;
 
+use Aternos\Model\Driver\Driver;
+use Aternos\Model\Driver\Features\CacheableInterface;
+use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\ModelInterface;
 
 /**
@@ -14,35 +17,55 @@ use Aternos\Model\ModelInterface;
  *
  * @package Aternos\Model\Driver\Cache
  */
-class Redis implements CacheDriverInterface
+class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
 {
+    public const ID = "redis";
+    protected string $id = self::ID;
+
     /**
      * Host address
      *
      * @var string
      */
-    protected $host = '127.0.0.1';
+    protected string $host = '127.0.0.1';
 
     /**
      * Host port
      *
      * @var int
      */
-    protected $port = 6379;
+    protected int $port = 6379;
 
     /**
      * Socket path
      *
      * If this is set, host and port are ignored
      *
-     * @var bool
+     * @var null|string
      */
-    protected $socket = false;
+    protected ?string $socket = null;
 
     /**
-     * @var \Redis
+     * @var \Redis|null
      */
-    protected $connection;
+    protected ?\Redis $connection = null;
+
+    /**
+     * Redis constructor.
+     * @param string|null $host
+     * @param int|null $port
+     * @param string|null $socket
+     */
+    public function __construct(?string $host = null, ?int $port = null, ?string $socket = null)
+    {
+        if ($host) {
+            $this->host = $host;
+        }
+        if ($port) {
+            $this->port = $port;
+        }
+        $this->socket = $socket;
+    }
 
     /**
      * Connect to redis
@@ -127,5 +150,35 @@ class Redis implements CacheDriverInterface
 
         $this->connect();
         return $this->connection->del($this->generateCacheKey($model));
+    }
+
+    /**
+     * @param string $host
+     * @return Redis
+     */
+    public function setHost(string $host): Redis
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * @param int $port
+     * @return Redis
+     */
+    public function setPort(int $port): Redis
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    /**
+     * @param string|null $socket
+     * @return Redis
+     */
+    public function setSocket(?string $socket): Redis
+    {
+        $this->socket = $socket;
+        return $this;
     }
 }

@@ -2,12 +2,13 @@
 
 namespace Aternos\Model;
 
-use Aternos\Model\Driver\DriverFactory;
+use Aternos\Model\Driver\DriverRegistry;
+use Aternos\Model\Driver\Mysqli\Mysqli;
 
 /**
  * Class SimpleModel
  *
- * Very basic model implementing only the nosql driver (not even registry).
+ * Very basic model implementing only the mysqli driver (not even registry).
  * Can be used for simple tasks, but is more of a demonstration.
  *
  * @package Aternos\Model
@@ -22,7 +23,7 @@ abstract class SimpleModel extends BaseModel
     public static function get(string $id, bool $update = false)
     {
         $model = new static($id);
-        if (DriverFactory::getInstance()->assembleNoSQLDriver()->get($model)) {
+        if (DriverRegistry::getInstance()->getDriver(Mysqli::ID)->get($model)) {
             return $model;
         }
 
@@ -34,7 +35,7 @@ abstract class SimpleModel extends BaseModel
      */
     public function save(): bool
     {
-        return DriverFactory::getInstance()->assembleNoSQLDriver()->save($this);
+        return DriverRegistry::getInstance()->getDriver(Mysqli::ID)->save($this);
     }
 
     /**
@@ -42,6 +43,6 @@ abstract class SimpleModel extends BaseModel
      */
     public function delete(): bool
     {
-        return DriverFactory::getInstance()->assembleNoSQLDriver()->delete($this);
+        return DriverRegistry::getInstance()->getDriver(Mysqli::ID)->delete($this);
     }
 }

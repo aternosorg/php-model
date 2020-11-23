@@ -3,7 +3,6 @@
 namespace Aternos\Model\Query\Generator;
 
 use Aternos\Model\Query\{DeleteQuery,
-    Field,
     OrderField,
     Query,
     SelectField,
@@ -26,35 +25,35 @@ class SQL implements QueryGeneratorInterface
      *
      * @var string
      */
-    public $stringEnclosure = "'";
+    public string $stringEnclosure = "'";
 
     /**
      * Enclose tables in query with this character
      *
      * @var string
      */
-    public $tableEnclosure = "`";
+    public string $tableEnclosure = "`";
 
     /**
      * Enclose columns in query with this character
      *
      * @var string
      */
-    public $columnEnclosure = "`";
+    public string $columnEnclosure = "`";
 
     /**
      * Callback function to escape values
      *
-     * @var \Closure
+     * @var callable|string
      */
     public $escapeFunction = "addslashes";
 
     /**
      * SQL constructor.
      *
-     * @param \Closure $escapeFunction
+     * @param callable $escapeFunction
      */
-    public function __construct($escapeFunction)
+    public function __construct(callable $escapeFunction)
     {
         $this->escapeFunction = $escapeFunction;
     }
@@ -147,6 +146,8 @@ class SQL implements QueryGeneratorInterface
 
             return "(" . implode($conjunction, $whereStrings) . ")";
         }
+
+        return "";
     }
 
     /**
@@ -242,7 +243,7 @@ class SQL implements QueryGeneratorInterface
     /**
      * Generate value for where ore field usage
      *
-     * @param $value
+     * @param string|int|float|null $value
      * @return string
      */
     private function generateValue($value)

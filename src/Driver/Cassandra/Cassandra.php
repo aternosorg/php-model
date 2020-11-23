@@ -1,7 +1,10 @@
 <?php
 
-namespace Aternos\Model\Driver\NoSQL;
+namespace Aternos\Model\Driver\Cassandra;
 
+use Aternos\Model\Driver\Driver;
+use Aternos\Model\Driver\Features\CRUDAbleInterface;
+use Aternos\Model\Driver\Features\QueryableInterface;
 use Aternos\Model\ModelInterface;
 use Aternos\Model\Query\Generator\SQL;
 use Aternos\Model\Query\Query;
@@ -17,49 +20,70 @@ use Aternos\Model\Query\QueryResult;
  *
  * @package Aternos\Model\Driver
  */
-class Cassandra implements NoSQLDriverInterface
+class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
 {
+    public const ID = "cassandra";
+    protected string $id = self::ID;
+
     /**
      * Host address (localhost by default)
      *
      * Can actually be one or multiple comma separated hosts (contact points)
      *
-     * @var bool|string
+     * @var null|string
      */
-    protected $host = false;
+    protected ?string $host = null;
 
     /**
      * Host port
      *
-     * @var bool|int
+     * @var int|null
      */
-    protected $port = false;
+    protected ?int $port = null;
 
     /**
      * Authentication username
      *
-     * @var bool|string
+     * @var null|string
      */
-    protected $user = false;
+    protected ?string $user = null;
 
     /**
      * Authentication password
      *
-     * @var bool|string
+     * @var null|string
      */
-    protected $password = false;
+    protected ?string $password = null;
 
     /**
      * Keyspace name
      *
      * @var string
      */
-    protected $keyspace = "data";
+    protected string $keyspace = "data";
 
     /**
-     * @var \Cassandra\Session
+     * @var \Cassandra\Session|null
      */
-    protected $connection;
+    protected ?\Cassandra\Session $connection = null;
+
+    /**
+     * Cassandra constructor.
+     *
+     * @param string|null $host
+     * @param int|null $port
+     * @param string|null $user
+     * @param string|null $password
+     * @param string $keyspace
+     */
+    public function __construct(?string $host = null, ?int $port = null, ?string $user = null, ?string $password = null, string $keyspace = "data")
+    {
+        $this->host = $host;
+        $this->port = $port;
+        $this->user = $user;
+        $this->password = $password;
+        $this->keyspace = $keyspace;
+    }
 
     /**
      * Connect to cassandra database
@@ -200,5 +224,55 @@ class Cassandra implements NoSQLDriverInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|null $host
+     * @return Cassandra
+     */
+    public function setHost(?string $host): Cassandra
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * @param int|null $port
+     * @return Cassandra
+     */
+    public function setPort(?int $port): Cassandra
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    /**
+     * @param string|null $user
+     * @return Cassandra
+     */
+    public function setUser(?string $user): Cassandra
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @param string|null $password
+     * @return Cassandra
+     */
+    public function setPassword(?string $password): Cassandra
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * @param string $keyspace
+     * @return Cassandra
+     */
+    public function setKeyspace(string $keyspace): Cassandra
+    {
+        $this->keyspace = $keyspace;
+        return $this;
     }
 }

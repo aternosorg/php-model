@@ -2,7 +2,16 @@
 
 namespace Aternos\Model;
 
-use Aternos\Model\Driver\{DriverFactory, QueryableDriverInterface};
+use Aternos\Model\Driver\DriverRegistry;
+use Aternos\Model\Driver\DriverRegistryInterface;
+use Aternos\Model\Driver\Features\CacheableInterface;
+use Aternos\Model\Driver\Features\DeletableInterface;
+use Aternos\Model\Driver\Features\GettableInterface;
+use Aternos\Model\Driver\Features\QueryableInterface;
+use Aternos\Model\Driver\Features\SavableInterface;
+use Aternos\Model\Driver\Mysqli\Mysqli;
+use Aternos\Model\Driver\Redis\Redis;
+use BadMethodCallException;
 use Aternos\Model\Query\{Limit, Query, QueryResult, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
 
 /**
@@ -21,46 +30,127 @@ abstract class GenericModel extends BaseModel
      *
      * @var bool
      */
-    protected static $registry = true;
+    protected static bool $registry = true;
 
     /**
      * Is this model cacheable and if yes, for how long (seconds)
      *
-     * @var bool|int
+     * @var ?int
      */
-    protected static $cache = false;
+    protected static ?int $cache = null;
 
     /**
-     * Should this model be saved in a nosql database
+     * Driver IDs ordered for a regular get by ID
      *
-     * @var bool
+     * Caches etc. first, database after that, search etc. at the end
+     *
+     * @var array|string[]
      */
-    protected static $nosql = false;
+    protected static array $drivers = [
+        Redis::ID,
+        Mysqli::ID
+    ];
 
     /**
-     * Should this model be saved in a relational database
+     * Driver IDs ordered for saving
      *
-     * @var bool
+     * Set this to null to use the reverse order of static::$drivers which implement SavableInterface
+     *
+     * @var array|null
      */
-    protected static $relational = true;
+    protected static ?array $saveDrivers = null;
 
     /**
-     * Is this model searchable and if yes, which fields
+     * Driver IDs ordered for deleting
      *
-     * @var bool|array
+     * Set this to null to use the reverse order of static::$drivers which implement DeletableInterface
+     *
+     * @var array|null
      */
-    protected static $search = false;
+    protected static ?array $deleteDrivers = null;
+
+    /**
+     * Driver IDs ordered for querying
+     *
+     * Set this to null to use the same order as static::$drivers which implement QueryableInterface
+     *
+     * @var array|null
+     */
+    protected static ?array $queryDrivers = null;
+
 
     /**
      * Get the driver factory for the current model
      *
-     * @return Driver\DriverFactory
+     * @return DriverRegistryInterface
      */
-    protected static function getDriverFactory()
+    protected static function getDriverRegistry(): DriverRegistryInterface
     {
-        $driverFactory = DriverFactory::getInstance();
+        return DriverRegistry::getInstance();
+    }
 
-        return $driverFactory;
+    /**
+     * Get all gettable drivers from static::$drivers
+     *
+     * @return array
+     */
+    protected static function getGettableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$drivers as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, GettableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all savable drivers from static::$saveDrivers or static::$drivers
+     *
+     * @return array
+     */
+    protected static function getSavableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$saveDrivers ?? array_reverse(static::$drivers) as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, SavableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all savable drivers from static::$saveDrivers or static::$drivers
+     *
+     * @return array
+     */
+    protected static function getDeletableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$deleteDrivers ?? array_reverse(static::$drivers) as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, DeletableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all savable drivers from static::$saveDrivers or static::$drivers
+     *
+     * @return array
+     */
+    protected static function getQueryableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$queryDrivers ?? static::$drivers as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, QueryableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
     }
 
     /**
@@ -73,12 +163,7 @@ abstract class GenericModel extends BaseModel
     public static function get(string $id, bool $update = false)
     {
         $registry = ModelRegistry::getInstance();
-        $factory = static::getDriverFactory();
-
-        /**
-         * @var static $model
-         */
-        $model = new static($id);
+        $driverRegistry = static::getDriverRegistry();
 
         // try to get the model from the registry
         if (static::$registry) {
@@ -90,46 +175,45 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        // try to get the model from cache
-        if (static::$cache && !$update && $factory->assembleCacheDriver()->get($model)) {
-            if (static::$registry) {
-                $registry->save($model);
+        $model = new static($id);
+
+        $cacheDrivers = [];
+        $success = false;
+        foreach (static::getGettableDrivers() as $gettableDriver) {
+            /** @var GettableInterface $driver */
+            $driver = $driverRegistry->getDriver($gettableDriver);
+            if ($update && $driver instanceof CacheableInterface) {
+                $cacheDrivers[] = $driver;
+                continue;
             }
 
-            return $model;
+            if ($driver->get($model)) {
+                $success = true;
+                break;
+            }
+
+            if ($driver instanceof CacheableInterface) {
+                $cacheDrivers[] = $driver;
+            }
         }
 
-        // try to get the model from nosql database
-        if (static::$nosql && $factory->assembleNoSQLDriver()->get($model)) {
-            if (static::$registry) {
-                $registry->save($model);
-            }
-
-            if (static::$cache) {
-                $factory->assembleCacheDriver()->save($model);
-            }
-
-            return $model;
+        if (!$success) {
+            return false;
         }
 
-        // try to get the model from relational database
-        if (static::$relational && $factory->assembleRelationalDriver()->get($model)) {
-            if (static::$registry) {
-                $registry->save($model);
+        if (static::$cache) {
+            foreach ($cacheDrivers as $cacheDriver) {
+                if ($cacheDriver instanceof SavableInterface) {
+                    $cacheDriver->save($model);
+                }
             }
-
-            if (static::$cache) {
-                $factory->assembleCacheDriver()->save($model);
-            }
-
-            if (static::$nosql) {
-                $factory->assembleNoSQLDriver()->save($model);
-            }
-
-            return $model;
         }
 
-        return false;
+        if (static::$registry) {
+            $registry->save($model);
+        }
+
+        return $model;
     }
 
     /**
@@ -140,22 +224,22 @@ abstract class GenericModel extends BaseModel
      */
     public static function query(Query $query): QueryResult
     {
-        $factory = static::getDriverFactory();
-
         $query->modelClassName = static::class;
 
-        /** @var QueryableDriverInterface $driver */
-        $driver = null;
-        if (static::$nosql) {
-            $driver = $factory->assembleNoSQLDriver();
-        } else if (static::$relational) {
-            $driver = $factory->assembleRelationalDriver();
-        } else {
-            throw new \BadMethodCallException("You can't query the model if no queryable driver is enabled.");
+        $result = false;
+        foreach (static::getQueryableDrivers() as $queryableDriver) {
+            /** @var QueryableInterface $driver */
+            $driver = static::getDriverRegistry()->getDriver($queryableDriver);
+            $result = $driver->query($query);
+
+            if ($result->wasSuccessful()) {
+                break;
+            }
         }
 
-        /** @var QueryResult $result */
-        $result = $driver->query($query);
+        if ($result === false) {
+            throw new BadMethodCallException("You can't query the model if no queryable driver is available.");
+        }
 
         if (static::$registry) {
             if ($result->wasSuccessful() && count($result) > 0) {
@@ -210,8 +294,6 @@ abstract class GenericModel extends BaseModel
      */
     public function save(): bool
     {
-        $factory = static::getDriverFactory();
-
         // new model, generate id and save in registry
         if (!$this->getId()) {
             $this->generateId();
@@ -221,30 +303,10 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        // save in relational database
-        if (static::$relational) {
-            if (!$factory->assembleRelationalDriver()->save($this)) {
-                return false;
-            }
-        }
-
-        // save in nosql database
-        if (static::$nosql) {
-            if (!$factory->assembleNoSQLDriver()->save($this)) {
-                return false;
-            }
-        }
-
-        // save in search database
-        if (static::$search) {
-            if (!$factory->assembleSearchDriver()->save($this)) {
-                return false;
-            }
-        }
-
-        // save in cache
-        if (static::$cache) {
-            if (!$factory->assembleCacheDriver()->save($this)) {
+        foreach (static::getSavableDrivers() as $savableDriver) {
+            /** @var SavableInterface $driver */
+            $driver = static::getDriverRegistry()->getDriver($savableDriver);
+            if (!$driver->save($this)) {
                 return false;
             }
         }
@@ -259,33 +321,12 @@ abstract class GenericModel extends BaseModel
      */
     public function delete(): bool
     {
-        $factory = static::getDriverFactory();
         $success = true;
 
-        // delete in relational database
-        if (static::$relational) {
-            if (!$factory->assembleRelationalDriver()->delete($this)) {
-                $success = false;
-            }
-        }
-
-        // delete in nosql database
-        if (static::$nosql) {
-            if (!$factory->assembleNoSQLDriver()->delete($this)) {
-                $success = false;
-            }
-        }
-
-        // delete in search database
-        if (static::$search) {
-            if (!$factory->assembleSearchDriver()->delete($this)) {
-                $success = false;
-            }
-        }
-
-        // delete in cache
-        if (static::$cache) {
-            if (!$factory->assembleCacheDriver()->delete($this)) {
+        foreach (static::getDeletableDrivers() as $deletableDriver) {
+            /** @var DeletableInterface $driver */
+            $driver = static::getDriverRegistry()->getDriver($deletableDriver);
+            if (!$driver->delete($this)) {
                 $success = false;
             }
         }
@@ -296,6 +337,25 @@ abstract class GenericModel extends BaseModel
         }
 
         return $success;
+    }
+
+    /**
+     * Set multiple fields declared by data on the model
+     *
+     * Directly updates the database, can be used for
+     * partial updates without rewriting the whole
+     * dataset
+     *
+     * @param array $data
+     * @return QueryResult
+     */
+    public function set(array $data)
+    {
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+
+        return static::update($data, [static::$idField => $this->{static::$idField}]);
     }
 
     /**

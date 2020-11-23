@@ -14,7 +14,7 @@ class ModelRegistry
      *
      * @var array
      */
-    private $registry = [];
+    protected array $registry = [];
 
     /**
      * Add a model to the registry
@@ -57,9 +57,9 @@ class ModelRegistry
     }
 
     /**
-     * @var ModelRegistry
+     * @var ModelRegistry|null
      */
-    protected static $instance;
+    protected static ?ModelRegistry $instance = null;
 
     /**
      * @return ModelRegistry

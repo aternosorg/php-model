@@ -19,7 +19,7 @@ abstract class BaseModel implements ModelInterface
      * It's protected to be easily replaced by a property with
      * a different name if that's required
      *
-     * @var string
+     * @var string|null
      */
     protected $id;
 
@@ -28,14 +28,14 @@ abstract class BaseModel implements ModelInterface
      *
      * @var string
      */
-    protected static $idField = "id";
+    protected static string $idField = "id";
 
     /**
      * Length of the random generated unique identifier
      *
      * @var int
      */
-    protected static $idLength = 16;
+    protected static int $idLength = 16;
 
     /**
      * Model constructor.

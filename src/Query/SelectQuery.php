@@ -12,7 +12,7 @@ class SelectQuery extends Query
     /**
      * @var SelectField[]
      */
-    protected $fields;
+    protected ?array $fields = null;
 
     /**
      * SelectQuery constructor.
@@ -47,7 +47,7 @@ class SelectQuery extends Query
      * @param array $fields
      * @return SelectQuery
      */
-    public function fields($fields)
+    public function fields(array $fields)
     {
         parent::fields($fields);
 

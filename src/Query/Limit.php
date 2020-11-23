@@ -14,14 +14,14 @@ class Limit
      *
      * @var int
      */
-    public $start = 0;
+    public int $start = 0;
 
     /**
      * Length of the limit
      *
-     * @var int
+     * @var int|null
      */
-    public $length;
+    public ?int $length = null;
 
     /**
      * Limit constructor.
@@ -29,7 +29,7 @@ class Limit
      * @param int $length
      * @param int $start
      */
-    public function __construct($length, $start = 0)
+    public function __construct(int $length, int $start = 0)
     {
         $this->length = $length;
         $this->start = $start;

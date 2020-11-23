@@ -19,10 +19,10 @@ class UpdateField extends Field
     /**
      * UpdateField constructor.
      *
-     * @param null $key
-     * @param null $value
+     * @param string|null $key
+     * @param mixed|null $value
      */
-    public function __construct($key = null, $value = null)
+    public function __construct(?string $key = null, $value = null)
     {
         parent::__construct($key);
         $this->value = $value;

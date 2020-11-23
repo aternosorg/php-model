@@ -15,10 +15,16 @@
     "source": "https://github.com/aternosorg/php-model",
     "issues": "https://github.com/aternosorg/php-model/issues"
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
     "php": ">=7.4",
     "ext-json": "*"
+  },
+  "require-dev": {
+    "ext-redis": "*",
+    "ext-cassandra": "*",
+    "ext-mysqli": "*",
+    "elasticsearch/elasticsearch": "^7.10"
   },
   "autoload": {
     "psr-4": {

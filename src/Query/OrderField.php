@@ -18,21 +18,21 @@ class OrderField
     /**
      * Field name to order by
      *
-     * @var string
+     * @var string|null
      */
-    public $field;
+    public ?string $field = null;
 
     /**
      * @var bool
      */
-    public $raw = false;
+    public bool $raw = false;
 
     /**
      * Order direction
      *
      * @var int
      */
-    public $direction = self::ASCENDING;
+    public int $direction = self::ASCENDING;
 
     /**
      * OrderField constructor.
@@ -40,7 +40,7 @@ class OrderField
      * @param string|null $field
      * @param int $direction
      */
-    public function __construct(string $field = null, int $direction = self::ASCENDING)
+    public function __construct(?string $field = null, int $direction = self::ASCENDING)
     {
         $this->field = $field;
         $this->direction = $direction;

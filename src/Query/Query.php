@@ -10,29 +10,29 @@ namespace Aternos\Model\Query;
 abstract class Query
 {
     /**
-     * @var WhereGroup
+     * @var WhereGroup|null
      */
-    protected $where;
+    protected ?WhereGroup $where = null;
 
     /**
-     * @var array
+     * @var array|null
      */
-    protected $order;
+    protected ?array $order = null;
 
     /**
      * @var Field[]
      */
-    protected $fields;
+    protected ?array $fields = null;
 
     /**
-     * @var Limit
+     * @var Limit|null
      */
-    protected $limit;
+    protected ?Limit $limit = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $modelClassName;
+    public ?string $modelClassName = null;
 
     /**
      * Set the WHERE part of the query
@@ -97,12 +97,8 @@ abstract class Query
      * @param array $order
      * @return Query
      */
-    public function orderBy($order)
+    public function orderBy(array $order)
     {
-        if (!is_array($order)) {
-            throw new \InvalidArgumentException('Argument $order is not an array.');
-        }
-
         $this->order = [];
         foreach ($order as $key => $value) {
             if ($value instanceof OrderField) {
@@ -136,13 +132,9 @@ abstract class Query
      *
      * @return array|bool
      */
-    public function getOrder()
+    public function getOrder(): ?array
     {
-        if ($this->order) {
-            return $this->order;
-        }
-
-        return false;
+        return $this->order;
     }
 
     /**
@@ -157,7 +149,7 @@ abstract class Query
      * @param array $fields
      * @return Query
      */
-    public function fields($fields)
+    public function fields(array $fields)
     {
         if (!is_array($fields)) {
             throw new \InvalidArgumentException('Argument $fields is not an array.');
@@ -169,15 +161,11 @@ abstract class Query
     /**
      * Get SELECT fields of the query
      *
-     * @return array|bool
+     * @return array|null
      */
-    public function getFields()
+    public function getFields(): ?array
     {
-        if ($this->fields) {
-            return $this->fields;
-        }
-
-        return false;
+        return $this->fields;
     }
 
     /**
@@ -209,14 +197,10 @@ abstract class Query
     /**
      * Get the LIMIT of the query
      *
-     * @return Limit|bool
+     * @return Limit|null
      */
-    public function getLimit()
+    public function getLimit(): ?Limit
     {
-        if ($this->limit) {
-            return $this->limit;
-        }
-
-        return false;
+        return $this->limit;
     }
 }

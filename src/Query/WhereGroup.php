@@ -20,19 +20,19 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @var array
      */
-    protected $group = [];
+    protected array $group = [];
 
     /**
      * @var int
      */
-    public $conjunction = self:: AND;
+    public int $conjunction = self:: AND;
 
     /**
      * Group iterator
      *
      * @var int
      */
-    private $iterator = 0;
+    protected int $iterator = 0;
 
     /**
      * WhereGroup constructor.
@@ -40,12 +40,8 @@ class WhereGroup implements \Iterator, \Countable
      * @param array $conditions
      * @param int $conjunction
      */
-    public function __construct($conditions = [], $conjunction = self:: AND)
+    public function __construct(array $conditions = [], $conjunction = self:: AND)
     {
-        if (!is_array($conditions)) {
-            throw new \InvalidArgumentException('Argument $conditions should be an array.');
-        }
-
         $this->group = $conditions;
         $this->conjunction = $conjunction;
     }

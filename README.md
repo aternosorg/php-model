@@ -27,17 +27,27 @@ and use them in your project or submit them to be added to the library.
 
 Currently included drivers are:
 
-* [Cache\Redis](src/Driver/Cache/Redis.php)
-* [NoSQL\Cassandra](src/Driver/NoSQL/Cassandra.php)
-* [Relational\Mysqli](src/Driver/Relational/Mysqli.php)
-* [Search\Elasticsearch](src/Driver/Search/Elasticsearch.php)
+* [Redis](src/Driver/Redis/Redis.php)
+* [Cassandra](src/Driver/Cassandra/Cassandra.php)
+* [Mysqli](src/Driver/Mysqli/Mysqli.php)
+* [Elasticsearch](src/Driver/Elasticsearch/Elasticsearch.php)
 
 *All of these drivers require additional extensions or packages, see "suggest" in [composer.json](composer.json).*
 
 Most drivers will work out of the box with a local database set up without
 password, but for most use cases you have to use different credentials. To
-do that with the included drivers, you have to create a new driver class
-extending the library driver and overwrite the protected credential properties 
+do that with the included drivers, you can create a new instance and set the
+credentials using the constructor
+```php
+$driver = new \Aternos\Model\Driver\Mysqli\Mysqli("localhost", 3306, "username", "password");
+```
+
+or fluent setters 
+```php
+$driver = (new \Aternos\Model\Driver\Mysqli\Mysqli())->setUsername("username")->setPassword("password");
+```
+
+or create a new driver class  extending the library driver and overwrite the protected credential properties 
 (either in the class itself or in the constructor), e.g.:
 
 ```php
@@ -45,28 +55,41 @@ extending the library driver and overwrite the protected credential properties
 
 namespace MyModel;
 
-class Mysqli extends \Aternos\Model\Driver\Relational\Mysqli 
+class Mysqli extends \Aternos\Model\Driver\Mysqli\Mysqli 
 {
-    protected $user = 'username';
-    protected $password = 'password';
-
-    public function __construct()
-    {
+    protected ?string $user = 'username';
+    protected ?string $password = 'password';
+    
+    public function __construct(?string $host = null,?int $port = null,?string $username = null,?string $password = null,?string $socket = null,string $database = "data") {
+        parent::__construct($host, $port, $username, $password, $socket, $database);
         $this->host = \Config::getHost();
     }
 }
 ```
 
-After that you have to register the class in the [DriverFactory](src/Driver/DriverFactory.php) 
-(or create your own DriverFactory overwriting the $drivers property):
+After that you have to register the class in the [DriverRegistry](src/Driver/DriverRegistry.php):
 
 ```php
 <?php
 
-\Aternos\Model\Driver\DriverFactory::getInstance()->registerDriver(
-    \Aternos\Model\Driver\Relational\RelationalDriverInterface::class, 
-    \MyModel\Mysqli::class
-);
+\Aternos\Model\Driver\DriverRegistry::getInstance()->registerDriver($driver);
+
+// or using your own class
+\Aternos\Model\Driver\DriverRegistry::getInstance()->registerDriverClass(\MyModel\Mysqli::ID, \MyModel\Mysqli::class);
+```
+
+All drivers have an ID to identify and if necessary overwrite existing drivers. Usually it is recommended to use a
+unique ID for each driver type, but if you need multiple drivers of the same type (e.g. if you have two different Mysql
+databases), you can create and register multiple drivers with different IDs. You can set the ID using the `setId()` fluent
+setter on any driver or by overwriting the `getId()` function in your own class.
+
+```php
+<?php
+$driverA = (new \Aternos\Model\Driver\Mysqli\Mysqli())->setId("mysqli-a")->setHost("a.mysql.host");
+\Aternos\Model\Driver\DriverRegistry::getInstance()->registerDriver($driverA);
+
+$driverB = (new \Aternos\Model\Driver\Mysqli\Mysqli())->setId("mysqli-b")->setHost("b.mysql.host");
+\Aternos\Model\Driver\DriverRegistry::getInstance()->registerDriver($driverB);
 ```
 
 ### Model
@@ -75,30 +98,34 @@ This library includes three different abstract model classes to make the model c
 easier:
  
 * [BaseModel](src/BaseModel.php) - Implements the basic model logic and is not related to any Driver
-* [SimpleModel](src/SimpleModel.php) - Minimal implementation for the NoSQL driver, mainly for demonstration purposes
-* [GenericModel](src/GenericModel.php) - Optional implementation of all drivers and registry, by default only the relational driver is enabled
+* [SimpleModel](src/SimpleModel.php) - Minimal implementation for the Mysqli driver, mainly for demonstration purposes
+* [GenericModel](src/GenericModel.php) - Optional implementation of all drivers and registry
 
 It's recommended to start with the [GenericModel](src/GenericModel.php) since it already implements
-all drivers and you can enable whatever you need (e.g. caching, searching) for each model or for
+multiple drivers and you can enable which drivers you need for each model or for
 all models (by using your own parent model for all your models).
 
-This is an example implementation of a model using the [GenericModel](src/GenericModel.php) with a NoSQL database
-as backend and caching:
+This is an example implementation of a model using the [GenericModel](src/GenericModel.php) with a Mysqli database
+as backend and caching. The driver configuration is an ordered array `$drivers` with driver IDs, the first driver is used first
+to get the model. The drivers for the other actions depend on the `$drivers` array (e.g. reversed for `save()` and
+`delete()`), but can be individually configured, e.g. setting the `$saveDrivers` array.
 
 ```php
 <?php
 
 class User extends \Aternos\Model\GenericModel 
 {
-    // configure the generic model drivers
-    // enable nosql driver
-    protected static $nosql = true; 
+    // use model registry (default: true)
+    protected static bool $registry = true; 
     
-    // cache the model for 60 seconds
-    protected static $cache = 60;
-    
-    // disable default relational driver
-    protected static $relational = false;
+    // cache the model for 60 seconds (default: null)
+    protected static ?int $cache = 60;
+
+    // configure the generic model drivers (this is the default)
+    protected static array $drivers = [
+        \Aternos\Model\Driver\Redis\Redis::ID,
+        \Aternos\Model\Driver\Mysqli\Mysqli::ID
+    ];
     
     // the name of your model (and table)
     public static function getName() : string

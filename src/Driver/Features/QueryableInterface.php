@@ -1,16 +1,16 @@
 <?php
 
-namespace Aternos\Model\Driver;
+namespace Aternos\Model\Driver\Features;
 
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
 
 /**
- * Interface QueryableDriver
+ * Interface QueryableInterface
  *
- * @package Aternos\Model\Driver
+ * @package Aternos\Model\Driver\Features
  */
-interface QueryableDriverInterface extends DriverInterface
+interface QueryableInterface
 {
     /**
      * Execute a SELECT, UPDATE or DELETE query

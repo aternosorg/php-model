@@ -1,8 +1,13 @@
 <?php
 
-namespace Aternos\Model\Driver\Relational;
+namespace Aternos\Model\Driver\Mysqli;
 
-use Aternos\Model\{ModelInterface, Query\Generator\SQL, Query\Query, Query\QueryResult};
+use Aternos\Model\{Driver\Driver,
+    Driver\Features\CRUDAbleInterface,
+    ModelInterface,
+    Query\Generator\SQL,
+    Query\Query,
+    Query\QueryResult};
 
 /**
  * Class Mysqli
@@ -14,54 +19,77 @@ use Aternos\Model\{ModelInterface, Query\Generator\SQL, Query\Query, Query\Query
  *
  * @package Aternos\Model\Driver
  */
-class Mysqli implements RelationalDriverInterface
+class Mysqli extends Driver implements CRUDAbleInterface
 {
+    public const ID = "mysqli";
+    protected string $id = self::ID;
+
     /**
      * Host address
      *
-     * @var string
+     * @var string|null
      */
-    protected $host = "";
+    protected ?string $host = null;
 
     /**
      * Host port
      *
-     * @var string
+     * @var int|null
      */
-    protected $port = 3306;
+    protected ?int $port = null;
 
     /**
      * Authentication username
      *
-     * @var string
+     * @var string|null
      */
-    protected $username = "";
+    protected ?string $username = null;
 
     /**
      * Authentication password
      *
-     * @var string
+     * @var string|null
      */
-    protected $password = "";
+    protected ?string $password = null;
 
     /**
      * Socket path or pipe
      *
-     * @var string
+     * @var string|null
      */
-    protected $socket = "";
+    protected ?string $socket = null;
 
     /**
      * Database name
      *
      * @var string
      */
-    protected $database = "data";
+    protected string $database = "data";
 
     /**
-     * @var \mysqli
+     * @var \mysqli|null
      */
-    protected $connection;
+    protected ?\mysqli $connection = null;
+
+    /**
+     * Mysqli constructor.
+     *
+     * @param string|null $host
+     * @param int|null $port
+     * @param string|null $username
+     * @param string|null $password
+     * @param string|null $socket
+     * @param string $database
+     */
+    public function __construct(?string $host = null, ?int $port = null, ?string $username = null, ?string $password = null, ?string $socket = null, string $database = "data")
+    {
+        $this->host = $host;
+        $this->port = $port;
+        $this->username = $username;
+        $this->password = $password;
+        $this->socket = $socket;
+        $this->database = $database;
+    }
 
     /**
      * Connect to database
@@ -220,5 +248,65 @@ class Mysqli implements RelationalDriverInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string|null $host
+     * @return Mysqli
+     */
+    public function setHost(?string $host): Mysqli
+    {
+        $this->host = $host;
+        return $this;
+    }
+
+    /**
+     * @param int|null $port
+     * @return Mysqli
+     */
+    public function setPort(?int $port): Mysqli
+    {
+        $this->port = $port;
+        return $this;
+    }
+
+    /**
+     * @param string|null $username
+     * @return Mysqli
+     */
+    public function setUsername(?string $username): Mysqli
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @param string|null $password
+     * @return Mysqli
+     */
+    public function setPassword(?string $password): Mysqli
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    /**
+     * @param string|null $socket
+     * @return Mysqli
+     */
+    public function setSocket(?string $socket): Mysqli
+    {
+        $this->socket = $socket;
+        return $this;
+    }
+
+    /**
+     * @param string $database
+     * @return Mysqli
+     */
+    public function setDatabase(string $database): Mysqli
+    {
+        $this->database = $database;
+        return $this;
     }
 }
