@@ -60,7 +60,7 @@ class Mysqli extends \Aternos\Model\Driver\Mysqli\Mysqli
     protected ?string $user = 'username';
     protected ?string $password = 'password';
     
-    public function __construct(?string $host = null,?int $port = null,?string $username = null,?string $password = null,?string $socket = null,string $database = "data") {
+    public function __construct(?string $host = null, ?int $port = null, ?string $username = null, ?string $password = null, ?string $socket = null, ?string $database = null) {
         parent::__construct($host, $port, $username, $password, $socket, $database);
         $this->host = \Config::getHost();
     }
