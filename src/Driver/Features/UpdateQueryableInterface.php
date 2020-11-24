@@ -4,18 +4,17 @@ namespace Aternos\Model\Driver\Features;
 
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
+use Aternos\Model\Query\UpdateQuery;
 
 /**
- * Interface QueryableInterface
+ * Interface UpdateQueryableInterface
  *
  * @package Aternos\Model\Driver\Features
  */
-interface QueryableInterface
+interface UpdateQueryableInterface extends QueryableInterface
 {
     /**
-     * Execute a query
-     *
-     * @param Query $query
+     * @param UpdateQuery|Query $query
      * @return QueryResult
      */
     public function query(Query $query): QueryResult;

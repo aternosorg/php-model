@@ -4,6 +4,7 @@ namespace Aternos\Model\Driver\Mysqli;
 
 use Aternos\Model\{Driver\Driver,
     Driver\Features\CRUDAbleInterface,
+    Driver\Features\CRUDQueryableInterface,
     ModelInterface,
     Query\Generator\SQL,
     Query\Query,
@@ -19,7 +20,7 @@ use Aternos\Model\{Driver\Driver,
  *
  * @package Aternos\Model\Driver
  */
-class Mysqli extends Driver implements CRUDAbleInterface
+class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 {
     public const ID = "mysqli";
     protected string $id = self::ID;

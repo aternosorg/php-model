@@ -6,13 +6,25 @@ use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\DriverRegistryInterface;
 use Aternos\Model\Driver\Features\CacheableInterface;
 use Aternos\Model\Driver\Features\DeletableInterface;
+use Aternos\Model\Driver\Features\DeleteQueryableInterface;
 use Aternos\Model\Driver\Features\GettableInterface;
 use Aternos\Model\Driver\Features\QueryableInterface;
 use Aternos\Model\Driver\Features\SavableInterface;
+use Aternos\Model\Driver\Features\SelectQueryableInterface;
+use Aternos\Model\Driver\Features\UpdateQueryableInterface;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
 use BadMethodCallException;
-use Aternos\Model\Query\{Limit, Query, QueryResult, SelectQuery, UpdateQuery, WhereCondition, WhereGroup};
+use Aternos\Model\Query\{DeleteQuery,
+    Limit,
+    Query,
+    QueryResult,
+    QueryResultCollection,
+    SelectQuery,
+    UpdateQuery,
+    WhereCondition,
+    WhereGroup
+};
 
 /**
  * Class GenericModel
@@ -40,7 +52,7 @@ abstract class GenericModel extends BaseModel
     protected static ?int $cache = null;
 
     /**
-     * Driver IDs ordered for a regular get by ID
+     * Driver IDs ordered for a regular get/select by ID
      *
      * Caches etc. first, database after that, search etc. at the end
      *
@@ -52,7 +64,7 @@ abstract class GenericModel extends BaseModel
     ];
 
     /**
-     * Driver IDs ordered for saving
+     * Driver IDs ordered for saving/updating
      *
      * Set this to null to use the reverse order of static::$drivers which implement SavableInterface
      *
@@ -68,15 +80,6 @@ abstract class GenericModel extends BaseModel
      * @var array|null
      */
     protected static ?array $deleteDrivers = null;
-
-    /**
-     * Driver IDs ordered for querying
-     *
-     * Set this to null to use the same order as static::$drivers which implement QueryableInterface
-     *
-     * @var array|null
-     */
-    protected static ?array $queryDrivers = null;
 
 
     /**
@@ -106,6 +109,22 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
+     * Get all select queryable drivers from static::$drivers
+     *
+     * @return array
+     */
+    protected static function getSelectQueryableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$drivers as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, SelectQueryableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
      * Get all savable drivers from static::$saveDrivers or static::$drivers
      *
      * @return array
@@ -122,7 +141,23 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
-     * Get all savable drivers from static::$saveDrivers or static::$drivers
+     * Get all update queryable drivers from static::$saveDrivers or static::$drivers
+     *
+     * @return array
+     */
+    protected static function getUpdateQueryableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$saveDrivers ?? array_reverse(static::$drivers) as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, UpdateQueryableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all savable drivers from static::$deleteDrivers or static::$drivers
      *
      * @return array
      */
@@ -138,15 +173,15 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
-     * Get all savable drivers from static::$saveDrivers or static::$drivers
+     * Get all delete queryable drivers from static::$deleteDrivers or static::$drivers
      *
      * @return array
      */
-    protected static function getQueryableDrivers(): array
+    protected static function getDeleteQueryableDrivers(): array
     {
         $drivers = [];
-        foreach (static::$queryDrivers ?? static::$drivers as $driver) {
-            if (static::getDriverRegistry()->isDriverInstanceOf($driver, QueryableInterface::class)) {
+        foreach (static::$deleteDrivers ?? array_reverse(static::$drivers) as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, DeleteQueryableInterface::class)) {
                 $drivers[] = $driver;
             }
         }
@@ -226,14 +261,29 @@ abstract class GenericModel extends BaseModel
     {
         $query->modelClassName = static::class;
 
+        if ($query instanceof SelectQuery) {
+            $drivers = static::getSelectQueryableDrivers();
+        } else if ($query instanceof UpdateQuery) {
+            $drivers = static::getUpdateQueryableDrivers();
+        } else if ($query instanceof DeleteQuery) {
+            $drivers = static::getDeleteQueryableDrivers();
+        } else {
+            throw new BadMethodCallException("This is not a valid query (Select/Update/Delete).");
+        }
+
         $result = false;
-        foreach (static::getQueryableDrivers() as $queryableDriver) {
+        $results = [];
+        foreach ($drivers as $queryableDriver) {
             /** @var QueryableInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($queryableDriver);
             $result = $driver->query($query);
 
-            if ($result->wasSuccessful()) {
+            if ($result->wasSuccessful() && $query instanceof SelectQuery) {
                 break;
+            }
+
+            if (!$query instanceof SelectQuery) {
+                $results[] = $result;
             }
         }
 
@@ -242,7 +292,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (static::$registry) {
-            if ($result->wasSuccessful() && count($result) > 0) {
+            if ($query instanceof SelectQuery && $result->wasSuccessful() && count($result) > 0) {
                 foreach ($result as $model) {
                     if ($model->getId() === null) {
                         continue;
@@ -252,7 +302,11 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        return $result;
+        if ($query instanceof SelectQuery || count($results) === 1) {
+            return $result;
+        } else {
+            return new QueryResultCollection(true, $results);
+        }
     }
 
     /**
