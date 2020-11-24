@@ -80,16 +80,16 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      * @param string|null $username
      * @param string|null $password
      * @param string|null $socket
-     * @param string $database
+     * @param string|null $database
      */
-    public function __construct(?string $host = null, ?int $port = null, ?string $username = null, ?string $password = null, ?string $socket = null, string $database = "data")
+    public function __construct(?string $host = null, ?int $port = null, ?string $username = null, ?string $password = null, ?string $socket = null, ?string $database = null)
     {
-        $this->host = $host;
-        $this->port = $port;
-        $this->username = $username;
-        $this->password = $password;
-        $this->socket = $socket;
-        $this->database = $database;
+        $this->host = $host ?? $this->host;
+        $this->port = $port ?? $this->port;
+        $this->username = $username ?? $this->username;
+        $this->password = $password ?? $this->password;
+        $this->socket = $socket ?? $this->socket;
+        $this->database = $database ?? $this->database;
     }
 
     /**

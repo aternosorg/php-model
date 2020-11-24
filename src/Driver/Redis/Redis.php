@@ -58,13 +58,9 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      */
     public function __construct(?string $host = null, ?int $port = null, ?string $socket = null)
     {
-        if ($host) {
-            $this->host = $host;
-        }
-        if ($port) {
-            $this->port = $port;
-        }
-        $this->socket = $socket;
+        $this->host = $host ?? $this->host;
+        $this->port = $port ?? $this->port;
+        $this->socket = $socket ?? $this->socket;
     }
 
     /**

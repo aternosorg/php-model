@@ -66,7 +66,8 @@ class DriverRegistry implements DriverRegistryInterface
         }
 
         if (isset($this->classes[$id])) {
-            $driver = new ($this->classes[$id])();
+            $class = $this->classes[$id];
+            $driver = new $class();
             $this->registerDriver($driver);
             return $driver;
         }

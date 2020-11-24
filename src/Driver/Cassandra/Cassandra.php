@@ -78,11 +78,11 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      */
     public function __construct(?string $host = null, ?int $port = null, ?string $user = null, ?string $password = null, string $keyspace = "data")
     {
-        $this->host = $host;
-        $this->port = $port;
-        $this->user = $user;
-        $this->password = $password;
-        $this->keyspace = $keyspace;
+        $this->host = $host ?? $this->host;
+        $this->port = $port ?? $this->port;
+        $this->user = $user ?? $this->user;
+        $this->password = $password ?? $this->password;
+        $this->keyspace = $keyspace ?? $this->keyspace;
     }
 
     /**
