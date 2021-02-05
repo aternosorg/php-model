@@ -2,7 +2,7 @@
 
 namespace Aternos\Model\Query;
 
-use Aternos\Model\ModelCollection;
+use Aternos\Model\ModelCollectionResult;
 
 /**
  * Class QueryResult
@@ -10,15 +10,8 @@ use Aternos\Model\ModelCollection;
  * @author Matthias Neid
  * @package Aternos\Model\Query
  */
-class QueryResult extends ModelCollection
+class QueryResult extends ModelCollectionResult
 {
-    /**
-     * Success state of the query
-     *
-     * @var bool
-     */
-    protected bool $success;
-
     /**
      * Raw query string that was executed
      *
@@ -37,21 +30,8 @@ class QueryResult extends ModelCollection
      */
     public function __construct(bool $success, $result = [], ?string $queryString = null)
     {
-        $this->success = $success;
+        parent::__construct($success, $result);
         $this->queryString = $queryString;
-        if (is_array($result)) {
-            $this->models = $result;
-        }
-    }
-
-    /**
-     * Check if the query was successful
-     *
-     * @return bool
-     */
-    public function wasSuccessful(): bool
-    {
-        return (bool)$this->success;
     }
 
     /**

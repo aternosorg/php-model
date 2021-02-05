@@ -10,10 +10,13 @@ use Aternos\Model\Driver\Features\DeleteQueryableInterface;
 use Aternos\Model\Driver\Features\GettableInterface;
 use Aternos\Model\Driver\Features\QueryableInterface;
 use Aternos\Model\Driver\Features\SavableInterface;
+use Aternos\Model\Driver\Features\SearchableInterface;
 use Aternos\Model\Driver\Features\SelectQueryableInterface;
 use Aternos\Model\Driver\Features\UpdateQueryableInterface;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
+use Aternos\Model\Search\Search;
+use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
 use Aternos\Model\Query\{DeleteQuery,
     Limit,
@@ -182,6 +185,22 @@ abstract class GenericModel extends BaseModel
         $drivers = [];
         foreach (static::$deleteDrivers ?? array_reverse(static::$drivers) as $driver) {
             if (static::getDriverRegistry()->isDriverInstanceOf($driver, DeleteQueryableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all searchable drivers from static::$drivers
+     *
+     * @return array
+     */
+    protected static function getSearchableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$drivers as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, SearchableInterface::class)) {
                 $drivers[] = $driver;
             }
         }
@@ -421,4 +440,44 @@ abstract class GenericModel extends BaseModel
     {
         return static::$cache ?: 0;
     }
+
+    /**
+     * Search the model
+     *
+     * @param Search $search
+     * @return SearchResult|static[]
+     */
+    public static function search(Search $search): SearchResult
+    {
+        $search->setModelClassName(static::class);
+
+        $result = false;
+        foreach (static::getSearchableDrivers() as $searchableDriver) {
+            /** @var SearchableInterface $driver */
+            $driver = static::getDriverRegistry()->getDriver($searchableDriver);
+            $result = $driver->search($search);
+
+            if ($result->wasSuccessful()) {
+                break;
+            }
+        }
+
+        if ($result === false) {
+            throw new BadMethodCallException("You can't search the model if no searchable driver is available.");
+        }
+
+        if (static::$registry) {
+            if ($result->wasSuccessful() && count($result) > 0) {
+                foreach ($result as $model) {
+                    if ($model->getId() === null) {
+                        continue;
+                    }
+                    ModelRegistry::getInstance()->save($model);
+                }
+            }
+        }
+
+        return $result;
+    }
+
 }
