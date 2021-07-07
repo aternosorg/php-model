@@ -98,7 +98,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     public function save(ModelInterface $model): bool
     {
         if (!$model->getCacheTime()) {
-            return false;
+            return true;
         }
 
         $this->connect();
@@ -141,7 +141,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     public function delete(ModelInterface $model): bool
     {
         if (!$model->getCacheTime()) {
-            return false;
+            return true;
         }
 
         $this->connect();
