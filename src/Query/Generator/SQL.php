@@ -88,6 +88,8 @@ class SQL implements QueryGeneratorInterface
             $queryString .= " WHERE " . $this->generateWhere($query);
         }
 
+        $queryString .= $this->generateGroup($query);
+
         if ($query->getOrder()) {
             $queryString .= " " . $this->generateOrder($query);
         }
@@ -238,6 +240,24 @@ class SQL implements QueryGeneratorInterface
         }
 
         return implode(", ", $fieldStrings);
+    }
+
+    /**
+     * @param Query $query
+     * @return string
+     */
+    protected function generateGroup(Query $query): string
+    {
+        if (!$query instanceof SelectQuery || count($query->getGroup()) === 0) {
+            return "";
+        }
+
+        $groupFieldStrings = [];
+        foreach ($query->getGroup() as $groupField) {
+            $groupFieldStrings[] = $this->columnEnclosure . $groupField->key . $this->columnEnclosure;
+        }
+
+        return " GROUP BY " . implode(", ", $groupFieldStrings);
     }
 
     /**

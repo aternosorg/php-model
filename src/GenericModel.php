@@ -19,6 +19,7 @@ use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
 use Aternos\Model\Query\{DeleteQuery,
+    GroupField,
     Limit,
     Query,
     QueryResult,
@@ -26,8 +27,7 @@ use Aternos\Model\Query\{DeleteQuery,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup
-};
+    WhereGroup};
 
 /**
  * Class GenericModel
@@ -339,11 +339,12 @@ abstract class GenericModel extends BaseModel
      * @param array|null $order
      * @param array|null $fields
      * @param array|null|int|Limit $limit
+     * @param array|GroupField[]|string[] $group
      * @return QueryResult|static[]
      */
-    public static function select($where = null, $order = null, $fields = null, $limit = null): QueryResult
+    public static function select($where = null, $order = null, $fields = null, $limit = null, $group = null): QueryResult
     {
-        return static::query(new SelectQuery($where, $order, $fields, $limit));
+        return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
     }
 
     /**

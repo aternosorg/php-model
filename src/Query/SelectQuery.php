@@ -13,6 +13,7 @@ class SelectQuery extends Query
      * @var SelectField[]
      */
     protected ?array $fields = null;
+    protected ?array $group = null;
 
     /**
      * SelectQuery constructor.
@@ -21,8 +22,9 @@ class SelectQuery extends Query
      * @param array|null $order
      * @param array|null $fields
      * @param array|null|int|Limit $limit
+     * @param array|null|string[]|GroupField[] $group
      */
-    public function __construct($where = null, $order = null, $fields = null, $limit = null)
+    public function __construct($where = null, $order = null, $fields = null, $limit = null, $group = null)
     {
         if ($where) {
             $this->where($where);
@@ -61,5 +63,30 @@ class SelectQuery extends Query
         }
 
         return $this;
+    }
+
+    /**
+     * Set group by fields
+     *
+     * @param array|GroupField[]|string[] $fields
+     */
+    public function groupBy(array $fields)
+    {
+        $this->group = null;
+        foreach ($fields as $key => $field) {
+            if ($field instanceof GroupField) {
+                $this->group[] = $field;
+            } else if (is_string($field)) {
+                $this->group[] = new GroupField($field);
+            }
+        }
+    }
+
+    /**
+     * @return array|null|GroupField[]
+     */
+    public function getGroup(): ?array
+    {
+        return $this->group;
     }
 }
