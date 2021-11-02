@@ -248,7 +248,7 @@ class SQL implements QueryGeneratorInterface
      */
     protected function generateGroup(Query $query): string
     {
-        if (!$query instanceof SelectQuery || count($query->getGroup()) === 0) {
+        if (!$query instanceof SelectQuery || $query->getGroup() === null || count($query->getGroup()) === 0) {
             return "";
         }
 
