@@ -41,6 +41,10 @@ class SelectQuery extends Query
         if ($limit) {
             $this->limit($limit);
         }
+
+        if ($group) {
+            $this->groupBy($group);
+        }
     }
 
     /**
