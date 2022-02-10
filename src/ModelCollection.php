@@ -99,7 +99,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      * @param mixed $offset
      * @return ModelInterface
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): ModelInterface
     {
         return $this->models[$offset];
     }
