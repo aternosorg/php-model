@@ -40,7 +40,7 @@ class WhereGroup implements \Iterator, \Countable
      * @param array $conditions
      * @param int $conjunction
      */
-    public function __construct(array $conditions = [], $conjunction = self:: AND)
+    public function __construct(array $conditions = [], int $conjunction = self:: AND)
     {
         $this->group = $conditions;
         $this->conjunction = $conjunction;
@@ -65,7 +65,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return array
      */
-    public function getAll()
+    public function getAll(): array
     {
         return $this->group;
     }
@@ -95,7 +95,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->iterator;
     }
@@ -105,7 +105,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return boolean
      */
-    public function valid()
+    public function valid(): bool
     {
         return array_key_exists($this->iterator, $this->group);
     }
@@ -125,7 +125,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->group);
     }

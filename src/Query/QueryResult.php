@@ -28,7 +28,7 @@ class QueryResult extends ModelCollectionResult
      * @param array $result Containing models (ModelInterface)
      * @param string|null $queryString
      */
-    public function __construct(bool $success, $result = [], ?string $queryString = null)
+    public function __construct(bool $success, array $result = [], ?string $queryString = null)
     {
         parent::__construct($success, $result);
         $this->queryString = $queryString;

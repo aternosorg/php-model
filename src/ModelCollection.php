@@ -27,7 +27,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return ModelInterface
      */
-    public function current()
+    public function current(): ModelInterface
     {
         return $this->models[$this->iterator];
     }
@@ -37,7 +37,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->iterator++;
     }
@@ -47,7 +47,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->iterator;
     }
@@ -57,7 +57,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return boolean
      */
-    public function valid()
+    public function valid(): bool
     {
         return array_key_exists($this->iterator, $this->models);
     }
@@ -67,7 +67,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterator = 0;
     }
@@ -77,18 +77,18 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->models);
     }
 
     /**
-     * Whether a offset exists
+     * Whether an offset exists
      *
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->models[$offset]);
     }
@@ -97,7 +97,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      * Offset to retrieve
      *
      * @param mixed $offset
-     * @return mixed
+     * @return ModelInterface
      */
     public function offsetGet($offset)
     {
@@ -110,7 +110,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      * @param $offset
      * @param $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->models[$offset] = $value;
     }
@@ -120,7 +120,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      *
      * @param $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->models[$offset]);
     }

@@ -21,7 +21,7 @@ class ModelCollectionResult extends ModelCollection
      * @param bool $success
      * @param array $result Containing models (ModelInterface)
      */
-    public function __construct(bool $success, $result = [])
+    public function __construct(bool $success, array $result = [])
     {
         $this->success = $success;
         if (is_array($result)) {
