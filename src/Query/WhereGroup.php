@@ -49,14 +49,10 @@ class WhereGroup implements \Iterator, \Countable
     /**
      * Add an element to the group
      *
-     * @param WhereGroup|WhereCondition $conditionOrGroup
+     * @param WhereCondition|WhereGroup $conditionOrGroup
      */
-    public function add($conditionOrGroup)
+    public function add(WhereCondition|WhereGroup $conditionOrGroup)
     {
-        if (!$conditionOrGroup instanceof WhereCondition && !$conditionOrGroup instanceof WhereGroup) {
-            throw new \InvalidArgumentException('Argument $conditionOrGroup has to be instance of WhereCondition or WhereGroup.');
-        }
-
         $this->group[] = $conditionOrGroup;
     }
 
@@ -75,7 +71,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return WhereGroup|WhereCondition
      */
-    public function current()
+    public function current(): WhereGroup|WhereCondition
     {
         return $this->group[$this->iterator];
     }
@@ -85,7 +81,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->iterator++;
     }
@@ -115,7 +111,7 @@ class WhereGroup implements \Iterator, \Countable
      *
      * @return void
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterator = 0;
     }
