@@ -18,16 +18,16 @@ abstract class SimpleModel extends BaseModel
     /**
      * @param string $id
      * @param bool $update
-     * @return ModelInterface|bool
+     * @return static|null
      */
-    public static function get(string $id, bool $update = false)
+    public static function get(string $id, bool $update = false): ?static
     {
         $model = new static($id);
         if (DriverRegistry::getInstance()->getDriver(Mysqli::ID)->get($model)) {
             return $model;
         }
 
-        return false;
+        return null;
     }
 
     /**

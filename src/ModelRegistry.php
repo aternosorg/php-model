@@ -20,8 +20,9 @@ class ModelRegistry
      * Add a model to the registry
      *
      * @param ModelInterface $model
+     * @return void
      */
-    public function save(ModelInterface $model)
+    public function save(ModelInterface $model): void
     {
         $this->registry[$model::getName()][$model->getId()] = $model;
     }
@@ -29,18 +30,20 @@ class ModelRegistry
     /**
      * Get a model by name and id from the registry
      *
-     * @param string $name
+     * @template TModel of ModelInterface
+     * @param class-string<TModel|ModelInterface> $className
      * @param string $id
-     * @return bool|ModelInterface
+     * @return null|TModel
      */
-    public function get(string $name, string $id)
+    public function get(string $className, string $id): ?ModelInterface
     {
+        $name = $className::getName();
         if (!isset($this->registry[$name])) {
-            return false;
+            return null;
         }
 
         if (!isset($this->registry[$name][$id])) {
-            return false;
+            return null;
         }
 
         return $this->registry[$name][$id];
@@ -50,8 +53,9 @@ class ModelRegistry
      * Delete a model from the registry
      *
      * @param ModelInterface $model
+     * @return void
      */
-    public function delete(ModelInterface $model)
+    public function delete(ModelInterface $model): void
     {
         unset($this->registry[$model::getName()][$model->getId()]);
     }

@@ -5,6 +5,7 @@ namespace Aternos\Model;
 /**
  * Class ModelCollection
  *
+ * @template TModel of ModelInterface
  * @package Aternos\Model
  */
 class ModelCollection implements \Iterator, \Countable, \ArrayAccess
@@ -15,7 +16,8 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * Add a model
      *
-     * @param ModelInterface $model
+     * @param TModel $model
+     * @noinspection PhpDocSignatureInspection
      */
     public function add(ModelInterface $model)
     {
@@ -25,7 +27,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * Return the current element
      *
-     * @return ModelInterface
+     * @return TModel
      */
     public function current(): ModelInterface
     {
@@ -88,7 +90,7 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      * @param mixed $offset
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->models[$offset]);
     }
@@ -97,9 +99,9 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
      * Offset to retrieve
      *
      * @param mixed $offset
-     * @return ModelInterface
+     * @return TModel
      */
-    public function offsetGet($offset): ModelInterface
+    public function offsetGet(mixed $offset): ModelInterface
     {
         return $this->models[$offset];
     }
@@ -107,10 +109,10 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * Offset to set
      *
-     * @param $offset
-     * @param $value
+     * @param mixed $offset
+     * @param TModel $value
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->models[$offset] = $value;
     }
@@ -118,9 +120,9 @@ class ModelCollection implements \Iterator, \Countable, \ArrayAccess
     /**
      * Offset to unset
      *
-     * @param $offset
+     * @param mixed $offset
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->models[$offset]);
     }

@@ -28,17 +28,17 @@ interface ModelInterface
     /**
      * Get the id of the model
      *
-     * @return string
+     * @return mixed
      */
-    public function getId();
+    public function getId(): mixed;
 
     /**
      * Set the id of the model
      *
      * @param string $id
-     * @return void
+     * @return $this
      */
-    public function setId($id);
+    public function setId(mixed $id): static;
 
     /**
      * Get the name of the id field
@@ -54,7 +54,7 @@ interface ModelInterface
      * @param bool $update
      * @return static|bool
      */
-    public static function get(string $id, bool $update = false);
+    public static function get(string $id, bool $update = false): ?static;
 
     /**
      * Query a model

@@ -5,7 +5,7 @@ namespace Aternos\Model;
 /**
  * Class BaseModel
  *
- * Contains all non driver related functions such as id and
+ * Contains all non-driver related functions such as id and
  * changed fields, use this to build models with custom driver
  * logic, but without writing everything from scratch
  *
@@ -19,9 +19,9 @@ abstract class BaseModel implements ModelInterface
      * It's protected to be easily replaced by a property with
      * a different name if that's required
      *
-     * @var string|null
+     * @var mixed
      */
-    protected $id;
+    protected mixed $id;
 
     /**
      * Name of the field used as unique identifier
@@ -52,9 +52,9 @@ abstract class BaseModel implements ModelInterface
     /**
      * Get the unique identifier of the model
      *
-     * @return string
+     * @return mixed
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->{static::$idField};
     }
@@ -62,11 +62,13 @@ abstract class BaseModel implements ModelInterface
     /**
      * Set the unique identifier
      *
-     * @param $id
+     * @param mixed $id
+     * @return $this
      */
-    public function setId($id)
+    public function setId(mixed $id): static
     {
         $this->{static::$idField} = $id;
+        return $this;
     }
 
     /**

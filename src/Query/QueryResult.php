@@ -3,11 +3,13 @@
 namespace Aternos\Model\Query;
 
 use Aternos\Model\ModelCollectionResult;
+use Aternos\Model\ModelInterface;
 
 /**
  * Class QueryResult
  *
- * @author Matthias Neid
+ * @template TModel of ModelInterface
+ * @extends ModelCollectionResult<TModel>
  * @package Aternos\Model\Query
  */
 class QueryResult extends ModelCollectionResult
@@ -25,7 +27,7 @@ class QueryResult extends ModelCollectionResult
      * QueryResult constructor.
      *
      * @param bool $success
-     * @param array $result Containing models (ModelInterface)
+     * @param TModel[] $result
      * @param string|null $queryString
      */
     public function __construct(bool $success, array $result = [], ?string $queryString = null)
@@ -48,17 +50,13 @@ class QueryResult extends ModelCollectionResult
             $model = $this->models[0];
         }
 
-        if (isset($model->{$key})) {
-            return $model->{$key};
-        } else {
-            return null;
-        }
+        return $model->{$key} ?? null;
     }
 
     /**
      * Get the executed query string
      *
-     * @return string
+     * @return string|null
      */
     public function getQueryString(): ?string
     {

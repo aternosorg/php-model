@@ -2,17 +2,18 @@
 
 namespace Aternos\Model;
 
+use Aternos\Model\Driver\DriverInterface;
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\DriverRegistryInterface;
-use Aternos\Model\Driver\Features\CacheableInterface;
-use Aternos\Model\Driver\Features\DeletableInterface;
-use Aternos\Model\Driver\Features\DeleteQueryableInterface;
-use Aternos\Model\Driver\Features\GettableInterface;
-use Aternos\Model\Driver\Features\QueryableInterface;
-use Aternos\Model\Driver\Features\SavableInterface;
-use Aternos\Model\Driver\Features\SearchableInterface;
-use Aternos\Model\Driver\Features\SelectQueryableInterface;
-use Aternos\Model\Driver\Features\UpdateQueryableInterface;
+use Aternos\Model\Driver\Features\{CacheableInterface,
+    DeletableInterface,
+    DeleteQueryableInterface,
+    GettableInterface,
+    QueryableInterface,
+    SavableInterface,
+    SearchableInterface,
+    SelectQueryableInterface,
+    UpdateQueryableInterface};
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
 use Aternos\Model\Search\Search;
@@ -59,7 +60,7 @@ abstract class GenericModel extends BaseModel
      *
      * Caches etc. first, database after that, search etc. at the end
      *
-     * @var array|string[]
+     * @var class-string<DriverInterface>[]
      */
     protected static array $drivers = [
         Redis::ID,
@@ -71,7 +72,7 @@ abstract class GenericModel extends BaseModel
      *
      * Set this to null to use the reverse order of static::$drivers which implement SavableInterface
      *
-     * @var array|null
+     * @var class-string<SavableInterface>[]|null
      */
     protected static ?array $saveDrivers = null;
 
@@ -80,10 +81,9 @@ abstract class GenericModel extends BaseModel
      *
      * Set this to null to use the reverse order of static::$drivers which implement DeletableInterface
      *
-     * @var array|null
+     * @var class-string<DeletableInterface>[]|null
      */
     protected static ?array $deleteDrivers = null;
-
 
     /**
      * Get the driver factory for the current model
@@ -98,7 +98,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all gettable drivers from static::$drivers
      *
-     * @return array
+     * @return class-string<GettableInterface>[]
      */
     protected static function getGettableDrivers(): array
     {
@@ -114,7 +114,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all select queryable drivers from static::$drivers
      *
-     * @return array
+     * @return class-string<SelectQueryableInterface>[]
      */
     protected static function getSelectQueryableDrivers(): array
     {
@@ -130,7 +130,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all savable drivers from static::$saveDrivers or static::$drivers
      *
-     * @return array
+     * @return class-string<SavableInterface>[]
      */
     protected static function getSavableDrivers(): array
     {
@@ -146,7 +146,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all update queryable drivers from static::$saveDrivers or static::$drivers
      *
-     * @return array
+     * @return class-string<UpdateQueryableInterface>[]
      */
     protected static function getUpdateQueryableDrivers(): array
     {
@@ -162,7 +162,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all savable drivers from static::$deleteDrivers or static::$drivers
      *
-     * @return array
+     * @return class-string<DeletableInterface>[]
      */
     protected static function getDeletableDrivers(): array
     {
@@ -178,7 +178,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all delete queryable drivers from static::$deleteDrivers or static::$drivers
      *
-     * @return array
+     * @return class-string<DeleteQueryableInterface>[]
      */
     protected static function getDeleteQueryableDrivers(): array
     {
@@ -194,7 +194,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all searchable drivers from static::$drivers
      *
-     * @return array
+     * @return class-string<SearchableInterface>[]
      */
     protected static function getSearchableDrivers(): array
     {
@@ -212,16 +212,16 @@ abstract class GenericModel extends BaseModel
      *
      * @param string $id
      * @param bool $update
-     * @return static|bool
+     * @return static|null
      */
-    public static function get(string $id, bool $update = false)
+    public static function get(string $id, bool $update = false): ?static
     {
         $registry = ModelRegistry::getInstance();
         $driverRegistry = static::getDriverRegistry();
 
         // try to get the model from the registry
         if (static::$registry) {
-            if ($registryModel = $registry->get(static::getName(), $id)) {
+            if ($registryModel = $registry->get(static::class, $id)) {
                 $model = $registryModel;
                 if (!$update) {
                     return $model;
@@ -234,7 +234,6 @@ abstract class GenericModel extends BaseModel
         $cacheDrivers = [];
         $success = false;
         foreach (static::getGettableDrivers() as $gettableDriver) {
-            /** @var GettableInterface $driver */
             $driver = $driverRegistry->getDriver($gettableDriver);
             if ($update && $driver instanceof CacheableInterface) {
                 $cacheDrivers[] = $driver;
@@ -252,7 +251,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (!$success) {
-            return false;
+            return null;
         }
 
         if (static::$cache) {
@@ -274,7 +273,7 @@ abstract class GenericModel extends BaseModel
      * Query the model
      *
      * @param Query $query
-     * @return QueryResult|static[]
+     * @return QueryResult<static>
      */
     public static function query(Query $query): QueryResult
     {
@@ -335,14 +334,18 @@ abstract class GenericModel extends BaseModel
      *   which is the same as
      * GenericModel::query((new SelectQuery())->where("a"=>"b"));
      *
-     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|WhereCondition|WhereGroup|null $where
      * @param array|null $order
      * @param array|null $fields
-     * @param array|null|int|Limit $limit
-     * @param array|GroupField[]|string[] $group
-     * @return QueryResult|static[]
+     * @param array|int|Limit|null $limit
+     * @param array|GroupField[]|string[]|null $group
+     * @return QueryResult<static>
      */
-    public static function select($where = null, $order = null, $fields = null, $limit = null, $group = null): QueryResult
+    public static function select(null|WhereCondition|array|WhereGroup $where = null,
+                                  null|array $order = null,
+                                  null|array $fields = null,
+                                  null|Limit|array|int $limit = null,
+                                  null|array $group = null): QueryResult
     {
         return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
     }
@@ -353,10 +356,13 @@ abstract class GenericModel extends BaseModel
      * @param array|null $fields
      * @param array|null|WhereCondition|WhereGroup $where
      * @param array|null $order
-     * @param array|null|int|Limit $limit
-     * @return QueryResult
+     * @param array|int|Limit|null $limit
+     * @return QueryResult<static>
      */
-    public static function update($fields = null, $where = null, $order = null, $limit = null)
+    public static function update(null|array                           $fields = null,
+                                  null|array|WhereCondition|WhereGroup $where = null,
+                                  null|array                           $order = null,
+                                  null|array|int|Limit                 $limit = null): QueryResult
     {
         return static::query(new UpdateQuery($fields, $where, $order, $limit));
     }
@@ -378,7 +384,6 @@ abstract class GenericModel extends BaseModel
         }
 
         foreach (static::getSavableDrivers() as $savableDriver) {
-            /** @var SavableInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($savableDriver);
             if (!$driver->save($this)) {
                 return false;
@@ -421,9 +426,9 @@ abstract class GenericModel extends BaseModel
      * dataset
      *
      * @param array $data
-     * @return QueryResult
+     * @return QueryResult<static>
      */
-    public function set(array $data)
+    public function set(array $data): QueryResult
     {
         foreach ($data as $key => $value) {
             $this->{$key} = $value;
@@ -446,7 +451,7 @@ abstract class GenericModel extends BaseModel
      * Search the model
      *
      * @param Search $search
-     * @return SearchResult|static[]
+     * @return SearchResult<static>
      */
     public static function search(Search $search): SearchResult
     {
@@ -480,5 +485,4 @@ abstract class GenericModel extends BaseModel
 
         return $result;
     }
-
 }

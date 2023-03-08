@@ -4,6 +4,9 @@ namespace Aternos\Model;
 
 /**
  * Class ModelCollectionResult
+ *
+ * @template TModel of ModelInterface
+ * @extends ModelCollection<TModel>
  * @package Aternos\Model
  */
 class ModelCollectionResult extends ModelCollection
@@ -19,7 +22,7 @@ class ModelCollectionResult extends ModelCollection
      * ModelCollectionResult constructor.
      *
      * @param bool $success
-     * @param array $result Containing models (ModelInterface)
+     * @param TModel[] $result
      */
     public function __construct(bool $success, array $result = [])
     {
