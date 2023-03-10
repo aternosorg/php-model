@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace Aternos\Model\Driver\Redis;
 
@@ -6,6 +6,7 @@ use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CacheableInterface;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\ModelInterface;
+use RedisException;
 
 /**
  * Class Redis
@@ -65,8 +66,10 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
 
     /**
      * Connect to redis
+     *
+     * @throws RedisException
      */
-    protected function connect()
+    protected function connect(): void
     {
         if (!$this->connection) {
             $this->connection = new \Redis();
@@ -94,6 +97,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws RedisException
      */
     public function save(ModelInterface $model): bool
     {
@@ -110,6 +114,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws RedisException
      */
     public function get(ModelInterface $model): bool
     {
@@ -137,6 +142,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws RedisException
      */
     public function delete(ModelInterface $model): bool
     {

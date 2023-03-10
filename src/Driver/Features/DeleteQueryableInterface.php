@@ -13,7 +13,7 @@ use Aternos\Model\Query\QueryResult;
 interface DeleteQueryableInterface extends QueryableInterface
 {
     /**
-     * @param DeleteQuery|Query $query
+     * @param DeleteQuery $query
      * @return QueryResult
      */
     public function query(Query $query): QueryResult;

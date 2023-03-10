@@ -18,13 +18,17 @@ class SelectQuery extends Query
     /**
      * SelectQuery constructor.
      *
-     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|WhereCondition|WhereGroup|null $where
      * @param array|null $order
      * @param array|null $fields
-     * @param array|null|int|Limit $limit
-     * @param array|null|string[]|GroupField[] $group
+     * @param array|int|Limit|null $limit
+     * @param array|GroupField[]|string[]|null $group
      */
-    public function __construct($where = null, $order = null, $fields = null, $limit = null, $group = null)
+    public function __construct(null|WhereCondition|array|WhereGroup $where = null,
+                                null|array                           $order = null,
+                                null|array                           $fields = null,
+                                null|Limit|array|int                 $limit = null,
+                                null|array $group = null)
     {
         if ($where) {
             $this->where($where);
@@ -51,14 +55,12 @@ class SelectQuery extends Query
      * Set fields
      *
      * @param array $fields
-     * @return SelectQuery
+     * @return $this
      */
-    public function fields(array $fields)
+    public function fields(array $fields): static
     {
-        parent::fields($fields);
-
         $this->fields = [];
-        foreach ($fields as $key => $field) {
+        foreach ($fields as $field) {
             if ($field instanceof SelectField) {
                 $this->fields[] = $field;
             } else if (is_string($field)) {
@@ -73,8 +75,9 @@ class SelectQuery extends Query
      * Set group by fields
      *
      * @param array|GroupField[]|string[] $fields
+     * @return $this
      */
-    public function groupBy(array $fields)
+    public function groupBy(array $fields): static
     {
         $this->group = null;
         foreach ($fields as $key => $field) {

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace Aternos\Model\Driver\Mysqli;
 
@@ -9,6 +9,8 @@ use Aternos\Model\{Driver\Driver,
     Query\Generator\SQL,
     Query\Query,
     Query\QueryResult};
+use Exception;
+use mysqli_result;
 
 /**
  * Class Mysqli
@@ -94,13 +96,15 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * Connect to database
+     *
+     * @throws Exception
      */
-    protected function connect()
+    protected function connect(): void
     {
         if (!$this->connection || !@mysqli_ping($this->connection)) {
             $this->connection = mysqli_connect($this->host, $this->username, $this->password, $this->database, $this->port, $this->socket);
             if (!$this->connection) {
-                throw new \Exception("Could not connect to Mysqli database. Error: " . mysqli_error($this->connection));
+                throw new Exception("Could not connect to Mysqli database. Error: " . mysqli_error($this->connection));
             }
         }
     }
@@ -109,16 +113,16 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      * Execute a mysql query
      *
      * @param string $query
-     * @return bool|\mysqli_result
-     * @throws \Exception
+     * @return bool|mysqli_result
+     * @throws Exception
      */
-    protected function rawQuery(string $query)
+    protected function rawQuery(string $query): mysqli_result|bool
     {
         $this->connect();
         $result = mysqli_query($this->connection, $query);
 
         if (mysqli_error($this->connection)) {
-            throw new \Exception("MySQLi Error #" . mysqli_errno($this->connection) . ": " . mysqli_error($this->connection));
+            throw new Exception("MySQLi Error #" . mysqli_errno($this->connection) . ": " . mysqli_error($this->connection));
         }
 
         return $result;
@@ -129,7 +133,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function save(ModelInterface $model): bool
     {
@@ -173,7 +177,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function get(ModelInterface $model): bool
     {
@@ -200,7 +204,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(ModelInterface $model): bool
     {
@@ -219,7 +223,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param Query $query
      * @return QueryResult
-     * @throws \Exception
+     * @throws Exception
      */
     public function query(Query $query): QueryResult
     {

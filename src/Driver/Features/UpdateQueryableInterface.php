@@ -14,7 +14,7 @@ use Aternos\Model\Query\UpdateQuery;
 interface UpdateQueryableInterface extends QueryableInterface
 {
     /**
-     * @param UpdateQuery|Query $query
+     * @param UpdateQuery $query
      * @return QueryResult
      */
     public function query(Query $query): QueryResult;

@@ -46,7 +46,7 @@ abstract class Query
      * @param array|WhereCondition|WhereGroup $where
      * @return Query
      */
-    public function where($where)
+    public function where(WhereCondition|array|WhereGroup $where): static
     {
         if (is_array($where)) {
             $group = new WhereGroup();
@@ -76,15 +76,15 @@ abstract class Query
     /**
      * Get WHERE part of the query
      *
-     * @return WhereGroup|bool
+     * @return WhereGroup|null
      */
-    public function getWhere()
+    public function getWhere(): WhereGroup|null
     {
         if ($this->where) {
             return $this->where;
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -97,7 +97,7 @@ abstract class Query
      * @param array $order
      * @return Query
      */
-    public function orderBy(array $order)
+    public function orderBy(array $order): static
     {
         $this->order = [];
         foreach ($order as $key => $value) {
@@ -107,18 +107,11 @@ abstract class Query
             }
 
             if (!is_int($value)) {
-                switch (strtoupper($value)) {
-                    case "ASCENDING":
-                    case "ASC":
-                        $value = OrderField::ASCENDING;
-                        break;
-                    case "DESCENDING":
-                    case "DESC":
-                        $value = OrderField::DESCENDING;
-                        break;
-                    default:
-                        throw new \InvalidArgumentException('Argument $order contains invalid order direction: ' . $value);
-                }
+                $value = match (strtoupper($value)) {
+                    "ASCENDING", "ASC" => OrderField::ASCENDING,
+                    "DESCENDING", "DESC" => OrderField::DESCENDING,
+                    default => throw new \InvalidArgumentException('Argument $order contains invalid order direction: ' . $value),
+                };
             }
 
             $this->order[] = new OrderField($key, $value);
@@ -142,21 +135,14 @@ abstract class Query
      *
      * Can be either an array of keys, of key value pairs or of Field objects
      *
-     * ['field', 'anotherfield']
-     * ['field' => 'value', 'anotherfield' => 'anothervalue']
-     * [new Field('field'), new Field('anotherfield', 'anothervalue')]
+     * ['field', 'another-field']
+     * ['field' => 'value', 'another-field' => 'another-value']
+     * [new Field('field'), new Field('another-field', 'another-value')]
      *
      * @param array $fields
      * @return Query
      */
-    public function fields(array $fields)
-    {
-        if (!is_array($fields)) {
-            throw new \InvalidArgumentException('Argument $fields is not an array.');
-        }
-
-        return $this;
-    }
+    abstract public function fields(array $fields): static;
 
     /**
      * Get SELECT fields of the query
@@ -176,10 +162,10 @@ abstract class Query
      * Int sets only the length (start is 0)
      * Array sets both [start, length] (e.g. [5, 10])
      *
-     * @param int|array|Limit $limit
+     * @param array|int|Limit $limit
      * @return Query
      */
-    public function limit($limit)
+    public function limit(Limit|array|int $limit): static
     {
         if (is_int($limit)) {
             $this->limit = new Limit($limit);

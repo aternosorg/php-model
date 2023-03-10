@@ -18,11 +18,14 @@ class UpdateQuery extends Query
      * UpdateQuery constructor.
      *
      * @param array|null $fields
-     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|WhereCondition|WhereGroup|null $where
      * @param array|null $order
-     * @param array|null|int|Limit $limit
+     * @param array|int|Limit|null $limit
      */
-    public function __construct($fields = null, $where = null, $order = null, $limit = null)
+    public function __construct(null|array                           $fields = null,
+                                null|WhereCondition|array|WhereGroup $where = null,
+                                null|array                           $order = null,
+                                null|Limit|array|int                 $limit = null)
     {
         if ($fields) {
             $this->fields($fields);
@@ -45,12 +48,10 @@ class UpdateQuery extends Query
      * Set fields
      *
      * @param array $fields
-     * @return UpdateQuery
+     * @return $this
      */
-    public function fields(array $fields)
+    public function fields(array $fields): static
     {
-        parent::fields($fields);
-
         $this->fields = [];
         foreach ($fields as $key => $field) {
             if ($field instanceof UpdateField) {

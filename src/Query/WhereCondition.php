@@ -28,7 +28,7 @@ class WhereCondition
      *
      * @var mixed
      */
-    public $value;
+    public mixed $value;
 
     /**
      * @var bool
@@ -44,10 +44,10 @@ class WhereCondition
      * WhereCondition constructor.
      *
      * @param string|null $field
-     * @param mixed $value
+     * @param mixed|null $value
      * @param string $operator
      */
-    public function __construct(?string $field = null, $value = null, string $operator = "=")
+    public function __construct(?string $field = null, mixed $value = null, string $operator = "=")
     {
         $this->field = $field;
         $this->value = $value;

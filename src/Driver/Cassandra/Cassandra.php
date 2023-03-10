@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace Aternos\Model\Driver\Cassandra;
 
@@ -9,6 +9,9 @@ use Aternos\Model\ModelInterface;
 use Aternos\Model\Query\Generator\SQL;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
+use Cassandra\Exception;
+use Cassandra\Rows;
+use Cassandra\Session;
 
 /**
  * Class Cassandra
@@ -63,9 +66,9 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
     protected string $keyspace = "data";
 
     /**
-     * @var \Cassandra\Session|null
+     * @var Session|null
      */
-    protected ?\Cassandra\Session $connection = null;
+    protected ?Session $connection = null;
 
     /**
      * Cassandra constructor.
@@ -88,43 +91,43 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
     /**
      * Connect to cassandra database
      */
-    protected function connect()
+    protected function connect(): void
     {
-        if (!$this->connection) {
-            $builder = \Cassandra::cluster();
-
-            if ($this->host) {
-                $builder->withContactPoints($this->host);
-            }
-
-            if ($this->port) {
-                $builder->withPort($this->port);
-            }
-
-            if ($this->user && $this->password) {
-                $builder->withCredentials($this->user, $this->password);
-            }
-
-            $cluster = $builder->build();
-            $this->connection = $cluster->connect($this->keyspace);
+        if ($this->connection) {
+            return;
         }
+
+        $builder = \Cassandra::cluster();
+
+        if ($this->host) {
+            $builder->withContactPoints($this->host);
+        }
+
+        if ($this->port) {
+            $builder->withPort($this->port);
+        }
+
+        if ($this->user && $this->password) {
+            $builder->withCredentials($this->user, $this->password);
+        }
+
+        $cluster = $builder->build();
+        $this->connection = $cluster->connect($this->keyspace);
     }
 
     /**
      * Execute a cassandra query
      *
-     * @param $query
-     * @return \Cassandra\Rows
-     * @throws \Cassandra\Exception
+     * @param string $query
+     * @return Rows
+     * @throws Exception
      */
-    protected function rawQuery(string $query)
+    protected function rawQuery(string $query): Rows
     {
         $this->connect();
 
         $statement = new \Cassandra\SimpleStatement($query);
-        $result = $this->connection->execute($statement);
-
-        return $result;
+        return $this->connection->execute($statement);
     }
 
     /**
@@ -132,7 +135,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Cassandra\Exception
+     * @throws Exception
      */
     public function save(ModelInterface $model): bool
     {
@@ -152,7 +155,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Cassandra\Exception
+     * @throws Exception
      */
     public function get(ModelInterface $model): bool
     {
@@ -178,7 +181,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws \Cassandra\Exception
+     * @throws Exception
      */
     public function delete(ModelInterface $model): bool
     {
@@ -195,7 +198,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param Query $query
      * @return QueryResult
-     * @throws \Cassandra\Exception
+     * @throws Exception
      */
     public function query(Query $query): QueryResult
     {

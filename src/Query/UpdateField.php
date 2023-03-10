@@ -14,7 +14,7 @@ class UpdateField extends Field
      *
      * @var mixed|null
      */
-    public $value;
+    public mixed $value;
 
     /**
      * UpdateField constructor.
@@ -22,7 +22,7 @@ class UpdateField extends Field
      * @param string|null $key
      * @param mixed|null $value
      */
-    public function __construct(?string $key = null, $value = null)
+    public function __construct(?string $key = null, mixed $value = null)
     {
         parent::__construct($key);
         $this->value = $value;
@@ -30,9 +30,9 @@ class UpdateField extends Field
 
     /**
      * @param mixed|null $value
-     * @return UpdateField
+     * @return $this
      */
-    public function setValue($value): UpdateField
+    public function setValue(mixed $value): UpdateField
     {
         $this->value = $value;
         return $this;

@@ -12,11 +12,13 @@ class DeleteQuery extends Query
     /**
      * DeleteQuery constructor.
      *
-     * @param array|null|WhereCondition|WhereGroup $where
+     * @param array|WhereCondition|WhereGroup|null $where
      * @param array|null $order
-     * @param array|null|int|Limit $limit
+     * @param array|int|Limit|null $limit
      */
-    public function __construct($where = null, $order = null, $limit = null)
+    public function __construct(null|WhereCondition|array|WhereGroup $where = null,
+                                null|array                           $order = null,
+                                null|Limit|array|int                 $limit = null)
     {
         if ($where) {
             $this->where($where);
@@ -32,10 +34,9 @@ class DeleteQuery extends Query
     }
 
     /**
-     * @param $fields
-     * @return Query|void
+     * @param array $fields
      */
-    public function fields($fields)
+    public function fields(array $fields): static
     {
         throw new \BadMethodCallException("You can't set fields on a delete query.");
     }

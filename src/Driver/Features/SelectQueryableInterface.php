@@ -14,7 +14,7 @@ use Aternos\Model\Query\SelectQuery;
 interface SelectQueryableInterface extends QueryableInterface
 {
     /**
-     * @param SelectQuery|Query $query
+     * @param SelectQuery $query
      * @return QueryResult
      */
     public function query(Query $query): QueryResult;

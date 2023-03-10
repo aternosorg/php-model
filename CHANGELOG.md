@@ -15,6 +15,7 @@
        instead of `false`.
     - `GenericModel::select()` and `GenericModel::update()` now have fully typed arguments.
     - `GenericModel->set()` now has the return type `QueryResult`.
+    - All `Query` classes now have proper typing for their arguments and return types.
 - `ModelRegistry->get(string $className, string $id): ?ModelInterface` now takes the class name
   as the first argument instead of the model name. This function is also generic and type hints
   the return type from the first argument.
