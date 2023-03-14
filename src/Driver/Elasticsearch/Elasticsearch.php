@@ -63,30 +63,29 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
     /**
      * Get the model
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @return ModelInterface|null
+     * @throws Exception
      */
-    public function get(ModelInterface $model): bool
+    public function get(string $modelClass, mixed $id): ?ModelInterface
     {
         $params = [
-            'index' => $model::getName(),
-            'id' => $model->getId()
+            'index' => $modelClass::getName(),
+            $modelClass::getIdField() => $id
         ];
 
         $this->connect();
         try {
             $response = $this->client->getSource($params);
         } catch (Missing404Exception $e) {
-            return false;
+            return null;
         }
         if (!is_array($response)) {
-            return false;
+            return null;
         }
 
-        foreach ($response as $key => $value) {
-            $model->{$key} = $value;
-        }
-        return true;
+        return $modelClass::getModelFromData($response);
     }
 
     /**

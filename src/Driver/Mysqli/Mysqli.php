@@ -175,28 +175,25 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     /**
      * Get the model
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @return ModelInterface|null
      * @throws Exception
      */
-    public function get(ModelInterface $model): bool
+    public function get(string $modelClass, mixed $id): ?ModelInterface
     {
         $this->connect();
-        $table = $model::getName();
+        $table = $modelClass::getName();
 
-        $id = mysqli_real_escape_string($this->connection, $model->getId());
-        $query = "SELECT * FROM `" . $table . "` WHERE `" . $model->getIdField() . "` = '" . $id . "'";
+        $escapedId = mysqli_real_escape_string($this->connection, $id);
+        $query = "SELECT * FROM `" . $table . "` WHERE `" . $modelClass::getIdField() . "` = '" . $escapedId . "'";
         $result = $this->rawQuery($query);
         if (!$result || mysqli_num_rows($result) === 0) {
-            return false;
+            return null;
         }
 
         $row = mysqli_fetch_assoc($result);
-        foreach ($row as $key => $value) {
-            $model->{$key} = $value;
-        }
-
-        return true;
+        return $modelClass::getModelFromData($row);
     }
 
     /**

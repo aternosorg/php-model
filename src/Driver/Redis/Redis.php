@@ -84,12 +84,13 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     /**
      * Generate a cache key string from a model
      *
-     * @param ModelInterface $model
+     * @param class-string $modelClass
+     * @param mixed $id
      * @return string
      */
-    protected function generateCacheKey(ModelInterface $model): string
+    protected function generateCacheKey(string $modelClass, mixed $id): string
     {
-        return "ATERNOS_MODEL::" . $model::getName() . "::" . $model->getId();
+        return "ATERNOS_MODEL::" . $modelClass::getName() . "::" . $id;
     }
 
     /**
@@ -106,35 +107,35 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         }
 
         $this->connect();
-        return $this->connection->set($this->generateCacheKey($model), json_encode($model), $model->getCacheTime());
+        return $this->connection->set($this->generateCacheKey($model::class, $model->getId()), json_encode($model), $model->getCacheTime());
     }
 
     /**
      * Get the model
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @return ModelInterface|null
      * @throws RedisException
      */
-    public function get(ModelInterface $model): bool
+    public function get(string $modelClass, mixed $id): ?ModelInterface
     {
-        if (!$model->getCacheTime()) {
-            return false;
+        if (!$modelClass::getCacheTime()) {
+            return null;
         }
 
         $this->connect();
-        $rawData = $this->connection->get($this->generateCacheKey($model));
+        $rawData = $this->connection->get($this->generateCacheKey($modelClass, $id));
 
         if (!$rawData) {
-            return false;
+            return null;
         }
 
         $data = json_decode($rawData, true);
-        foreach ($data as $key => $value) {
-            $model->{$key} = $value;
+        if (!is_array($data)) {
+            return null;
         }
-
-        return true;
+        return $modelClass::getModelFromData($data);
     }
 
     /**
@@ -151,7 +152,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         }
 
         $this->connect();
-        return $this->connection->del($this->generateCacheKey($model));
+        return $this->connection->del($this->generateCacheKey($model::class, $model->getId()));
     }
 
     /**

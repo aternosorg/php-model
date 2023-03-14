@@ -13,7 +13,8 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
     SavableInterface,
     SearchableInterface,
     SelectQueryableInterface,
-    UpdateQueryableInterface};
+    UpdateQueryableInterface
+};
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
 use Aternos\Model\Search\Search;
@@ -28,7 +29,9 @@ use Aternos\Model\Query\{DeleteQuery,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup};
+    WhereGroup
+};
+use Exception;
 
 /**
  * Class GenericModel
@@ -54,6 +57,25 @@ abstract class GenericModel extends BaseModel
      * @var ?int
      */
     protected static ?int $cache = null;
+
+    /**
+     * A list of variant child models filtered by static::$filters
+     * Should also contain the default class with $filters = null
+     * as fallback
+     *
+     * @var class-string<GenericModel>[]
+     */
+    protected static array $variants = [];
+
+    /**
+     * Key => value filters for the current variant class
+     *
+     * Are used to filter the variants array based on raw data
+     * and also applied to get/select/update/delete
+     *
+     * @var array|null
+     */
+    protected static ?array $filters = null;
 
     /**
      * Driver IDs ordered for a regular get/select by ID
@@ -84,6 +106,16 @@ abstract class GenericModel extends BaseModel
      * @var class-string<DeletableInterface>[]|null
      */
     protected static ?array $deleteDrivers = null;
+
+    /**
+     * Return the cache time
+     *
+     * @return int
+     */
+    public static function getCacheTime(): int
+    {
+        return static::$cache ?: 0;
+    }
 
     /**
      * Get the driver factory for the current model
@@ -208,11 +240,61 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
+     * @param array $rawData
+     * @return bool
+     */
+    public static function matchesFilters(array $rawData): bool
+    {
+        if (static::$filters === null) {
+            return true;
+        }
+        foreach (static::$filters as $key => $value) {
+            if (!isset($rawData[$key]) || $rawData[$key] !== $value) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param array $rawData
+     * @return class-string<static>|null
+     */
+    public static function getVariantForData(array $rawData): ?string
+    {
+        foreach (static::$variants as $variantClass) {
+            if (!is_subclass_of($variantClass, static::class) && $variantClass !== static::class) {
+                continue;
+            }
+            if ($variantClass::matchesFilters($rawData)) {
+                return $variantClass;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param array $rawData
+     * @return static|null
+     */
+    public static function getModelFromData(array $rawData): ?static
+    {
+        $variantClass = static::getVariantForData($rawData);
+        if ($variantClass === null) {
+            return null;
+        }
+        /** @var static $model */
+        $model = new $variantClass();
+        return $model->applyData($rawData);
+    }
+
+    /**
      * Get a model by id
      *
      * @param string $id
      * @param bool $update
      * @return static|null
+     * @throws Exception
      */
     public static function get(string $id, bool $update = false): ?static
     {
@@ -229,10 +311,8 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        $model = new static($id);
-
         $cacheDrivers = [];
-        $success = false;
+        $model = null;
         foreach (static::getGettableDrivers() as $gettableDriver) {
             $driver = $driverRegistry->getDriver($gettableDriver);
             if ($update && $driver instanceof CacheableInterface) {
@@ -240,8 +320,7 @@ abstract class GenericModel extends BaseModel
                 continue;
             }
 
-            if ($driver->get($model)) {
-                $success = true;
+            if ($model = $driver->get(static::class, $id)) {
                 break;
             }
 
@@ -250,7 +329,7 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        if (!$success) {
+        if (!$model) {
             return null;
         }
 
@@ -278,6 +357,17 @@ abstract class GenericModel extends BaseModel
     public static function query(Query $query): QueryResult
     {
         $query->modelClassName = static::class;
+
+        if (static::$filters !== null && count(static::$filters) > 0) {
+            $wrappedWhereGroup = new WhereGroup(conjunction: WhereGroup::AND);
+            foreach (static::$filters as $key => $value) {
+                $wrappedWhereGroup->add(new WhereCondition($key, $value));
+            }
+            if ($query->getWhere()) {
+                $wrappedWhereGroup->add($query->getWhere());
+            }
+            $query->where($wrappedWhereGroup);
+        }
 
         if ($query instanceof SelectQuery) {
             $drivers = static::getSelectQueryableDrivers();
@@ -342,10 +432,10 @@ abstract class GenericModel extends BaseModel
      * @return QueryResult<static>
      */
     public static function select(null|WhereCondition|array|WhereGroup $where = null,
-                                  null|array $order = null,
-                                  null|array $fields = null,
-                                  null|Limit|array|int $limit = null,
-                                  null|array $group = null): QueryResult
+                                  null|array                           $order = null,
+                                  null|array                           $fields = null,
+                                  null|Limit|array|int                 $limit = null,
+                                  null|array                           $group = null): QueryResult
     {
         return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
     }
@@ -365,6 +455,18 @@ abstract class GenericModel extends BaseModel
                                   null|array|int|Limit                 $limit = null): QueryResult
     {
         return static::query(new UpdateQuery($fields, $where, $order, $limit));
+    }
+
+    /**
+     * @param array $rawData
+     * @return $this
+     */
+    public function applyData(array $rawData): static
+    {
+        foreach ($rawData as $key => $value) {
+            $this->{$key} = $value;
+        }
+        return $this;
     }
 
     /**
@@ -435,16 +537,6 @@ abstract class GenericModel extends BaseModel
         }
 
         return static::update($data, [static::$idField => $this->{static::$idField}]);
-    }
-
-    /**
-     * Return the cache time
-     *
-     * @return int
-     */
-    public function getCacheTime(): int
-    {
-        return static::$cache ?: 0;
     }
 
     /**

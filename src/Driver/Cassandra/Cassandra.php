@@ -153,27 +153,24 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
     /**
      * Get the model
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @return ModelInterface|null
      * @throws Exception
      */
-    public function get(ModelInterface $model): bool
+    public function get(string $modelClass, mixed $id): ?ModelInterface
     {
-        $table = $model::getName();
+        $table = $modelClass::getName();
 
-        $id = str_replace("'", "''", $model->getId());
-        $query = "SELECT * FROM " . $table . " WHERE " . $model->getIdField() . " = '" . $id . "'";
+        $id = str_replace("'", "''", $id);
+        $query = "SELECT * FROM " . $table . " WHERE " . $modelClass::getIdField() . " = '" . $id . "'";
         $rows = $this->rawQuery($query);
         if ($rows->count() === 0) {
             return false;
         }
 
         $current = $rows->current();
-        foreach ($current as $key => $value) {
-            $model->{$key} = $value;
-        }
-
-        return true;
+        return $modelClass::getModelFromData($current);
     }
 
     /**

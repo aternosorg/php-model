@@ -23,7 +23,7 @@ interface ModelInterface
      *
      * @return int
      */
-    public function getCacheTime(): int;
+    public static function getCacheTime(): int;
 
     /**
      * Get the id of the model
@@ -45,7 +45,15 @@ interface ModelInterface
      *
      * @return string
      */
-    public function getIdField(): string;
+    public static function getIdField(): string;
+
+    /**
+     * Get a new model object from a raw data array
+     *
+     * @param array $rawData
+     * @return static|null
+     */
+    public static function getModelFromData(array $rawData): ?static;
 
     /**
      * Get a model by id

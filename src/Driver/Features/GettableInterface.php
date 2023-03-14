@@ -14,8 +14,9 @@ interface GettableInterface
     /**
      * Get the model
      *
-     * @param ModelInterface $model
-     * @return bool
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @return ModelInterface|null
      */
-    public function get(ModelInterface $model): bool;
+    public function get(string $modelClass, mixed $id): ?ModelInterface;
 }

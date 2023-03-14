@@ -38,11 +38,21 @@ abstract class BaseModel implements ModelInterface
     protected static int $idLength = 16;
 
     /**
+     * Get the field name of the unique identifier
+     *
+     * @return string
+     */
+    public static function getIdField(): string
+    {
+        return static::$idField;
+    }
+
+    /**
      * Model constructor.
      *
-     * @param null|string $id
+     * @param mixed $id
      */
-    public function __construct($id = null)
+    public function __construct(mixed $id = null)
     {
         if ($id) {
             $this->setId($id);
@@ -69,16 +79,6 @@ abstract class BaseModel implements ModelInterface
     {
         $this->{static::$idField} = $id;
         return $this;
-    }
-
-    /**
-     * Get the field name of the unique identifier
-     *
-     * @return string
-     */
-    public function getIdField(): string
-    {
-        return static::$idField;
     }
 
     /**
