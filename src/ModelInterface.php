@@ -85,4 +85,12 @@ interface ModelInterface
      * @return bool
      */
     public function delete(): bool;
+
+    /**
+     * Get a field value, even if it's not part of the defined model
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getField(string $key): mixed;
 }

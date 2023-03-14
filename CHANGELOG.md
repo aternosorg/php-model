@@ -24,6 +24,8 @@
 - `ModelRegistry->get(string $className, string $id): ?ModelInterface` now takes the class name
   as the first argument instead of the model name. This function is also generic and type hints
   the return type from the first argument.
+- Fields that aren't defined in the model are no longer set as dynamic properties. They
+  have to be retrieved using the new `ModelInterface->getField(string $key): mixed` function.
   
 ### Added
 - `ModelCollection` and its children now have generic type hinting in phpdoc allowing for type

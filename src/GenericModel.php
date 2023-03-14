@@ -458,18 +458,6 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
-     * @param array $rawData
-     * @return $this
-     */
-    public function applyData(array $rawData): static
-    {
-        foreach ($rawData as $key => $value) {
-            $this->{$key} = $value;
-        }
-        return $this;
-    }
-
-    /**
      * Save the model changes
      *
      * @return bool

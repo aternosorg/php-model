@@ -14,16 +14,6 @@ namespace Aternos\Model;
 abstract class BaseModel implements ModelInterface
 {
     /**
-     * Should be added as public property to all inheriting models
-     *
-     * It's protected to be easily replaced by a property with
-     * a different name if that's required
-     *
-     * @var mixed
-     */
-    protected mixed $id;
-
-    /**
      * Name of the field used as unique identifier
      *
      * @var string
@@ -38,6 +28,25 @@ abstract class BaseModel implements ModelInterface
     protected static int $idLength = 16;
 
     /**
+     * Should be added as public property to all inheriting models
+     *
+     * It's protected to be easily replaced by a property with
+     * a different name if that's required
+     *
+     * @var mixed
+     */
+    protected mixed $id;
+
+    /**
+     * Additional fields that aren't part of the model, but occur in the result
+     *
+     * e.g. results of calculations, aliased fields etc.
+     *
+     * @var array
+     */
+    protected array $additionalFields = [];
+
+    /**
      * Get the field name of the unique identifier
      *
      * @return string
@@ -45,6 +54,16 @@ abstract class BaseModel implements ModelInterface
     public static function getIdField(): string
     {
         return static::$idField;
+    }
+
+    /**
+     * @param array $rawData
+     * @return static|null
+     */
+    public static function getModelFromData(array $rawData): ?static
+    {
+        $model = new static();
+        return $model->applyData($rawData);
     }
 
     /**
@@ -96,5 +115,38 @@ abstract class BaseModel implements ModelInterface
         } while (static::get($id));
 
         $this->setId($id);
+    }
+
+    /**
+     * Apply data to the model
+     *
+     * @param array $rawData
+     * @return $this
+     */
+    public function applyData(array $rawData): static
+    {
+        foreach ($rawData as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->{$key} = $value;
+            } else {
+                $this->additionalFields[$key] = $value;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Get a field value, even if it's not part of the defined model
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getField(string $key): mixed
+    {
+        if (property_exists($this, $key)) {
+            return $this->{$key};
+        } else {
+            return $this->additionalFields[$key];
+        }
     }
 }
