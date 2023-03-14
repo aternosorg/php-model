@@ -8,7 +8,7 @@ Every part of the library can be overwritten and replaced separately for custom 
 
 In contrary to other model libraries, this library is not tied to any specific database
 backend, instead every model can contain custom logic for accessing different databases, 
-e.g. for a different cache or search backend. Therefore this library does not provide
+e.g. for a different cache or search backend. Therefore, this library does not provide
 any provisioning functionality.
 
 **Note: This library is still in development and some features especially regarding more
@@ -98,7 +98,6 @@ This library includes three different abstract model classes to make the model c
 easier:
  
 * [BaseModel](src/BaseModel.php) - Implements the basic model logic and is not related to any Driver
-* [SimpleModel](src/SimpleModel.php) - Minimal implementation for the Mysqli driver, mainly for demonstration purposes
 * [GenericModel](src/GenericModel.php) - Optional implementation of all drivers and registry
 
 It's recommended to start with the [GenericModel](src/GenericModel.php) since it already implements
@@ -139,9 +138,6 @@ class User extends \Aternos\Model\GenericModel
     public $email;
 }
 ```
-
-If you want to implement your own driver logic in your model take a look at the [SimpleModel](src/SimpleModel.php), 
-which should give you a good idea of the minimal requirements.
 
 ### Use your model
 You can now use your model in your code:
