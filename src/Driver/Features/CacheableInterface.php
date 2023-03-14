@@ -2,8 +2,6 @@
 
 namespace Aternos\Model\Driver\Features;
 
-use Aternos\Model\Driver\DriverInterface;
-
 /**
  * Interface CacheableInterface
  *

@@ -10,8 +10,8 @@ use Aternos\Model\Query\{DeleteQuery,
     UpdateField,
     UpdateQuery,
     WhereCondition,
-    WhereGroup
-};
+    WhereGroup};
+use UnexpectedValueException;
 
 /**
  * Class SQL
@@ -105,10 +105,10 @@ class SQL implements QueryGeneratorInterface
      * Generate query from where conditions and groups
      *
      * @param Query $query
-     * @param WhereGroup|WhereCondition|null $where
+     * @param WhereCondition|WhereGroup|null $where
      * @return string
      */
-    private function generateWhere(Query $query, $where = null)
+    private function generateWhere(Query $query, WhereCondition|WhereGroup $where = null): string
     {
         if (!$where) {
             $where = $query->getWhere();
@@ -130,16 +130,11 @@ class SQL implements QueryGeneratorInterface
 
             return $field . " " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
-            switch ($where->conjunction) {
-                case WhereGroup:: AND:
-                    $conjunction = " AND ";
-                    break;
-                case WhereGroup:: OR:
-                    $conjunction = " OR ";
-                    break;
-                default:
-                    throw new \UnexpectedValueException("Invalid conjunction: " . $where->conjunction);
-            }
+            $conjunction = match ($where->conjunction) {
+                WhereGroup:: AND => " AND ",
+                WhereGroup:: OR => " OR ",
+                default => throw new UnexpectedValueException("Invalid conjunction: " . $where->conjunction),
+            };
 
             $whereStrings = [];
             foreach ($where as $wherePart) {
@@ -158,7 +153,7 @@ class SQL implements QueryGeneratorInterface
      * @param Query $query
      * @return string
      */
-    private function generateOrder(Query $query)
+    private function generateOrder(Query $query): string
     {
         $orderFields = $query->getOrder();
 
@@ -167,16 +162,11 @@ class SQL implements QueryGeneratorInterface
         $formattedOrderFields = [];
         foreach ($orderFields as $orderField) {
             /** @var OrderField $orderField */
-            switch ($orderField->direction) {
-                case OrderField::ASCENDING:
-                    $direction = "ASC";
-                    break;
-                case OrderField::DESCENDING:
-                    $direction = "DESC";
-                    break;
-                default:
-                    throw new \UnexpectedValueException("Invalid direction: " . $orderField->direction);
-            }
+            $direction = match ($orderField->direction) {
+                OrderField::ASCENDING => "ASC",
+                OrderField::DESCENDING => "DESC",
+                default => throw new UnexpectedValueException("Invalid direction: " . $orderField->direction),
+            };
 
             if ($orderField->raw) {
                 $formattedOrderFields[] = $orderField->field . " " . $direction;
@@ -197,7 +187,7 @@ class SQL implements QueryGeneratorInterface
      * @param Query $query
      * @return string
      */
-    private function generateFields(Query $query)
+    private function generateFields(Query $query): string
     {
         $fields = $query->getFields();
 
@@ -263,10 +253,10 @@ class SQL implements QueryGeneratorInterface
     /**
      * Generate value for where ore field usage
      *
-     * @param string|int|float|null $value
+     * @param float|int|string|null $value
      * @return string
      */
-    private function generateValue($value)
+    private function generateValue(float|int|string|null $value): string
     {
         if (is_int($value) || is_float($value)) {
             return $value;

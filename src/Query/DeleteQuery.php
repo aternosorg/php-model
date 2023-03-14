@@ -2,6 +2,8 @@
 
 namespace Aternos\Model\Query;
 
+use BadMethodCallException;
+
 /**
  * Class DeleteQuery
  *
@@ -38,6 +40,6 @@ class DeleteQuery extends Query
      */
     public function fields(array $fields): static
     {
-        throw new \BadMethodCallException("You can't set fields on a delete query.");
+        throw new BadMethodCallException("You can't set fields on a delete query.");
     }
 }

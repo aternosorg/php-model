@@ -84,7 +84,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     /**
      * Generate a cache key string from a model
      *
-     * @param class-string $modelClass
+     * @param class-string<ModelInterface> $modelClass
      * @param mixed $id
      * @return string
      */

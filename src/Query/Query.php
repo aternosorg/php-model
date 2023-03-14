@@ -3,6 +3,7 @@
 namespace Aternos\Model\Query;
 
 use Aternos\Model\ModelInterface;
+use InvalidArgumentException;
 
 /**
  * Class Query
@@ -59,7 +60,7 @@ abstract class Query
                     } elseif (count($value) === 3) {
                         $group->add(new WhereCondition($value[0], $value[2], $value[1]));
                     } else {
-                        throw new \InvalidArgumentException('Argument $where has an invalid array element with a length of ' . count($value) . '.');
+                        throw new InvalidArgumentException('Argument $where has an invalid array element with a length of ' . count($value) . '.');
                     }
                 } else {
                     $group->add(new WhereCondition($key, $value));
@@ -112,7 +113,7 @@ abstract class Query
                 $value = match (strtoupper($value)) {
                     "ASCENDING", "ASC" => OrderField::ASCENDING,
                     "DESCENDING", "DESC" => OrderField::DESCENDING,
-                    default => throw new \InvalidArgumentException('Argument $order contains invalid order direction: ' . $value),
+                    default => throw new InvalidArgumentException('Argument $order contains invalid order direction: ' . $value),
                 };
             }
 
@@ -176,7 +177,7 @@ abstract class Query
         } elseif ($limit instanceof Limit) {
             $this->limit = $limit;
         } else {
-            throw new \InvalidArgumentException('Argument $limit has an invalid type.');
+            throw new InvalidArgumentException('Argument $limit has an invalid type.');
         }
 
         return $this;

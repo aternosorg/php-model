@@ -11,6 +11,7 @@ use Aternos\Model\Search\SearchResult;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
+use Exception;
 
 /**
  * Class Elasticsearch
@@ -111,6 +112,7 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
      */
     public function search(Search $search): SearchResult
     {
+        /** @var class-string<ModelInterface> $modelClassName */
         $modelClassName = $search->getModelClassName();
         $params = [
             'index' => $modelClassName::getName(),

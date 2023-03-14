@@ -13,13 +13,9 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
     SavableInterface,
     SearchableInterface,
     SelectQueryableInterface,
-    UpdateQueryableInterface
-};
+    UpdateQueryableInterface};
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
-use Aternos\Model\Search\Search;
-use Aternos\Model\Search\SearchResult;
-use BadMethodCallException;
 use Aternos\Model\Query\{DeleteQuery,
     GroupField,
     Limit,
@@ -29,8 +25,10 @@ use Aternos\Model\Query\{DeleteQuery,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup
-};
+    WhereGroup};
+use Aternos\Model\Search\Search;
+use Aternos\Model\Search\SearchResult;
+use BadMethodCallException;
 use Exception;
 
 /**

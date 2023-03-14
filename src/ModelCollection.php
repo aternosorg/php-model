@@ -2,13 +2,17 @@
 
 namespace Aternos\Model;
 
+use ArrayAccess;
+use Countable;
+use Iterator;
+
 /**
  * Class ModelCollection
  *
  * @template TModel of ModelInterface
  * @package Aternos\Model
  */
-class ModelCollection implements \Iterator, \Countable, \ArrayAccess
+class ModelCollection implements Iterator, Countable, ArrayAccess
 {
     protected array $models = [];
     protected int $iterator = 0;

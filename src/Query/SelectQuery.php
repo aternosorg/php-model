@@ -87,6 +87,7 @@ class SelectQuery extends Query
                 $this->group[] = new GroupField($field);
             }
         }
+        return $this;
     }
 
     /**

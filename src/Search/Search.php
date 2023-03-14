@@ -2,6 +2,8 @@
 
 namespace Aternos\Model\Search;
 
+use Aternos\Model\ModelInterface;
+
 /**
  * Class Search
  * @package Aternos\Model\Search
@@ -46,7 +48,7 @@ class Search
     }
 
     /**
-     * @return string|null
+     * @return class-string<ModelInterface>|null
      */
     public function getModelClassName(): ?string
     {

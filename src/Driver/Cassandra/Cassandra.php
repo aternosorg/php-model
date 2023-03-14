@@ -12,6 +12,7 @@ use Aternos\Model\Query\QueryResult;
 use Cassandra\Exception;
 use Cassandra\Rows;
 use Cassandra\Session;
+use Cassandra\SimpleStatement;
 
 /**
  * Class Cassandra
@@ -126,8 +127,8 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
     {
         $this->connect();
 
-        $statement = new \Cassandra\SimpleStatement($query);
-        return $this->connection->execute($statement);
+        $statement = new SimpleStatement($query);
+        return $this->connection->execute($statement, null);
     }
 
     /**
@@ -166,7 +167,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
         $query = "SELECT * FROM " . $table . " WHERE " . $modelClass::getIdField() . " = '" . $id . "'";
         $rows = $this->rawQuery($query);
         if ($rows->count() === 0) {
-            return false;
+            return null;
         }
 
         $current = $rows->current();

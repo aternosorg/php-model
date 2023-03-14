@@ -2,12 +2,15 @@
 
 namespace Aternos\Model\Query;
 
+use Countable;
+use Iterator;
+
 /**
  * Class WhereConditionGroup
  *
  * @package Aternos\Model\Query
  */
-class WhereGroup implements \Iterator, \Countable
+class WhereGroup implements Iterator, Countable
 {
     /**
      * Conjunction values
