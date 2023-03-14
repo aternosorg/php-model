@@ -85,6 +85,9 @@ abstract class BaseModel implements ModelInterface
      */
     public function getId(): mixed
     {
+        if (!isset($this->{static::$idField})) {
+            return null;
+        }
         return $this->{static::$idField};
     }
 
