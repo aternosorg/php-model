@@ -263,6 +263,10 @@ abstract class GenericModel extends BaseModel
      */
     public static function getVariantForData(array $rawData): ?string
     {
+        if (empty(static::$variants)) {
+            return static::class;
+        }
+
         foreach (static::$variants as $variantClass) {
             if (!is_subclass_of($variantClass, static::class) && $variantClass !== static::class) {
                 continue;
