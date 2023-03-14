@@ -30,7 +30,7 @@ abstract class Field
      * @param string|null $key
      * @return Field
      */
-    public function setKey(?string $key): Field
+    public function setKey(?string $key): static
     {
         $this->key = $key;
         return $this;
