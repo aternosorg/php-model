@@ -357,7 +357,8 @@ abstract class GenericModel extends BaseModel
      * Query the model
      *
      * @param Query $query
-     * @return QueryResult<static>
+     * @return QueryResult<static>|static[]
+     * @noinspection PhpDocSignatureInspection
      */
     public static function query(Query $query): QueryResult
     {
@@ -434,7 +435,8 @@ abstract class GenericModel extends BaseModel
      * @param array|null $fields
      * @param array|int|Limit|null $limit
      * @param array|GroupField[]|string[]|null $group
-     * @return QueryResult<static>
+     * @return QueryResult<static>|static[]
+     * @noinspection PhpDocSignatureInspection
      */
     public static function select(null|WhereCondition|array|WhereGroup $where = null,
                                   null|array                           $order = null,
@@ -465,7 +467,8 @@ abstract class GenericModel extends BaseModel
      * @param array|null|WhereCondition|WhereGroup $where
      * @param array|null $order
      * @param array|int|Limit|null $limit
-     * @return QueryResult<static>
+     * @return QueryResult<static>|static[]
+     * @noinspection PhpDocSignatureInspection
      */
     public static function update(null|array                           $fields = null,
                                   null|array|WhereCondition|WhereGroup $where = null,
@@ -534,7 +537,8 @@ abstract class GenericModel extends BaseModel
      * dataset
      *
      * @param array $data
-     * @return QueryResult<static>
+     * @return QueryResult<static>|static[]
+     * @noinspection PhpDocSignatureInspection
      */
     public function set(array $data): QueryResult
     {
