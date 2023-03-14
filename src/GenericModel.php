@@ -13,10 +13,12 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
     SavableInterface,
     SearchableInterface,
     SelectQueryableInterface,
-    UpdateQueryableInterface};
+    UpdateQueryableInterface
+};
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
-use Aternos\Model\Query\{DeleteQuery,
+use Aternos\Model\Query\{CountField,
+    DeleteQuery,
     GroupField,
     Limit,
     Query,
@@ -25,7 +27,8 @@ use Aternos\Model\Query\{DeleteQuery,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup};
+    WhereGroup
+};
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
@@ -436,6 +439,19 @@ abstract class GenericModel extends BaseModel
                                   null|array                           $group = null): QueryResult
     {
         return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
+    }
+
+    /**
+     * @param WhereCondition|array|WhereGroup|null $where
+     * @return int|null
+     */
+    public static function count(null|WhereCondition|array|WhereGroup $where = null): ?int
+    {
+        $result = static::select(where: $where, fields: [new CountField()]);
+        if ($result->wasSuccessful()) {
+            return $result[0]->getField(CountField::COUNT_FIELD);
+        }
+        return null;
     }
 
     /**

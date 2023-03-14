@@ -35,6 +35,7 @@
   `GenericModel::$filters` which are key value pairs that identify the type. Direct calls to get and 
   query functions will automatically filter the results to the correct variant. Calls to the shared
   parent model will return all variants but of the correct subtype.
+- Added `CountField` and `GenericModel::count()` for easier count queries.
 
 ### Removed
 - Removed `SimpleModel`.
