@@ -154,12 +154,13 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
     /**
      * Get the model
      *
-     * @param class-string<ModelInterface> $modelClass
+     * @param class-string $modelClass
      * @param mixed $id
+     * @param ModelInterface|null $model
      * @return ModelInterface|null
      * @throws Exception
      */
-    public function get(string $modelClass, mixed $id): ?ModelInterface
+    public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
         $table = $modelClass::getName();
 
@@ -171,6 +172,9 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
         }
 
         $current = $rows->current();
+        if ($model) {
+            return $model->applyData($current);
+        }
         return $modelClass::getModelFromData($current);
     }
 

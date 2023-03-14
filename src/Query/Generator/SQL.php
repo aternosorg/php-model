@@ -212,7 +212,11 @@ class SQL implements QueryGeneratorInterface
                         }
                     }
 
-                    $fieldString .= $this->columnEnclosure . $field->key . $this->columnEnclosure;
+                    if ($field->key !== "*") {
+                        $fieldString .= $this->columnEnclosure . $field->key . $this->columnEnclosure;
+                    } else {
+                        $fieldString .= $field->key;
+                    }
 
                     if ($field->function !== null) {
                         $fieldString .= ")";

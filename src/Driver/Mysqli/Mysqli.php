@@ -175,12 +175,13 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     /**
      * Get the model
      *
-     * @param class-string<ModelInterface> $modelClass
+     * @param class-string $modelClass
      * @param mixed $id
+     * @param ModelInterface|null $model
      * @return ModelInterface|null
      * @throws Exception
      */
-    public function get(string $modelClass, mixed $id): ?ModelInterface
+    public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
         $this->connect();
         $table = $modelClass::getName();
@@ -193,6 +194,9 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
         }
 
         $row = mysqli_fetch_assoc($result);
+        if ($model) {
+            return $model->applyData($row);
+        }
         return $modelClass::getModelFromData($row);
     }
 

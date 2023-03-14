@@ -454,10 +454,13 @@ abstract class GenericModel extends BaseModel
     public static function count(null|WhereCondition|array|WhereGroup $where = null): ?int
     {
         $result = static::select(where: $where, fields: [new CountField()]);
-        if ($result->wasSuccessful()) {
-            return $result[0]->getField(CountField::COUNT_FIELD);
+        if (!$result->wasSuccessful()) {
+            return null;
         }
-        return null;
+        if (count($result) === 0) {
+            return 0;
+        }
+        return $result[0]->getField(CountField::COUNT_FIELD);
     }
 
     /**
@@ -476,6 +479,37 @@ abstract class GenericModel extends BaseModel
                                   null|array|int|Limit                 $limit = null): QueryResult
     {
         return static::query(new UpdateQuery($fields, $where, $order, $limit));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function reload(): static
+    {
+        $driverRegistry = static::getDriverRegistry();
+
+        $cacheDrivers = [];
+        foreach (static::getGettableDrivers() as $gettableDriver) {
+            $driver = $driverRegistry->getDriver($gettableDriver);
+            if ($driver instanceof CacheableInterface) {
+                $cacheDrivers[] = $driver;
+                continue;
+            }
+
+            if ($driver->get(static::class, $this->getId(), $this)) {
+                break;
+            }
+        }
+
+        if (static::$cache) {
+            foreach ($cacheDrivers as $cacheDriver) {
+                if ($cacheDriver instanceof SavableInterface) {
+                    $cacheDriver->save($this);
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**

@@ -113,12 +113,13 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     /**
      * Get the model
      *
-     * @param class-string<ModelInterface> $modelClass
+     * @param class-string $modelClass
      * @param mixed $id
+     * @param ModelInterface|null $model
      * @return ModelInterface|null
      * @throws RedisException
      */
-    public function get(string $modelClass, mixed $id): ?ModelInterface
+    public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
         if (!$modelClass::getCacheTime()) {
             return null;
@@ -134,6 +135,10 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         $data = json_decode($rawData, true);
         if (!is_array($data)) {
             return null;
+        }
+
+        if ($model) {
+            return $model->applyData($data);
         }
         return $modelClass::getModelFromData($data);
     }

@@ -93,4 +93,12 @@ interface ModelInterface
      * @return mixed
      */
     public function getField(string $key): mixed;
+
+    /**
+     * Apply data to the model
+     *
+     * @param array $rawData
+     * @return $this
+     */
+    public function applyData(array $rawData): static;
 }

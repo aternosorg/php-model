@@ -18,8 +18,8 @@
     - `GenericModel::select()` and `GenericModel::update()` now have fully typed arguments.
     - `GenericModel->set()` now has the return type `QueryResult`.
     - All `Query` classes now have proper typing for their arguments and return types.
-    - `GettableInterface->get(string $modelClass, mixed $id): ?ModelInterface` no longer applies
-      data to a given model, but creates a new model using `ModelInterface::getModelFromData(array $rawData): ?static`
+    - `GettableInterface->get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface` only optionally
+      applies data to a given model, usually it creates a new model using `ModelInterface::getModelFromData(array $rawData): ?static`
       It also returns `null` if the model is not found instead of `false`.
 - `ModelRegistry->get(string $className, string $id): ?ModelInterface` now takes the class name
   as the first argument instead of the model name. This function is also generic and type hints
@@ -37,6 +37,7 @@
   parent model will return all variants but of the correct subtype.
 - Added `CountField` and `GenericModel::count()` for easier count queries.
 - Added `SumField` and `AverageField`.
+- Added `GenericModel::reload(): static` to reload the model from the database.
 
 ### Removed
 - Removed `SimpleModel`.

@@ -69,7 +69,7 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
      * @return ModelInterface|null
      * @throws Exception
      */
-    public function get(string $modelClass, mixed $id): ?ModelInterface
+    public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
         $params = [
             'index' => $modelClass::getName(),
@@ -86,6 +86,9 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
             return null;
         }
 
+        if ($model) {
+            return $model->applyData($response);
+        }
         return $modelClass::getModelFromData($response);
     }
 

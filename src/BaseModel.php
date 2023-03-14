@@ -149,7 +149,7 @@ abstract class BaseModel implements ModelInterface
         if (property_exists($this, $key)) {
             return $this->{$key};
         } else {
-            return $this->additionalFields[$key];
+            return $this->additionalFields[$key] ?? null;
         }
     }
 }
