@@ -2,6 +2,8 @@
 
 namespace Aternos\Model\Query;
 
+use Aternos\Model\ModelInterface;
+
 /**
  * Class Query
  *
@@ -30,7 +32,7 @@ abstract class Query
     protected ?Limit $limit = null;
 
     /**
-     * @var string|null
+     * @var class-string<ModelInterface>|null
      */
     public ?string $modelClassName = null;
 
