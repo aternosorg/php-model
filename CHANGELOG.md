@@ -40,3 +40,4 @@
 
 ### Removed
 - Removed `SimpleModel`.
+- Removed magic getter from `QueryResult`.

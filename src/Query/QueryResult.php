@@ -37,23 +37,6 @@ class QueryResult extends ModelCollectionResult
     }
 
     /**
-     * Get values from the current model
-     *
-     * @param $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        if ($this->valid()) {
-            $model = $this->current();
-        } else {
-            $model = $this->models[0];
-        }
-
-        return $model->{$key} ?? null;
-    }
-
-    /**
      * Get the executed query string
      *
      * @return string|null
