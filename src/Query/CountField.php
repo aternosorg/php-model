@@ -13,7 +13,6 @@ class CountField extends SelectField
 
     public ?int $function = self::COUNT;
     public ?string $alias = self::COUNT_FIELD;
-    public bool $raw = true;
 
     public function __construct()
     {
