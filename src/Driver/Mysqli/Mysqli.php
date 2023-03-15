@@ -248,7 +248,9 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
             /** @var class-string<ModelInterface> $modelClass */
             $modelClass = $query->modelClassName;
             $model = $modelClass::getModelFromData($row);
-            $result->add($model);
+            if ($model) {
+                $result->add($model);
+            }
         }
 
         return $result;

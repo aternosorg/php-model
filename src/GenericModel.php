@@ -250,7 +250,17 @@ abstract class GenericModel extends BaseModel
             return true;
         }
         foreach (static::$filters as $key => $value) {
-            if (!isset($rawData[$key]) || $rawData[$key] !== $value) {
+            if (!isset($rawData[$key])) {
+                return false;
+            }
+            $dataValue = $rawData[$key];
+            if (is_int($value) && !is_int($dataValue)) {
+                $dataValue = (int)$dataValue;
+            } elseif (is_float($value) && !is_float($dataValue)) {
+                $dataValue = (float)$dataValue;
+            }
+
+            if ($value !== $dataValue) {
                 return false;
             }
         }
