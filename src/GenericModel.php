@@ -319,6 +319,9 @@ abstract class GenericModel extends BaseModel
         // try to get the model from the registry
         if (static::$registry) {
             if ($registryModel = $registry->get(static::class, $id)) {
+                if (!($registryModel instanceof static)) {
+                    return null;
+                }
                 $model = $registryModel;
                 if (!$update) {
                     return $model;
