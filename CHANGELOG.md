@@ -4,7 +4,7 @@
 
 ### Main breaking changes
 #### ModelInterface ID type
-- The `ModelInterface` ID is now typed as `mixed`. Any model extending `GenericModel`
+The `ModelInterface` ID is now typed as `mixed`. Any model extending `GenericModel`
   have to change the type of the `$id` property to `mixed`:
 ```php
 class MyModel extends GenericModel
