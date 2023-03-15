@@ -2,6 +2,50 @@
 
 ## [Unreleased 3.0.0]
 
+### Main breaking changes
+#### ModelInterface ID type
+- The `ModelInterface` ID is now typed as `mixed`. Any model extending `GenericModel`
+  have to change the type of the `$id` property to `mixed`:
+```php
+class MyModel extends GenericModel
+{
+    public $id;
+}
+```
+has to be changed to
+```php
+class MyModel extends GenericModel
+{
+    public mixed $id;
+}
+```
+
+#### QueryResult getter
+The magic getter function of `QueryResult` was removed. They have to be accessed using the correct
+array key (usually `[0]`).
+```php
+$queryResult = MyModel::select(["field" => "value"]);
+$value = $queryResult->field;
+```
+has to be changed to
+```php
+$queryResult = MyModel::select(["field" => "value"]);
+$value = $queryResult[0]?->field;
+```
+
+#### Dynamic properties
+Dynamic properties are deprecated since PHP 8.2. Unknown fields are now stored in `BaseModel->$additionalFields`
+and have to be accessed using the new `ModelInterface->getField(string $key): mixed` function.
+```php
+$queryResult = MyModel::select(fields: [(new \Aternos\Model\Query\SelectField("field"))->setAlias("alias")]);
+$value = $queryResult[0]?->alias;
+```
+has to be changed to
+```php
+$queryResult = MyModel::select(fields: [(new \Aternos\Model\Query\SelectField("field"))->setAlias("alias")]);
+$value = $queryResult[0]?->getField("alias");
+```
+
 ### Changed
 - Potentially breaking type changes/additions:
     - The `ModelInterface` ID is now typed as `mixed`. This also affects the
