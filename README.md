@@ -94,7 +94,7 @@ $driverB = (new \Aternos\Model\Driver\Mysqli\Mysqli())->setId("mysqli-b")->setHo
 
 ### Model
 Now you can create a model class. All model classes have to follow the [ModelInterface](src/ModelInterface.php).
-This library includes three different abstract model classes to make the model creation
+This library includes two different abstract model classes to make the model creation
 easier:
  
 * [BaseModel](src/BaseModel.php) - Implements the basic model logic and is not related to any Driver
