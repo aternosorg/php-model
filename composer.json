@@ -1,5 +1,5 @@
 {
-  "name": "aternos/model",
+  "name": "tkulev/model",
   "description": "PHP library for simple and complex database models",
   "keywords": ["database", "model"],
   "readme": "README.md",
@@ -9,6 +9,10 @@
     {
       "name": "Matthias Neid",
       "email": "matthias@aternos.org"
+    },
+    {
+      "name": "Tihomil Kulev",
+      "email": "tkulev@gmail.com"
     }
   ],
   "support": {

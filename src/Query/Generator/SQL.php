@@ -108,7 +108,7 @@ class SQL implements QueryGeneratorInterface
      * @param WhereCondition|WhereGroup|null $where
      * @return string
      */
-    private function generateWhere(Query $query, WhereCondition|WhereGroup $where = null): string
+    public function generateWhere(Query $query, WhereCondition|WhereGroup $where = null): string
     {
         if (!$where) {
             $where = $query->getWhere();
@@ -153,7 +153,7 @@ class SQL implements QueryGeneratorInterface
      * @param Query $query
      * @return string
      */
-    private function generateOrder(Query $query): string
+    public function generateOrder(Query $query): string
     {
         $orderFields = $query->getOrder();
 
@@ -187,7 +187,7 @@ class SQL implements QueryGeneratorInterface
      * @param Query $query
      * @return string
      */
-    private function generateFields(Query $query): string
+    public function generateFields(Query $query): string
     {
         $fields = $query->getFields();
 
@@ -260,7 +260,7 @@ class SQL implements QueryGeneratorInterface
      * @param float|int|string|null $value
      * @return string
      */
-    private function generateValue(float|int|string|null $value): string
+    public function generateValue(float|int|string|null $value): string
     {
         if (is_int($value) || is_float($value)) {
             return $value;

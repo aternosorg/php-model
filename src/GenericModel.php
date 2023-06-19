@@ -455,9 +455,10 @@ abstract class GenericModel extends BaseModel
                                   null|array                           $order = null,
                                   null|array                           $fields = null,
                                   null|Limit|array|int                 $limit = null,
-                                  null|array                           $group = null): QueryResult
+                                  null|array                           $group = null,
+                                  null|array                           $joins = null): QueryResult
     {
-        return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
+        return static::query(new SelectQuery($where, $order, $fields, $limit, $group, $joins));
     }
 
     /**

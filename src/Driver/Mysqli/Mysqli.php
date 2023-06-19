@@ -6,7 +6,7 @@ use Aternos\Model\{Driver\Driver,
     Driver\Features\CRUDAbleInterface,
     Driver\Features\CRUDQueryableInterface,
     ModelInterface,
-    Query\Generator\SQL,
+    Query\Generator\MySQLGenerator,
     Query\Query,
     Query\QueryResult};
 use Exception;
@@ -230,7 +230,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     {
         $this->connect();
 
-        $generator = new SQL(function ($value) {
+        $generator = new MySQLGenerator(function ($value) {
             return mysqli_real_escape_string($this->connection, $value);
         });
 

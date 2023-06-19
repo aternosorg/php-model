@@ -14,7 +14,17 @@ class SelectQuery extends Query
      */
     protected ?array $fields = null;
     protected ?array $group = null;
+    protected ?array $joins = null;
 
+    /**
+     * SelectQuery constructor.
+     *
+     * @param array|WhereCondition|WhereGroup|null $where
+     * @param array|null $order
+     * @param array|null $fields
+     * @param array|int|Limit|null $limit
+     * @param array|GroupField[]|string[]|null $group
+     */
     /**
      * SelectQuery constructor.
      *
@@ -28,7 +38,8 @@ class SelectQuery extends Query
                                 null|array                           $order = null,
                                 null|array                           $fields = null,
                                 null|Limit|array|int                 $limit = null,
-                                null|array $group = null)
+                                null|array                           $group = null,
+                                null|array                           $joins = null)
     {
         if ($where) {
             $this->where($where);
@@ -48,6 +59,10 @@ class SelectQuery extends Query
 
         if ($group) {
             $this->groupBy($group);
+        }
+
+        if ($joins) {
+            $this->joins($joins);
         }
     }
 
@@ -96,5 +111,25 @@ class SelectQuery extends Query
     public function getGroup(): ?array
     {
         return $this->group;
+    }
+
+    /**
+     * Set joins
+     *
+     * @param array $fields
+     * @return $this
+     */
+    public function joins(array $joins): static
+    {
+        $this->joins = $joins;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getJoins(): ?array
+    {
+        return $this->joins;
     }
 }
