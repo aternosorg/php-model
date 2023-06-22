@@ -4,6 +4,8 @@ namespace Aternos\Model\Query\Generator;
 use \Aternos\Model\Query\Query;
 use \Aternos\Model\Query\OrderField;
 use \Aternos\Model\Query\SelectQuery;
+use \Aternos\Model\Query\UpdateQuery;
+use \Aternos\Model\Query\DeleteQuery;
 class MySQLGenerator extends \Aternos\Model\Query\Generator\SQL {
     /**
      * Generate a query string from a Query object with join
