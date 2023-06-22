@@ -6,9 +6,12 @@ use Aternos\Model\{Driver\Driver,
     Driver\Features\CRUDAbleInterface,
     Driver\Features\CRUDQueryableInterface,
     ModelInterface,
+    Query\DeleteQuery,
     Query\Generator\SQL,
     Query\Query,
-    Query\QueryResult};
+    Query\QueryResult,
+    Query\UpdateQuery
+};
 use Exception;
 use mysqli_result;
 
@@ -240,6 +243,11 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
         $result = new QueryResult((bool)$rawQueryResult);
         $result->setQueryString($queryString);
+        if ($query instanceof UpdateQuery || $query instanceof DeleteQuery) {
+            $result->setAffectedRows(mysqli_affected_rows($this->connection));
+            return $result;
+        }
+
         if (is_bool($rawQueryResult)) {
             return $result;
         }

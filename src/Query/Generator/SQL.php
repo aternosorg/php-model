@@ -95,7 +95,11 @@ class SQL implements QueryGeneratorInterface
         }
 
         if ($limit = $query->getLimit()) {
-            $queryString .= " LIMIT " . $limit->start . ", " . $limit->length;
+            if ($query instanceof UpdateQuery || $query instanceof DeleteQuery) {
+                $queryString .= " LIMIT " . $limit->length;
+            } else {
+                $queryString .= " LIMIT " . $limit->start . ", " . $limit->length;
+            }
         }
 
         return $queryString;
