@@ -24,6 +24,13 @@ class QueryResult extends ModelCollectionResult
     protected ?string $queryString = null;
 
     /**
+     * Number of affected rows in update or delete queries
+     *
+     * @var int|null
+     */
+    protected ?int $affectedRows = null;
+
+    /**
      * QueryResult constructor.
      *
      * @param bool $success
@@ -54,6 +61,26 @@ class QueryResult extends ModelCollectionResult
     {
         if ($this->queryString === null) {
             $this->queryString = $queryString;
+        }
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getAffectedRows(): ?int
+    {
+        return $this->affectedRows;
+    }
+
+    /**
+     * @param int|null $affectedRows
+     * @return $this
+     */
+    public function setAffectedRows(?int $affectedRows): static
+    {
+        if ($this->affectedRows === null) {
+            $this->affectedRows = $affectedRows;
         }
         return $this;
     }
