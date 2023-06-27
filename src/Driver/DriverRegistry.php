@@ -6,6 +6,7 @@ use Aternos\Model\Driver\Cassandra\Cassandra;
 use Aternos\Model\Driver\Elasticsearch\Elasticsearch;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
+use Aternos\Model\Driver\Test\TestDriver;
 use InvalidArgumentException;
 
 /**
@@ -22,7 +23,8 @@ class DriverRegistry implements DriverRegistryInterface
         Cassandra::ID => Cassandra::class,
         Elasticsearch::ID => Elasticsearch::class,
         Mysqli::ID => Mysqli::class,
-        Redis::ID => Redis::class
+        Redis::ID => Redis::class,
+        TestDriver::ID => TestDriver::class
     ];
 
     /**
@@ -73,6 +75,17 @@ class DriverRegistry implements DriverRegistryInterface
         }
 
         throw new InvalidArgumentException("Driver with ID '" . $id . "' not found.");
+    }
+
+    /**
+     * Get the test driver
+     *
+     * @return TestDriver
+     */
+    public function getTestDriver(): TestDriver
+    {
+        /** @var TestDriver */
+        return $this->getDriver(TestDriver::ID);
     }
 
     /**
