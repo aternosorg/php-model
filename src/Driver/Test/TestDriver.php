@@ -82,19 +82,68 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
         return $this;
     }
 
+    /**
+     * @param string $tableName
+     * @return $this
+     */
+    public function clearEntries(string $tableName): static
+    {
+        if (isset($this->tables[$tableName])) {
+            $this->tables[$tableName]->clear();
+        }
+        return $this;
+    }
+
+    /**
+     * @param ModelInterface $model
+     * @return bool
+     * @throws Exception
+     */
     public function delete(ModelInterface $model): bool
     {
-        // TODO: Implement delete() method.
+        $table = $this->getTable($model::getName());
+        $entry = $table->getById($model->getId(), $model::getIdField());
+        if (!$entry) {
+            return false;
+        }
+        $table->deleteEntry($entry);
+        return true;
     }
 
+    /**
+     * @param class-string<ModelInterface> $modelClass
+     * @param mixed $id
+     * @param ModelInterface|null $model
+     * @return ModelInterface|null
+     * @throws Exception
+     */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
-        // TODO: Implement get() method.
+        $entry = $this->getTable($modelClass::getName())->getById($id, $modelClass::getIdField());
+        if (!$entry) {
+            return null;
+        }
+        if ($model) {
+            return $entry->applyToModel($model);
+        }
+        return $modelClass::getModelFromData($entry->getData());
     }
 
+    /**
+     * @param ModelInterface $model
+     * @return bool
+     * @throws Exception
+     */
     public function save(ModelInterface $model): bool
     {
-        // TODO: Implement save() method.
+        $table = $this->getTable($model::getName());
+        $entry = $table->getById($model->getId(), $model::getIdField());
+        if (!$entry) {
+            $table->addEntry((new TestTableEntry(get_object_vars($model))));
+            return true;
+        }
+        $entry->applyFromModel($model);
+        return true;
     }
 
     /**

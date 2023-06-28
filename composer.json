@@ -1,7 +1,10 @@
 {
   "name": "aternos/model",
   "description": "PHP library for simple and complex database models",
-  "keywords": ["database", "model"],
+  "keywords": [
+    "database",
+    "model"
+  ],
   "readme": "README.md",
   "type": "library",
   "license": "MIT",
@@ -24,11 +27,18 @@
     "ext-redis": "*",
     "ext-cassandra": "*",
     "ext-mysqli": "*",
-    "elasticsearch/elasticsearch": "^7.10"
+    "elasticsearch/elasticsearch": "^7.10",
+    "phpunit/phpunit": "^10.2"
   },
   "autoload": {
     "psr-4": {
       "Aternos\\Model\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Aternos\\Model\\Test\\Tests\\": "test/tests/",
+      "Aternos\\Model\\Test\\Src\\": "test/src/"
     }
   },
   "suggest": {
