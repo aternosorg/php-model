@@ -61,7 +61,11 @@ class TestTable
         }
 
         if ($query instanceof SelectQuery) {
-            $entries = $this->groupAndAggregateEntries($entries, $query->getGroup(), $query->getFields());
+            $clonedEntries = [];
+            foreach ($entries as $entry) {
+                $clonedEntries[] = clone $entry;
+            }
+            $entries = $this->groupAndAggregateEntries($clonedEntries, $query->getGroup(), $query->getFields());
         }
 
         $queryResult = new QueryResult(true);

@@ -323,6 +323,13 @@ class TestDriverTest extends TestCase
         $result = TestModel::select(fields: [new SumField("number")]);
         $this->assertTrue($result->wasSuccessful());
         $this->assertEquals(45, $result[0]->number);
+
+        // test if data wasn't changed
+        $models = TestModel::select();
+        $this->assertCount(10, $models);
+        foreach ($models as $model) {
+            $this->assertNotEquals(45, $model->number);
+        }
     }
 
     public function testSelectAverage(): void
