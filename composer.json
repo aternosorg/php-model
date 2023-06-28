@@ -24,9 +24,6 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "ext-redis": "*",
-    "ext-cassandra": "*",
-    "ext-mysqli": "*",
     "elasticsearch/elasticsearch": "^7.10",
     "phpunit/phpunit": "^10.2"
   },
