@@ -126,7 +126,7 @@ abstract class Query
     /**
      * Get ORDER part of the query
      *
-     * @return array|bool
+     * @return OrderField[]|null
      */
     public function getOrder(): ?array
     {

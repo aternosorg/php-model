@@ -5,6 +5,7 @@ namespace Aternos\Model;
 use Aternos\Model\Driver\DriverInterface;
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\DriverRegistryInterface;
+use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Driver\Features\{CacheableInterface,
     DeletableInterface,
     DeleteQueryableInterface,
@@ -301,6 +302,52 @@ abstract class GenericModel extends BaseModel
         /** @var static $model */
         $model = new $variantClass();
         return $model->applyData($rawData);
+    }
+
+    /**
+     *
+     *
+     * @return void
+     */
+    public static function enableTestDriver(): void
+    {
+        static::$drivers = [TestDriver::ID];
+        static::$saveDrivers = null;
+        static::$deleteDrivers = null;
+    }
+
+    /**
+     * @param array $entries
+     * @return void
+     */
+    public static function addTestEntries(array $entries): void
+    {
+        foreach ($entries as $entry) {
+            static::addTestEntry($entry);
+        }
+    }
+
+    /**
+     * @param array $entry
+     * @return void
+     */
+    public static function addTestEntry(array $entry): void
+    {
+        static::enableTestDriver();
+        /** @var TestDriver $driver */
+        $driver = static::getDriverRegistry()->getDriver(TestDriver::ID);
+        $driver->addEntry(static::getName(), $entry);
+    }
+
+    /**
+     * @return void
+     */
+    public static function clearTestEntries(): void
+    {
+        static::enableTestDriver();
+        /** @var TestDriver $driver */
+        $driver = static::getDriverRegistry()->getDriver(TestDriver::ID);
+        $driver->clearEntries(static::getName());
     }
 
     /**
