@@ -83,6 +83,15 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     }
 
     /**
+     * @return $this
+     */
+    public function clearTables(): static
+    {
+        $this->tables = [];
+        return $this;
+    }
+
+    /**
      * @param string $tableName
      * @return $this
      */

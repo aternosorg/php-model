@@ -279,6 +279,91 @@ User::query(new \Aternos\Model\Query\DeleteQuery(
 ));
 ```
 
+## Testing
+This library includes a [`TestDriver`](src/Driver/Test/TestDriver.php) which can be used to write tests without a database.
+It uses a simple array as storage and is not persistent. It supports most basic operations and queries, but might not work
+for all use cases yet especially not for database specific queries.
+
+You can just add test data to your model which will also enable the test driver for that model.
+```php
+<?php
+
+// add a single entry
+User::addTestEntry([
+    "id" => 1,
+    "name" => "Test",
+    "email" => "test@example.org"
+]);
+
+// add multiple entries at once
+User::addTestEntries($entries);
+
+// clear all test entries
+User::clearTestEntries();
+```
+
+Alternatively, you can also add data to the test driver directly.
+```php
+/** @var \Aternos\Model\Driver\Test\TestDriver $testDriver */
+$testDriver = \Aternos\Model\Driver\DriverRegistry::getInstance()->getDriver(\Aternos\Model\Driver\Test\TestDriver::ID);
+
+// add multiple tables at once
+$testDriver->addTables([
+    "user" => [
+        [
+            "id" => 1,
+            "name" => "Test",
+            "email" => "test@example.org"
+        ],
+        ...
+    ],
+    "another_table" => [
+        [
+            "id" => 1,
+            ...
+        ]
+    ],
+    ...
+]);
+
+// add a single table
+$testDriver->addTable("user", [
+    [
+        "id" => 1,
+        "name" => "Test",
+        "email" => "test@example.org"
+    ],
+    ...
+]);
+
+// add an entry to a table
+$testDriver->addEntry("user", [
+    "id" => 1,
+    "name" => "Test",
+    "email" => "test@example.org"
+]);
+
+// clear all entries from a table
+$testDriver->clearEntries("user");
+
+// clear all tables
+$testDriver->clearTables();
+```
+If you add data to the driver directly, you still have to enable the test driver for each model that you want to test.
+
+```php
+<?php
+
+// enable the test driver for the user model
+User::enableTestDriver();
+
+// you can enable the test driver for all models at once by enabling it on a shared parent
+class MyModel extends Aternos\Model\GenericModel {}
+class User extends MyModel { ... }
+class AnotherModel extends MyModel { ... }
+MyModel::enableTestDriver();
+```
+
 ## Advanced usage
 *More information about more advanced usage, such as writing your own drivers, driver factory or models
 will be added in the future, in the meantime just take a look at the source code.*
