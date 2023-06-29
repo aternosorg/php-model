@@ -58,17 +58,6 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     }
 
     /**
-     * @param ModelInterface $model
-     * @return TestTableEntry|null
-     * @throws Exception
-     */
-    protected function getEntryFromModel(ModelInterface $model): ?TestTableEntry
-    {
-        $table = $this->getTable($model::getName());
-
-    }
-
-    /**
      * @param string $tableName
      * @param array $entry
      * @return $this

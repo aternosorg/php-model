@@ -71,8 +71,8 @@ class TestTableEntry implements \ArrayAccess
             ">=" => $dataValue >= $whereValue,
             "<" => $dataValue < $whereValue,
             "<=" => $dataValue <= $whereValue,
-            "like" => preg_match("/" . str_replace("%", ".*", preg_quote($whereValue)) . "/", $dataValue) === 1,
-            "not like" => preg_match("/" . str_replace("%", ".*", preg_quote($whereValue)) . "/", $dataValue) !== 1,
+            "like" => preg_match("#" . str_replace("%", ".*", preg_quote($whereValue)) . "#", $dataValue) === 1,
+            "not like" => preg_match("#" . str_replace("%", ".*", preg_quote($whereValue)) . "#", $dataValue) !== 1,
             default => false,
         };
     }
