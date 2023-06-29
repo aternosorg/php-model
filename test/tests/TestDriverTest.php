@@ -263,6 +263,64 @@ class TestDriverTest extends TestCase
         $this->assertEquals(10, $models[0]->number);
     }
 
+    public function testSelectLikeSingleChar(): void
+    {
+        $model = new TestModel();
+        $model->id = "10TEST";
+        $model->text = "TEST";
+        $model->number = 10;
+        $model->save();
+
+        $model = new TestModel();
+        $model->id = "11TESAT";
+        $model->text = "TESAT";
+        $model->number = 11;
+        $model->save();
+
+        $models = TestModel::select([["text", "LIKE", "TE_T"]]);
+        $this->assertCount(1, $models);
+        $this->assertEquals("10TEST", $models[0]->id);
+        $this->assertEquals("TEST", $models[0]->text);
+        $this->assertEquals(10, $models[0]->number);
+    }
+
+    public function testSelectLikeLineBreak(): void
+    {
+        $model = new TestModel();
+        $model->id = "10TEST";
+        $model->text = "TE\nST";
+        $model->number = 10;
+        $model->save();
+
+        $models = TestModel::select([["text", "LIKE", "T%T"]]);
+        $this->assertCount(1, $models);
+        $this->assertEquals("10TEST", $models[0]->id);
+        $this->assertEquals("TE\nST", $models[0]->text);
+        $this->assertEquals(10, $models[0]->number);
+    }
+
+    public function testSelectLikeEscaping(): void
+    {
+        $model = new TestModel();
+        $model->id = "10T%T";
+        $model->text = "T%T";
+        $model->number = 10;
+        $model->save();
+
+        $model = new TestModel();
+        $model->id = "11TEST";
+        $model->text = "TEST";
+        $model->number = 11;
+        $model->save();
+
+
+        $models = TestModel::select([["text", "LIKE", "T\\%T"]]);
+        $this->assertCount(1, $models);
+        $this->assertEquals("10T%T", $models[0]->id);
+        $this->assertEquals("T%T", $models[0]->text);
+        $this->assertEquals(10, $models[0]->number);
+    }
+
     public function testSelectOrder(): void
     {
         $models = TestModel::select(order: ["number" => OrderField::DESCENDING]);
