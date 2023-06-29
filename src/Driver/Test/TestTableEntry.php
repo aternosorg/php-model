@@ -77,9 +77,14 @@ class TestTableEntry implements \ArrayAccess
         };
     }
 
+    /**
+     * @param string $likePattern
+     * @param string $value
+     * @return bool
+     */
     protected function matchesLike(string $likePattern, string $value): bool
     {
-        $likePattern = preg_replace("#(?<!\\\\)%#", ".*", $likePattern);
+        $likePattern = preg_replace("#(?<!\\\\)%#", ".*", preg_quote($likePattern));
         $likePattern = preg_replace("#(?<!\\\\)_#", ".", $likePattern);
         return preg_match("#" . $likePattern . "#si", $value) === 1;
     }
