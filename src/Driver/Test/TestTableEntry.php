@@ -86,6 +86,8 @@ class TestTableEntry implements \ArrayAccess
     {
         $likePattern = preg_replace("#(?<!\\\\)%#", ".*", preg_quote($likePattern));
         $likePattern = preg_replace("#(?<!\\\\)_#", ".", $likePattern);
+        $likePattern = str_replace("\\%", "%", $likePattern);
+        $likePattern = str_replace("\\_", "_", $likePattern);
         return preg_match("#" . $likePattern . "#si", $value) === 1;
     }
 
