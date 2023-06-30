@@ -305,6 +305,22 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
+     * Disable the registry temporarily
+     */
+    public static function disableRegistry(): void
+    {
+        static::$registry = false;
+    }
+
+    /**
+     * Enable the registry again/temporarily
+     */
+    public static function enableRegistry(): void
+    {
+        static::$registry = true;
+    }
+
+    /**
      *
      *
      * @return void

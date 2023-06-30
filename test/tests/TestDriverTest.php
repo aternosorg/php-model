@@ -14,7 +14,6 @@ use Aternos\Model\Query\WhereGroup;
 use Aternos\Model\Test\Src\TestModel;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\Test;
 
 class TestDriverTest extends TestCase
 {
@@ -503,6 +502,7 @@ class TestDriverTest extends TestCase
      */
     public function testUpdate(): void
     {
+        TestModel::disableRegistry();
         $model = TestModel::get("1B");
         $this->assertEquals("B", $model->text);
 
@@ -528,6 +528,7 @@ class TestDriverTest extends TestCase
      */
     public function testDeleteQuery(): void
     {
+        TestModel::disableRegistry();
         $this->assertNotNull(TestModel::get("1B"));
 
         $model = new TestModel();

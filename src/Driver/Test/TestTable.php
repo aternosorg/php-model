@@ -3,6 +3,7 @@
 namespace Aternos\Model\Driver\Test;
 
 use Aternos\Model\ModelInterface;
+use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\OrderField;
@@ -194,6 +195,7 @@ class TestTable
     public function clear(): static
     {
         $this->entries = [];
+        ModelRegistry::getInstance()->clearModel($this->name);
         return $this;
     }
 

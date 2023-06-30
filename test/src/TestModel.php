@@ -4,7 +4,6 @@ namespace Aternos\Model\Test\Src;
 
 class TestModel extends \Aternos\Model\GenericModel
 {
-    protected static bool $registry = false;
     public mixed $id;
     public ?string $text = null;
     public ?int $number = null;

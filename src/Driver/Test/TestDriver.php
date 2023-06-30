@@ -6,6 +6,7 @@ use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\Driver\Features\CRUDQueryableInterface;
 use Aternos\Model\ModelInterface;
+use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
 use Exception;
@@ -73,6 +74,7 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
      */
     public function clearTables(): static
     {
+        ModelRegistry::getInstance()->clearAll();
         $this->tables = [];
         return $this;
     }

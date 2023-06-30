@@ -61,6 +61,26 @@ class ModelRegistry
     }
 
     /**
+     * @param string $modelName
+     * @return void
+     */
+    public function clearModel(string $modelName): void
+    {
+        if (!isset($this->registry[$modelName])) {
+            return;
+        }
+        unset($this->registry[$modelName]);
+    }
+
+    /**
+     * @return void
+     */
+    public function clearAll(): void
+    {
+        $this->registry = [];
+    }
+
+    /**
      * @var ModelRegistry|null
      */
     protected static ?ModelRegistry $instance = null;
