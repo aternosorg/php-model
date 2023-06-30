@@ -51,7 +51,7 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
      */
     public function getTable(string $name): TestTable
     {
-        if (!$this->tables[$name]) {
+        if (!isset($this->tables[$name])) {
             $this->tables[$name] = new TestTable($name);
         }
         return $this->tables[$name];
