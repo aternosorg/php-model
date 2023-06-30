@@ -47,12 +47,11 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     /**
      * @param string $name
      * @return TestTable
-     * @throws Exception
      */
     public function getTable(string $name): TestTable
     {
         if (!$this->tables[$name]) {
-            throw new Exception("Table " . $name . " does not exist.");
+            $this->tables[$name] = new TestTable($name);
         }
         return $this->tables[$name];
     }
@@ -64,10 +63,8 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
      */
     public function addEntry(string $tableName, array $entry): static
     {
-        if (!isset($this->tables[$tableName])) {
-            $this->tables[$tableName] = new TestTable($tableName);
-        }
-        $this->tables[$tableName]->addEntry(new TestTableEntry($entry));
+        $table = $this->getTable($tableName);
+        $table->addEntry(new TestTableEntry($entry));
         return $this;
     }
 

@@ -2,6 +2,8 @@
 
 namespace Aternos\Model\Test\Tests;
 
+use Aternos\Model\Driver\DriverRegistry;
+use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\OrderField;
@@ -12,6 +14,7 @@ use Aternos\Model\Query\WhereGroup;
 use Aternos\Model\Test\Src\TestModel;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Test;
 
 class TestDriverTest extends TestCase
 {
@@ -40,6 +43,16 @@ class TestDriverTest extends TestCase
         $this->assertEquals("1B", $model->id);
         $this->assertEquals("B", $model->text);
         $this->assertEquals(1, $model->number);
+    }
+
+    public function testGetOnNonExistingTable(): void
+    {
+        /** @var TestDriver $driver */
+        $driver = DriverRegistry::getInstance()->getDriver("test");
+        $driver->clearTables();
+
+        $model = TestModel::get("1B");
+        $this->assertNull($model);
     }
 
     /**
