@@ -73,6 +73,8 @@ class TestTableEntry implements \ArrayAccess
             "<=" => $dataValue <= $whereValue,
             "like" => $this->matchesLike($whereValue, $dataValue),
             "not like" => !$this->matchesLike($whereValue, $dataValue),
+            "in" => in_array($dataValue, $whereValue, true),
+            "not in" => !in_array($dataValue, $whereValue, true),
             default => false,
         };
     }
