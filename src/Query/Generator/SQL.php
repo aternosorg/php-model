@@ -261,11 +261,19 @@ class SQL implements QueryGeneratorInterface
     /**
      * Generate value for where ore field usage
      *
-     * @param float|int|string|null $value
+     * @param float|int|string|array|null $value
      * @return string
      */
-    private function generateValue(float|int|string|null $value): string
+    private function generateValue(float|int|string|null|array $value): string
     {
+        if (is_array($value)) {
+            $values = [];
+            foreach ($value as $v) {
+                $values[] = $this->generateValue($v);
+            }
+            return "(" . implode(", ", $values) . ")";
+        }
+
         if (is_int($value) || is_float($value)) {
             return $value;
         }
