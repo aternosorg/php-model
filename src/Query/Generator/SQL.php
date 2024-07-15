@@ -237,7 +237,7 @@ class SQL implements QueryGeneratorInterface
                 }
 
             } else if ($field instanceof UpdateField) {
-                $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure . "=" . $this->generateValue($field->value);
+                $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure . " = " . $this->generateValue($field->value);
             }
         }
 
