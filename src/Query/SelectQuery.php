@@ -28,7 +28,7 @@ class SelectQuery extends Query
                                 null|array                           $order = null,
                                 null|array                           $fields = null,
                                 null|Limit|array|int                 $limit = null,
-                                null|array $group = null)
+                                null|array                           $group = null)
     {
         if ($where) {
             $this->where($where);
