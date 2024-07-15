@@ -118,8 +118,12 @@ class SQL implements QueryGeneratorInterface
             $where = $query->getWhere();
         }
         if ($where instanceof WhereCondition) {
-            if ($where->value === null && $where->operator === "=") {
-                $where->operator = "IS";
+            if ($where->value === null) {
+                if ($where->operator === "=") {
+                    $where->operator = "IS";
+                } elseif ($where->operator === "!=") {
+                    $where->operator = "IS NOT";
+                }
             }
 
             $value = $where->value;
