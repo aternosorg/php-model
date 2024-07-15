@@ -118,8 +118,12 @@ class SQL implements QueryGeneratorInterface
             $where = $query->getWhere();
         }
         if ($where instanceof WhereCondition) {
-            if ($where->value === null && $where->operator === "=") {
-                $where->operator = "IS";
+            if ($where->value === null) {
+                if ($where->operator === "=") {
+                    $where->operator = "IS";
+                } elseif ($where->operator === "!=") {
+                    $where->operator = "IS NOT";
+                }
             }
 
             $value = $where->value;
@@ -233,7 +237,7 @@ class SQL implements QueryGeneratorInterface
                 }
 
             } else if ($field instanceof UpdateField) {
-                $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure . "=" . $this->generateValue($field->value);
+                $fieldStrings[] = $this->columnEnclosure . $field->key . $this->columnEnclosure . " = " . $this->generateValue($field->value);
             }
         }
 
