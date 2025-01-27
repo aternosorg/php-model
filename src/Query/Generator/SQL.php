@@ -112,7 +112,7 @@ class SQL implements QueryGeneratorInterface
      * @param WhereCondition|WhereGroup|null $where
      * @return string
      */
-    private function generateWhere(Query $query, WhereCondition|WhereGroup $where = null): string
+    private function generateWhere(Query $query, WhereCondition|WhereGroup|null $where = null): string
     {
         if (!$where) {
             $where = $query->getWhere();
