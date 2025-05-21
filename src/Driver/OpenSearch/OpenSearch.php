@@ -1,6 +1,6 @@
 <?php
 
-namespace Aternos\Model\Driver\Elasticsearch;
+namespace Aternos\Model\Driver\OpenSearch;
 
 use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
@@ -8,10 +8,12 @@ use Aternos\Model\Driver\Features\SearchableInterface;
 use Aternos\Model\ModelInterface;
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
-use Elasticsearch\Client;
-use Elasticsearch\ClientBuilder;
-use Elasticsearch\Common\Exceptions\Missing404Exception;
-use Exception;
+use OpenSearch\Client;
+use OpenSearch\EndpointFactoryInterface;
+use OpenSearch\Exception\NotFoundHttpException;
+use OpenSearch\Namespaces\NamespaceBuilderInterface;
+use OpenSearch\TransportFactory;
+use OpenSearch\TransportInterface;
 
 /**
  * Class Elasticsearch
@@ -22,9 +24,9 @@ use Exception;
  *
  * @package Aternos\Model\Driver\Search
  */
-class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInterface
+class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterface
 {
-    public const ID = "elasticsearch";
+    public const ID = "opensearch";
     protected string $id = self::ID;
 
     /**
@@ -33,12 +35,29 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
     protected ?Client $client = null;
 
     /**
+     * @param TransportInterface|null $transport
+     * @param EndpointFactoryInterface|null $endpointFactory
+     * @param NamespaceBuilderInterface[] $registeredNamespaces
+     */
+    public function __construct(
+        protected ?TransportInterface $transport = null,
+        protected ?EndpointFactoryInterface $endpointFactory = null,
+        protected array $registeredNamespaces = [],
+    )
+    {
+    }
+
+    /**
      * Connect to the elasticsearch cluster
      */
-    protected function connect()
+    protected function connect(): void
     {
         if (!$this->client) {
-            $this->client = ClientBuilder::create()->build();
+            $this->client = new Client(
+                $this->transport ?? (new TransportFactory())->create(),
+                $this->endpointFactory,
+
+            );
         }
     }
 
@@ -66,8 +85,8 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
      *
      * @param class-string<ModelInterface> $modelClass
      * @param mixed $id
+     * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws Exception
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
@@ -79,7 +98,7 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
         $this->connect();
         try {
             $response = $this->client->getSource($params);
-        } catch (Missing404Exception $e) {
+        } catch (NotFoundHttpException) {
             return null;
         }
         if (!is_array($response)) {
@@ -136,9 +155,7 @@ class Elasticsearch extends Driver implements CRUDAbleInterface, SearchableInter
 
             /** @var ModelInterface $model */
             $model = new $modelClassName();
-            foreach ($resultDocument["_source"] as $key => $value) {
-                $model->{$key} = $value;
-            }
+            $model->applyData($resultDocument["_source"]);
             $result->add($model);
         }
         return $result;

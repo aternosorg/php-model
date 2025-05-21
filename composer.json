@@ -24,8 +24,10 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "elasticsearch/elasticsearch": "^7.10",
-    "phpunit/phpunit": "^10.5"
+    "phpunit/phpunit": "^10.5",
+    "opensearch-project/opensearch-php": "^2.4",
+    "symfony/http-client": "^7.2",
+    "nyholm/psr7": "^1.8"
   },
   "autoload": {
     "psr-4": {
@@ -42,6 +44,11 @@
     "ext-redis": "To use the Redis Cache driver",
     "ext-cassandra": "To use the Cassandra NoSQL driver",
     "ext-mysqli": "To use the Mysqli Relational driver",
-    "elasticsearch/elasticsearch": "To use the Elasticsearch Search driver"
+    "opensearch-project/opensearch-php": "To use the OpenSearch Search driver"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
   }
 }
