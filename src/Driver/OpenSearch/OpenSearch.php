@@ -5,15 +5,17 @@ namespace Aternos\Model\Driver\OpenSearch;
 use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\Driver\Features\SearchableInterface;
+use Aternos\Model\Driver\OpenSearch\Exception\HttpErrorResponseException;
+use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
+use Aternos\Model\Driver\OpenSearch\Exception\OpenSearchException;
+use Aternos\Model\Driver\OpenSearch\Exception\SerializeException;
 use Aternos\Model\ModelInterface;
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
-use OpenSearch\Client;
-use OpenSearch\EndpointFactoryInterface;
-use OpenSearch\Exception\NotFoundHttpException;
-use OpenSearch\Namespaces\NamespaceBuilderInterface;
-use OpenSearch\TransportFactory;
-use OpenSearch\TransportInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use stdClass;
 
 /**
  * Class Elasticsearch
@@ -30,35 +32,70 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
     protected string $id = self::ID;
 
     /**
-     * @var Client|null
+     * @var OpenSearchHost[]
      */
-    protected ?Client $client = null;
+    protected array $hosts;
+
+    protected int $maxRetries = 3;
 
     /**
-     * @param TransportInterface|null $transport
-     * @param EndpointFactoryInterface|null $endpointFactory
-     * @param NamespaceBuilderInterface[] $registeredNamespaces
+     * @param string[] $hosts
+     * @param ClientInterface $client
+     * @param RequestFactoryInterface $requestFactory
+     * @param StreamFactoryInterface $streamFactory
      */
     public function __construct(
-        protected ?TransportInterface $transport = null,
-        protected ?EndpointFactoryInterface $endpointFactory = null,
-        protected array $registeredNamespaces = [],
+        array $hosts,
+        protected ClientInterface $client,
+        protected RequestFactoryInterface $requestFactory,
+        protected StreamFactoryInterface $streamFactory,
     )
     {
+        $this->hosts = [];
+        foreach ($hosts as $host) {
+            $this->hosts[] = new OpenSearchHost($host, $this->client, $this->requestFactory, $this->streamFactory);
+        }
     }
 
     /**
-     * Connect to the elasticsearch cluster
+     * @param string $method
+     * @param string $uri
+     * @param mixed|null $body
+     * @return stdClass
+     * @throws HttpErrorResponseException
+     * @throws HttpTransportException
+     * @throws SerializeException
+     * @throws OpenSearchException
      */
-    protected function connect(): void
+    protected function request(string $method, string $uri, mixed $body = null): stdClass
     {
-        if (!$this->client) {
-            $this->client = new Client(
-                $this->transport ?? (new TransportFactory())->create(),
-                $this->endpointFactory,
-
-            );
+        $offset = array_rand($this->hosts);
+        $lastError = null;
+        for ($i = 0; $i < $this->maxRetries; $i++) {
+            $host = $this->hosts[$offset + $i % count($this->hosts)];
+            try {
+                return $host->request($method, $uri, $body);
+            } catch (OpenSearchException $e) {
+                $lastError = $e;
+                if ($e instanceof HttpTransportException) {
+                    continue;
+                }
+                if ($e instanceof HttpErrorResponseException && $e->getCode() >= 500 || in_array($e->getCode(), [404, 408])) {
+                    continue;
+                }
+                throw $e;
+            }
         }
+        throw $lastError;
+    }
+
+    /**
+     * @param string ...$path
+     * @return string
+     */
+    protected function buildUrl(string ...$path): string
+    {
+        return "/" . implode("/", array_map(rawurlencode(...), $path));
     }
 
     /**
@@ -69,14 +106,15 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      */
     public function save(ModelInterface $model): bool
     {
-        $params = [
-            "index" => $model::getName(),
-            "id" => $model->getId(),
-            "body" => get_object_vars($model)
-        ];
-
-        $this->connect();
-        $this->client->index($params);
+        try {
+            $this->request(
+                "PUT",
+                $this->buildUrl($model::getName(), "_doc", $model->getId()),
+                get_object_vars($model)
+            );
+        } catch (OpenSearchException) {
+            return false;
+        }
         return true;
     }
 
@@ -87,28 +125,34 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
+     * @throws HttpErrorResponseException
+     * @throws HttpTransportException
+     * @throws OpenSearchException
+     * @throws SerializeException
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
-        $params = [
-            'index' => $modelClass::getName(),
-            $modelClass::getIdField() => $id
-        ];
-
-        $this->connect();
         try {
-            $response = $this->client->getSource($params);
-        } catch (NotFoundHttpException) {
+            $response = $this->request(
+                "GET",
+                $this->buildUrl($modelClass::getName(), "_doc", $id)
+            );
+        } catch (HttpErrorResponseException $e) {
+            if ($e->getCode() === 404) {
+                return null;
+            }
+            throw $e;
+        }
+        if (!is_object($response->_source)) {
             return null;
         }
-        if (!is_array($response)) {
-            return null;
-        }
+
+        $data = get_object_vars($response->_source);
 
         if ($model) {
-            return $model->applyData($response);
+            return $model->applyData($data);
         }
-        return $modelClass::getModelFromData($response);
+        return $modelClass::getModelFromData($data);
     }
 
     /**
@@ -119,43 +163,49 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      */
     public function delete(ModelInterface $model): bool
     {
-        $params = [
-            "index" => $model::getName(),
-            "id" => $model->getId()
-        ];
+        try {
+            $this->request(
+                "DELETE",
+                $this->buildUrl($model::getName(), "_doc", $model->getId())
+            );
+        } catch (OpenSearchException) {
+            return false;
+        }
 
-        $this->client->delete($params);
         return true;
     }
 
     /**
      * @param Search $search
      * @return SearchResult
+     * @throws HttpErrorResponseException
+     * @throws HttpTransportException
+     * @throws OpenSearchException
+     * @throws SerializeException
      */
     public function search(Search $search): SearchResult
     {
         /** @var class-string<ModelInterface> $modelClassName */
         $modelClassName = $search->getModelClassName();
-        $params = [
-            'index' => $modelClassName::getName(),
-            'body' => $search->getSearchQuery()
-        ];
 
-        $this->connect();
-        $response = $this->client->search($params);
-        if (!is_array($response) || !isset($response["hits"]) || !is_array($response["hits"]) || !isset($response["hits"]["hits"]) || !is_array($response["hits"]["hits"])) {
+        $response = $this->request(
+            "GET",
+            $this->buildUrl($modelClassName::getName(), "_search"),
+            $search->getSearchQuery()
+        );
+        if (!isset($response->hits) || !is_object($response->hits) || !isset($response->hits->hits) || !is_array($response->hits->hits)) {
             return new SearchResult(false);
         }
 
         $result = new SearchResult(true);
-        foreach ($response["hits"]["hits"] as $resultDocument) {
-            if (!isset($resultDocument["_source"]) || !is_array($resultDocument["_source"])) {
+        foreach ($response->hits->hits as $resultDocument) {
+            if (!isset($resultDocument->_source) || !is_object($resultDocument->_source)) {
                 continue;
             }
 
             /** @var ModelInterface $model */
             $model = new $modelClassName();
-            $model->applyData($resultDocument["_source"]);
+            $model->applyData(get_object_vars($resultDocument->_source));
             $result->add($model);
         }
         return $result;
