@@ -5,6 +5,7 @@ namespace Aternos\Model\Driver\OpenSearch;
 use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\Driver\Features\SearchableInterface;
+use Aternos\Model\Driver\OpenSearch\Authentication\OpenSearchAuthenticationInterface;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpErrorResponseException;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
 use Aternos\Model\Driver\OpenSearch\Exception\OpenSearchException;
@@ -43,17 +44,25 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      * @param ClientInterface $client
      * @param RequestFactoryInterface $requestFactory
      * @param StreamFactoryInterface $streamFactory
+     * @param OpenSearchAuthenticationInterface|null $authentication
      */
     public function __construct(
         array $hosts,
         protected ClientInterface $client,
         protected RequestFactoryInterface $requestFactory,
         protected StreamFactoryInterface $streamFactory,
+        protected ?OpenSearchAuthenticationInterface $authentication = null,
     )
     {
         $this->hosts = [];
         foreach ($hosts as $host) {
-            $this->hosts[] = new OpenSearchHost($host, $this->client, $this->requestFactory, $this->streamFactory);
+            $this->hosts[] = new OpenSearchHost(
+                $host,
+                $this->client,
+                $this->requestFactory,
+                $this->streamFactory,
+                $this->authentication
+            );
         }
     }
 

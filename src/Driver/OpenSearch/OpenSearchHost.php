@@ -2,6 +2,7 @@
 
 namespace Aternos\Model\Driver\OpenSearch;
 
+use Aternos\Model\Driver\OpenSearch\Authentication\OpenSearchAuthenticationInterface;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpErrorResponseException;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
 use Aternos\Model\Driver\OpenSearch\Exception\OpenSearchException;
@@ -18,11 +19,19 @@ use stdClass;
 
 class OpenSearchHost
 {
+    /**
+     * @param string $baseUri
+     * @param ClientInterface $client
+     * @param RequestFactoryInterface $requestFactory
+     * @param StreamFactoryInterface $streamFactory
+     * @param OpenSearchAuthenticationInterface|null $authentication
+     */
     public function __construct(
-        protected string                  $baseUri,
-        protected ClientInterface         $client,
-        protected RequestFactoryInterface $requestFactory,
-        protected StreamFactoryInterface  $streamFactory,
+        protected string                             $baseUri,
+        protected ClientInterface                    $client,
+        protected RequestFactoryInterface            $requestFactory,
+        protected StreamFactoryInterface             $streamFactory,
+        protected ?OpenSearchAuthenticationInterface $authentication = null,
     )
     {
     }
@@ -43,6 +52,10 @@ class OpenSearchHost
             $request = $request
                 ->withHeader("Content-Type", "application/json")
                 ->withBody($this->streamFactory->createStream($this->serialize($body)));
+        }
+
+        if ($this->authentication !== null) {
+            $request = $this->authentication->applyTo($request);
         }
 
         try {
