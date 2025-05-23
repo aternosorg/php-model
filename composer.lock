@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf10558784da0be992fb3b591aaef0a3",
+    "content-hash": "e65a6ad5873432956e40e565a87b7b3e",
     "packages": [
         {
             "name": "psr/http-client",
@@ -168,58 +168,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "aternos/curl-psr",
-            "version": "v1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/aternosorg/php-curl-psr.git",
-                "reference": "b867a2a0bbf29c46f1448f783ebf7270377219a8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/aternosorg/php-curl-psr/zipball/b867a2a0bbf29c46f1448f783ebf7270377219a8",
-                "reference": "b867a2a0bbf29c46f1448f783ebf7270377219a8",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "php": ">=8.3.0",
-                "psr/http-client": "^1.0",
-                "psr/http-factory": "^1.1",
-                "psr/http-message": "^1.1 || ^2.0"
-            },
-            "provide": {
-                "psr/http-client-implementation": "1.0",
-                "psr/http-factory-implementation": "1.1",
-                "psr/http-message-implementation": "2.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^11.4"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Aternos\\CurlPsr\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kurt Thiemann",
-                    "email": "kurt@aternos.org"
-                }
-            ],
-            "description": "A simple PSR-18 HTTP client based on cURL that supports actual streaming",
-            "support": {
-                "issues": "https://github.com/aternosorg/php-curl-psr/issues",
-                "source": "https://github.com/aternosorg/php-curl-psr/tree/v1.3.1"
-            },
-            "time": "2025-03-10T11:55:35+00:00"
-        },
         {
             "name": "myclabs/deep-copy",
             "version": "1.12.1",

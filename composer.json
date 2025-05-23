@@ -26,8 +26,7 @@
     "psr/http-factory": "^1.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5",
-    "aternos/curl-psr": "^1.3"
+    "phpunit/phpunit": "^10.5"
   },
   "autoload": {
     "psr-4": {
