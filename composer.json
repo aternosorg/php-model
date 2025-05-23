@@ -20,7 +20,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.3",
     "ext-json": "*",
     "psr/http-client": "^1.0",
     "psr/http-factory": "^1.1"
