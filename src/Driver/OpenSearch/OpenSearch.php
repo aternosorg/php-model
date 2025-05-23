@@ -112,18 +112,15 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws OpenSearchException
      */
     public function save(ModelInterface $model): bool
     {
-        try {
-            $this->request(
-                "PUT",
-                $this->buildUrl($model::getName(), "_doc", $model->getId()),
-                get_object_vars($model)
-            );
-        } catch (OpenSearchException) {
-            return false;
-        }
+        $this->request(
+            "PUT",
+            $this->buildUrl($model::getName(), "_doc", $model->getId()),
+            get_object_vars($model)
+        );
         return true;
     }
 
@@ -152,11 +149,16 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             }
             throw $e;
         }
-        if (!is_object($response->_source)) {
-            return null;
+
+        if (!isset($response->_source) || !is_object($response->_source)) {
+            throw new SerializeException("Received invalid document _source from OpenSearch");
+        }
+        if (!isset($response->_id) || !is_string($response->_id)) {
+            throw new SerializeException("Received invalid document _id from OpenSearch");
         }
 
         $data = get_object_vars($response->_source);
+        $data[$modelClass::getIdField()] = $response->_id;
 
         if ($model) {
             return $model->applyData($data);
@@ -169,6 +171,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      *
      * @param ModelInterface $model
      * @return bool
+     * @throws OpenSearchException
      */
     public function delete(ModelInterface $model): bool
     {
@@ -177,8 +180,11 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
                 "DELETE",
                 $this->buildUrl($model::getName(), "_doc", $model->getId())
             );
-        } catch (OpenSearchException) {
-            return false;
+        } catch (HttpErrorResponseException $e) {
+            if ($e->getCode() === 404) {
+                return false;
+            }
+            throw $e;
         }
 
         return true;
@@ -203,14 +209,20 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             $search->getSearchQuery()
         );
         if (!isset($response->hits) || !is_object($response->hits) || !isset($response->hits->hits) || !is_array($response->hits->hits)) {
-            return new SearchResult(false);
+            throw new SerializeException("Received invalid search response from OpenSearch");
         }
 
         $result = new SearchResult(true);
         foreach ($response->hits->hits as $resultDocument) {
             if (!isset($resultDocument->_source) || !is_object($resultDocument->_source)) {
-                continue;
+                throw new SerializeException("Received invalid document _source from OpenSearch");
             }
+            if (!isset($resultDocument->_id) || !is_string($resultDocument->_id)) {
+                throw new SerializeException("Received invalid document _id from OpenSearch");
+            }
+
+            $data = $resultDocument->_source;
+            $data->{$modelClassName::getIdField()} = $resultDocument->_id;
 
             /** @var ModelInterface $model */
             $model = new $modelClassName();

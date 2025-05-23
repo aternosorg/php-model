@@ -43,7 +43,8 @@
   "suggest": {
     "ext-redis": "To use the Redis Cache driver",
     "ext-cassandra": "To use the Cassandra NoSQL driver",
-    "ext-mysqli": "To use the Mysqli Relational driver"
+    "ext-mysqli": "To use the Mysqli Relational driver",
+    "shyim/opensearch-php-dsl": "OpenSearch DSL query builder"
   },
   "config": {
     "allow-plugins": {

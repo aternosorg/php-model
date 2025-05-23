@@ -5,7 +5,6 @@ namespace Aternos\Model\Driver\OpenSearch;
 use Aternos\Model\Driver\OpenSearch\Authentication\OpenSearchAuthenticationInterface;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpErrorResponseException;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
-use Aternos\Model\Driver\OpenSearch\Exception\OpenSearchException;
 use Aternos\Model\Driver\OpenSearch\Exception\SerializeException;
 use Exception;
 use JsonException;
