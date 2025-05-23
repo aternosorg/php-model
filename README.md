@@ -30,7 +30,7 @@ Currently included drivers are:
 * [Redis](src/Driver/Redis/Redis.php)
 * [Cassandra](src/Driver/Cassandra/Cassandra.php)
 * [Mysqli](src/Driver/Mysqli/Mysqli.php)
-* [Elasticsearch](src/Driver/Elasticsearch/Elasticsearch.php)
+* [OpenSearch](src/Driver/OpenSearch/OpenSearch.php)
 
 *All of these drivers require additional extensions or packages, see "suggest" in [composer.json](composer.json).*
 
