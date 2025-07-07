@@ -217,6 +217,12 @@ class SQL implements QueryGeneratorInterface
                             case SelectField::AVERAGE:
                                 $fieldString .= "AVG(";
                                 break;
+                            case SelectField::MIN:
+                                $fieldString .= "MIN(";
+                                break;
+                            case SelectField::MAX:
+                                $fieldString .= "MAX(";
+                                break;
                         }
                     }
 

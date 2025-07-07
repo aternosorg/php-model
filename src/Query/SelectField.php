@@ -9,9 +9,11 @@ namespace Aternos\Model\Query;
  */
 class SelectField extends Field
 {
-    const COUNT = 0,
+    const int COUNT = 0,
         SUM = 1,
-        AVERAGE = 2;
+        AVERAGE = 2,
+        MIN = 3,
+        MAX = 4;
 
     /**
      * @var string|null

@@ -6,6 +6,8 @@ use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\MaxField;
+use Aternos\Model\Query\MinField;
 use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\SumField;
@@ -492,6 +494,56 @@ class TestDriverTest extends TestCase
                 $this->assertEquals(2.5, $model->getField("average"));
             } else {
                 $this->assertEquals($model->number, $model->getField("average"));
+            }
+        }
+    }
+
+    public function testSelectGroupMin(): void
+    {
+        $model = new TestModel();
+        $model->id = "-5A";
+        $model->text = "A";
+        $model->number = -5;
+        $model->save();
+
+        $models = TestModel::select(fields: [
+            new MinField("number"),
+            new SelectField("number"),
+            new SelectField("text"),
+        ], group: ["text"]);
+
+        $this->assertTrue($models->wasSuccessful());
+        $this->assertCount(10, $models);
+        foreach ($models as $model) {
+            if ($model->text === "A") {
+                $this->assertEquals(-5, $model->getField("number"));
+            } else {
+                $this->assertEquals($model->number, $model->getField("number"));
+            }
+        }
+    }
+
+    public function testSelectGroupMax(): void
+    {
+        $model = new TestModel();
+        $model->id = "5A";
+        $model->text = "A";
+        $model->number = 5;
+        $model->save();
+
+        $models = TestModel::select(fields: [
+            new MaxField("number"),
+            new SelectField("number"),
+            new SelectField("text"),
+        ], group: ["text"]);
+
+        $this->assertTrue($models->wasSuccessful());
+        $this->assertCount(10, $models);
+        foreach ($models as $model) {
+            if ($model->text === "A") {
+                $this->assertEquals(5, $model->getField("number"));
+            } else {
+                $this->assertEquals($model->number, $model->getField("number"));
             }
         }
     }
