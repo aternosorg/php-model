@@ -226,6 +226,46 @@ class SQLTest extends TestCase
         $this->assertEquals("SELECT AVG(`number`) FROM `test`", $this->sql->generate($query));
     }
 
+    public function testSelectMin()
+    {
+        $query = new SelectQuery(fields: [
+            (new SelectField('number'))->setFunction(SelectField::MIN),
+        ]);
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT MIN(`number`) FROM `test`", $this->sql->generate($query));
+    }
+
+    public function testSelectMinAs()
+    {
+        $query = new SelectQuery(fields: [
+            (new SelectField('number'))->setFunction(SelectField::MIN)->setAlias('minNumber'),
+        ]);
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT MIN(`number`) AS `minNumber` FROM `test`", $this->sql->generate($query));
+    }
+
+    public function testSelectMax()
+    {
+        $query = new SelectQuery(fields: [
+            (new SelectField('number'))->setFunction(SelectField::MAX),
+        ]);
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT MAX(`number`) FROM `test`", $this->sql->generate($query));
+    }
+
+    public function testSelectMaxAs()
+    {
+        $query = new SelectQuery(fields: [
+            (new SelectField('number'))->setFunction(SelectField::MAX)->setAlias('maxNumber'),
+        ]);
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT MAX(`number`) AS `maxNumber` FROM `test`", $this->sql->generate($query));
+    }
+
     public function testSelectLimitNumber()
     {
         $query = new SelectQuery(limit:100);

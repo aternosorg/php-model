@@ -110,6 +110,10 @@ class TestTableEntryGroup
                 } elseif ($field->function === SelectField::AVERAGE) {
                     $averageFields[$key]++;
                     $aggregatedEntry[$key] += $entry[$field->key] ?? 0;
+                } elseif ($field->function === SelectField::MIN) {
+                    $aggregatedEntry[$key] = min($aggregatedEntry[$key] ?? PHP_INT_MAX, $entry[$field->key] ?? PHP_INT_MAX);
+                } elseif ($field->function === SelectField::MAX) {
+                    $aggregatedEntry[$key] = max($aggregatedEntry[$key] ?? PHP_INT_MIN, $entry[$field->key] ?? PHP_INT_MIN);
                 }
             }
         }
