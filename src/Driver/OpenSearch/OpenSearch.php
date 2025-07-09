@@ -11,6 +11,7 @@ use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
 use Aternos\Model\Driver\OpenSearch\Exception\OpenSearchException;
 use Aternos\Model\Driver\OpenSearch\Exception\SerializeException;
 use Aternos\Model\ModelInterface;
+use Aternos\Model\Search\CountRelation;
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use Psr\Http\Client\ClientInterface;
@@ -193,6 +194,18 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
     }
 
     /**
+     * @param string $name
+     * @return CountRelation|null
+     */
+    protected function getHitCountRelation(string $name): ?CountRelation
+    {
+        return match ($name) {
+            "eq" => CountRelation::EQUALS,
+            "gte" => CountRelation::GREATER_THAN_OR_EQUALS,
+        };
+    }
+
+    /**
      * @param Search $search
      * @return SearchResult
      * @throws HttpErrorResponseException
@@ -215,6 +228,19 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
         }
 
         $result = new SearchResult(true);
+        if (isset($response->took) && is_int($response->took)) {
+            $result->setSearchTime($response->took);
+        }
+
+        if (isset($response->hits->total) && is_object($response->hits->total)) {
+            if (isset($response->hits->total->value) && is_int($response->hits->total->value)) {
+                $result->setTotalCount($response->hits->total->value);
+            }
+            if (isset($response->hits->total->relation) && is_string($response->hits->total->relation)) {
+                $result->setTotalCountRelation($this->getHitCountRelation($response->hits->total->relation));
+            }
+        }
+
         foreach ($response->hits->hits as $resultDocument) {
             if (!isset($resultDocument->_id) || !is_string($resultDocument->_id)) {
                 throw new SerializeException("Received invalid document _id from OpenSearch");
