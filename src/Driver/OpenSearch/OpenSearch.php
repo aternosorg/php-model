@@ -150,14 +150,16 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             throw $e;
         }
 
-        if (!isset($response->_source) || !is_object($response->_source)) {
-            throw new SerializeException("Received invalid document _source from OpenSearch");
-        }
         if (!isset($response->_id) || !is_string($response->_id)) {
             throw new SerializeException("Received invalid document _id from OpenSearch");
         }
 
-        $data = get_object_vars($response->_source);
+        if (isset($response->_source) && is_object($response->_source)) {
+            $data = get_object_vars($response->_source);
+        } else {
+            $data = [];
+        }
+
         $data[$modelClass::getIdField()] = $response->_id;
 
         if ($model) {
@@ -214,19 +216,21 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
 
         $result = new SearchResult(true);
         foreach ($response->hits->hits as $resultDocument) {
-            if (!isset($resultDocument->_source) || !is_object($resultDocument->_source)) {
-                throw new SerializeException("Received invalid document _source from OpenSearch");
-            }
             if (!isset($resultDocument->_id) || !is_string($resultDocument->_id)) {
                 throw new SerializeException("Received invalid document _id from OpenSearch");
             }
 
-            $data = $resultDocument->_source;
-            $data->{$modelClassName::getIdField()} = $resultDocument->_id;
+            if (isset($resultDocument->_source) && is_object($resultDocument->_source)) {
+                $data = get_object_vars($resultDocument->_source);
+            } else {
+                $data = [];
+            }
+
+            $data[$modelClassName::getIdField()] = $resultDocument->_id;
 
             /** @var ModelInterface $model */
             $model = new $modelClassName();
-            $model->applyData(get_object_vars($resultDocument->_source));
+            $model->applyData($data);
             $result->add($model);
         }
         return $result;
