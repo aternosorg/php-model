@@ -482,7 +482,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (static::$registry) {
-            if ($query instanceof SelectQuery && $result->wasSuccessful() && count($result) > 0) {
+            if ($query instanceof SelectQuery && $result->wasSuccessful() && $query->shouldSaveResults()) {
                 foreach ($result as $model) {
                     if ($model->getId() === null) {
                         continue;
@@ -511,6 +511,7 @@ abstract class GenericModel extends BaseModel
      * @param array|null $fields
      * @param array|int|Limit|null $limit
      * @param array|GroupField[]|string[]|null $group
+     * @param bool $saveResults Whether results of this query should be saved in the model registry.
      * @return QueryResult<static>|static[]
      * @noinspection PhpDocSignatureInspection
      */
@@ -518,9 +519,10 @@ abstract class GenericModel extends BaseModel
                                   null|array                           $order = null,
                                   null|array                           $fields = null,
                                   null|Limit|array|int                 $limit = null,
-                                  null|array                           $group = null): QueryResult
+                                  null|array                           $group = null,
+                                  bool                                 $saveResults = true): QueryResult
     {
-        return static::query(new SelectQuery($where, $order, $fields, $limit, $group));
+        return static::query(new SelectQuery($where, $order, $fields, $limit, $group, $saveResults));
     }
 
     /**

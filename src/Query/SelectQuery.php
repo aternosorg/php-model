@@ -23,12 +23,14 @@ class SelectQuery extends Query
      * @param array|null $fields
      * @param array|int|Limit|null $limit
      * @param array|GroupField[]|string[]|null $group
+     * @param bool $saveResults Whether results of this query should be saved in the model registry.
      */
     public function __construct(null|WhereCondition|array|WhereGroup $where = null,
                                 null|array                           $order = null,
                                 null|array                           $fields = null,
                                 null|Limit|array|int                 $limit = null,
-                                null|array                           $group = null)
+                                null|array                           $group = null,
+                                protected bool                       $saveResults = true)
     {
         if ($where) {
             $this->where($where);
@@ -96,5 +98,14 @@ class SelectQuery extends Query
     public function getGroup(): ?array
     {
         return $this->group;
+    }
+
+    /**
+     * Whether results of this query should be saved in the model registry
+     * @return bool
+     */
+    public function shouldSaveResults(): bool
+    {
+        return $this->saveResults;
     }
 }
