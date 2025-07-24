@@ -482,7 +482,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (static::$registry) {
-            if ($query instanceof SelectQuery && $result->wasSuccessful() && $query->shouldSaveResults()) {
+            if ($query instanceof SelectQuery && $result->wasSuccessful() && $query->shouldSaveResultsToRegistry()) {
                 foreach ($result as $model) {
                     if ($model->getId() === null) {
                         continue;
@@ -520,9 +520,9 @@ abstract class GenericModel extends BaseModel
                                   null|array                           $fields = null,
                                   null|Limit|array|int                 $limit = null,
                                   null|array                           $group = null,
-                                  bool                                 $saveResults = true): QueryResult
+                                  bool                                 $saveResultsToRegistry = true): QueryResult
     {
-        return static::query(new SelectQuery($where, $order, $fields, $limit, $group, $saveResults));
+        return static::query(new SelectQuery($where, $order, $fields, $limit, $group, $saveResultsToRegistry));
     }
 
     /**
