@@ -103,12 +103,12 @@ class SelectQuery extends Query
     /**
      * Set whether results of this query should be saved in the model registry
      *
-     * @param bool $saveResults
+     * @param bool $saveResultsToRegistry
      * @return $this
      */
-    public function saveResultsToRegistry(bool $saveResults = true): static
+    public function saveResultsToRegistry(bool $saveResultsToRegistry = true): static
     {
-        $this->saveResultsToRegistry = $saveResults;
+        $this->saveResultsToRegistry = $saveResultsToRegistry;
         return $this;
     }
 

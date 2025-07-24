@@ -511,7 +511,7 @@ abstract class GenericModel extends BaseModel
      * @param array|null $fields
      * @param array|int|Limit|null $limit
      * @param array|GroupField[]|string[]|null $group
-     * @param bool $saveResults Whether results of this query should be saved in the model registry.
+     * @param bool $saveResultsToRegistry Whether results of this query should be saved in the model registry.
      * @return QueryResult<static>|static[]
      * @noinspection PhpDocSignatureInspection
      */
