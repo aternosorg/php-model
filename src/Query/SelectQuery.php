@@ -101,7 +101,20 @@ class SelectQuery extends Query
     }
 
     /**
+     * Set whether results of this query should be saved in the model registry
+     *
+     * @param bool $saveResults
+     * @return $this
+     */
+    public function saveResults(bool $saveResults = true): static
+    {
+        $this->saveResults = $saveResults;
+        return $this;
+    }
+
+    /**
      * Whether results of this query should be saved in the model registry
+     *
      * @return bool
      */
     public function shouldSaveResults(): bool
