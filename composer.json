@@ -1,13 +1,13 @@
 {
   "name": "aternos/model",
   "description": "PHP library for simple and complex database models",
+  "license": "MIT",
+  "type": "library",
   "keywords": [
     "database",
     "model"
   ],
   "readme": "README.md",
-  "type": "library",
-  "license": "MIT",
   "authors": [
     {
       "name": "Matthias Neid",
@@ -15,10 +15,9 @@
     }
   ],
   "support": {
-    "source": "https://github.com/aternosorg/php-model",
-    "issues": "https://github.com/aternosorg/php-model/issues"
+    "issues": "https://github.com/aternosorg/php-model/issues",
+    "source": "https://github.com/aternosorg/php-model"
   },
-  "minimum-stability": "stable",
   "require": {
     "php": ">=8.3",
     "ext-json": "*",
@@ -28,6 +27,13 @@
   "require-dev": {
     "phpunit/phpunit": "^10.5"
   },
+  "suggest": {
+    "ext-cassandra": "To use the Cassandra NoSQL driver",
+    "ext-mysqli": "To use the Mysqli Relational driver",
+    "ext-redis": "To use the Redis Cache driver",
+    "shyim/opensearch-php-dsl": "OpenSearch DSL query builder"
+  },
+  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "Aternos\\Model\\": "src/"
@@ -35,14 +41,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Aternos\\Model\\Test\\Tests\\": "test/tests/",
-      "Aternos\\Model\\Test\\Src\\": "test/src/"
+      "Aternos\\Model\\Test\\Src\\": "test/src/",
+      "Aternos\\Model\\Test\\Tests\\": "test/tests/"
     }
-  },
-  "suggest": {
-    "ext-redis": "To use the Redis Cache driver",
-    "ext-cassandra": "To use the Cassandra NoSQL driver",
-    "ext-mysqli": "To use the Mysqli Relational driver",
-    "shyim/opensearch-php-dsl": "OpenSearch DSL query builder"
   }
 }
