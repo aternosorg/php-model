@@ -15,8 +15,8 @@ class WhereGroup implements Iterator, Countable
     /**
      * Conjunction values
      */
-    const AND = 0;
-    const OR = 1;
+    const int AND = 0;
+    const int OR = 1;
 
     /**
      * Multiple WhereGroup or WhereCondition objects
