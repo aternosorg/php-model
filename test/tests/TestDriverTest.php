@@ -6,6 +6,7 @@ use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\MaxField;
 use Aternos\Model\Query\MinField;
 use Aternos\Model\Query\OrderField;
@@ -337,7 +338,7 @@ class TestDriverTest extends TestCase
 
     public function testSelectOrder(): void
     {
-        $models = TestModel::select(order: ["number" => OrderField::DESCENDING]);
+        $models = TestModel::select(order: ["number" => Direction::DESCENDING]);
         $this->assertCount(10, $models);
         $this->assertEquals("9J", $models[0]->id);
         $this->assertEquals("J", $models[0]->text);

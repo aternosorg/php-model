@@ -3,6 +3,7 @@
 namespace Aternos\Model\Query\Generator;
 
 use Aternos\Model\Query\{DeleteQuery,
+    Direction,
     OrderField,
     Query,
     SelectField,
@@ -171,9 +172,8 @@ class SQL implements QueryGeneratorInterface
         foreach ($orderFields as $orderField) {
             /** @var OrderField $orderField */
             $direction = match ($orderField->direction) {
-                OrderField::ASCENDING => "ASC",
-                OrderField::DESCENDING => "DESC",
-                default => throw new UnexpectedValueException("Invalid direction: " . $orderField->direction),
+                Direction::ASCENDING => "ASC",
+                Direction::DESCENDING => "DESC",
             };
 
             if ($orderField->raw) {

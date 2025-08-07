@@ -9,11 +9,6 @@ namespace Aternos\Model\Query;
  */
 class OrderField
 {
-    /**
-     * Direction constants
-     */
-    const int ASCENDING = 0;
-    const int DESCENDING = 1;
 
     /**
      * Field name to order by
@@ -30,17 +25,17 @@ class OrderField
     /**
      * Order direction
      *
-     * @var int
+     * @var Direction
      */
-    public int $direction = self::ASCENDING;
+    public Direction $direction = Direction::ASCENDING;
 
     /**
      * OrderField constructor.
      *
      * @param string|null $field
-     * @param int $direction
+     * @param Direction $direction
      */
-    public function __construct(?string $field = null, int $direction = self::ASCENDING)
+    public function __construct(?string $field = null, Direction $direction = Direction::ASCENDING)
     {
         $this->field = $field;
         $this->direction = $direction;
@@ -57,10 +52,10 @@ class OrderField
     }
 
     /**
-     * @param int $direction
+     * @param Direction $direction
      * @return OrderField
      */
-    public function setDirection(int $direction): OrderField
+    public function setDirection(Direction $direction): OrderField
     {
         $this->direction = $direction;
         return $this;
