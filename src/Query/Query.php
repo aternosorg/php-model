@@ -109,6 +109,11 @@ abstract class Query
                 continue;
             }
 
+            if ($value instanceof Direction) {
+                $this->order[] = new OrderField($key, $value);
+                continue;
+            }
+
             if (is_string($value)) {
                 $value = match (strtoupper($value)) {
                     "ASCENDING", "ASC" => Direction::ASCENDING,
