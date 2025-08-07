@@ -12,11 +12,6 @@ use Iterator;
  */
 class WhereGroup implements Iterator, Countable
 {
-    /**
-     * Conjunction values
-     */
-    const int AND = 0;
-    const int OR = 1;
 
     /**
      * Multiple WhereGroup or WhereCondition objects
@@ -26,9 +21,9 @@ class WhereGroup implements Iterator, Countable
     protected array $group = [];
 
     /**
-     * @var int
+     * @var Conjunction
      */
-    public int $conjunction = self:: AND;
+    public Conjunction $conjunction = Conjunction::AND;
 
     /**
      * Group iterator
@@ -41,9 +36,9 @@ class WhereGroup implements Iterator, Countable
      * WhereGroup constructor.
      *
      * @param array $conditions
-     * @param int $conjunction
+     * @param Conjunction $conjunction
      */
-    public function __construct(array $conditions = [], int $conjunction = self:: AND)
+    public function __construct(array $conditions = [], Conjunction $conjunction = Conjunction::AND)
     {
         $this->group = $conditions;
         $this->conjunction = $conjunction;

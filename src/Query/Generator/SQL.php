@@ -2,7 +2,8 @@
 
 namespace Aternos\Model\Query\Generator;
 
-use Aternos\Model\Query\{DeleteQuery,
+use Aternos\Model\Query\{Conjunction,
+    DeleteQuery,
     Direction,
     OrderField,
     Query,
@@ -12,7 +13,6 @@ use Aternos\Model\Query\{DeleteQuery,
     UpdateQuery,
     WhereCondition,
     WhereGroup};
-use UnexpectedValueException;
 
 /**
  * Class SQL
@@ -140,9 +140,8 @@ class SQL implements QueryGeneratorInterface
             return $field . " " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
             $conjunction = match ($where->conjunction) {
-                WhereGroup:: AND => " AND ",
-                WhereGroup:: OR => " OR ",
-                default => throw new UnexpectedValueException("Invalid conjunction: " . $where->conjunction),
+                Conjunction::AND => " AND ",
+                Conjunction::OR => " OR ",
             };
 
             $whereStrings = [];

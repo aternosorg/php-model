@@ -225,7 +225,7 @@ User::query(new \Aternos\Model\Query\SelectQuery(
         new \Aternos\Model\Query\WhereGroup([
             new \Aternos\Model\Query\WhereCondition("hello", "world"),
             new \Aternos\Model\Query\WhereCondition("foo", "bar")
-        ], \Aternos\Model\Query\WhereGroup:: OR)
+        ], \Aternos\Model\Query\Conjunction::OR)
     ]),
     [
         new \Aternos\Model\Query\OrderField("field", \Aternos\Model\Query\Direction::DESCENDING),

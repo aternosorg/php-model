@@ -2,6 +2,7 @@
 
 namespace Aternos\Model\Test\Tests;
 
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\Generator\SQL;
 use Aternos\Model\Query\Limit;
@@ -142,7 +143,7 @@ class SQLTest extends TestCase
             new WhereGroup([
                 new WhereCondition('number', 1, '>'),
                 new WhereCondition('number', 0, '<'),
-            ], WhereGroup::OR),
+            ], Conjunction::OR),
         );
         $query->modelClassName = TestModel::class;
 
