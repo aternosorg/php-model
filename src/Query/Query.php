@@ -115,6 +115,8 @@ abstract class Query
                     "DESCENDING", "DESC" => Direction::DESCENDING,
                     default => throw new InvalidArgumentException('Argument $order contains invalid order direction: ' . $value),
                 };
+            } else {
+                throw new InvalidArgumentException('Argument $order contains invalid order direction: ' . $value);
             }
 
             $this->order[] = new OrderField($key, $value);
