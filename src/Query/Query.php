@@ -109,7 +109,7 @@ abstract class Query
                 continue;
             }
 
-            if (!is_int($value)) {
+            if (is_string($value)) {
                 $value = match (strtoupper($value)) {
                     "ASCENDING", "ASC" => Direction::ASCENDING,
                     "DESCENDING", "DESC" => Direction::DESCENDING,
