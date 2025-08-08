@@ -30,7 +30,7 @@ use stdClass;
  */
 class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterface
 {
-    public const ID = "opensearch";
+    public const string ID = "opensearch";
     protected string $id = self::ID;
 
     /**

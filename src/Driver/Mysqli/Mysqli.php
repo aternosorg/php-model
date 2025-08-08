@@ -27,7 +27,7 @@ use mysqli_result;
  */
 class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 {
-    public const ID = "mysqli";
+    public const string ID = "mysqli";
     protected string $id = self::ID;
 
     /**

@@ -4,11 +4,12 @@ namespace Aternos\Model\Test\Tests;
 
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\Test\TestDriver;
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\MaxField;
 use Aternos\Model\Query\MinField;
-use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\SumField;
 use Aternos\Model\Query\WhereCondition;
@@ -144,7 +145,7 @@ class TestDriverTest extends TestCase
         $models = TestModel::select(new WhereGroup([
             new WhereCondition("number", 1),
             new WhereCondition("number", 2)
-        ], WhereGroup::OR));
+        ], Conjunction::OR));
         $this->assertCount(2, $models);
         $this->assertEquals("1B", $models[0]->id);
         $this->assertEquals("B", $models[0]->text);
@@ -337,7 +338,7 @@ class TestDriverTest extends TestCase
 
     public function testSelectOrder(): void
     {
-        $models = TestModel::select(order: ["number" => OrderField::DESCENDING]);
+        $models = TestModel::select(order: ["number" => Direction::DESCENDING]);
         $this->assertCount(10, $models);
         $this->assertEquals("9J", $models[0]->id);
         $this->assertEquals("J", $models[0]->text);

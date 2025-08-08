@@ -18,7 +18,8 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
 };
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
-use Aternos\Model\Query\{CountField,
+use Aternos\Model\Query\{Conjunction,
+    CountField,
     DeleteQuery,
     GroupField,
     Limit,
@@ -28,8 +29,7 @@ use Aternos\Model\Query\{CountField,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup
-};
+    WhereGroup};
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
@@ -441,7 +441,7 @@ abstract class GenericModel extends BaseModel
         $query->modelClassName = static::class;
 
         if (static::$filters !== null && count(static::$filters) > 0) {
-            $wrappedWhereGroup = new WhereGroup(conjunction: WhereGroup::AND);
+            $wrappedWhereGroup = new WhereGroup(conjunction: Conjunction::AND);
             foreach (static::$filters as $key => $value) {
                 $wrappedWhereGroup->add(new WhereCondition($key, $value));
             }

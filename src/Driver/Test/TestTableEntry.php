@@ -3,7 +3,7 @@
 namespace Aternos\Model\Driver\Test;
 
 use Aternos\Model\ModelInterface;
-use Aternos\Model\Query\Field;
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\UpdateField;
 use Aternos\Model\Query\WhereCondition;
@@ -42,14 +42,14 @@ class TestTableEntry implements \ArrayAccess
             } else if ($condition instanceof WhereCondition) {
                 $matches = $this->matchesWhereCondition($condition);
             }
-            if ($where->conjunction === WhereGroup::AND && !$matches) {
+            if ($where->conjunction === Conjunction::AND && !$matches) {
                 return false;
             }
-            if ($where->conjunction === WhereGroup::OR && $matches) {
+            if ($where->conjunction === Conjunction::OR && $matches) {
                 return true;
             }
         }
-        return $where->conjunction === WhereGroup::AND;
+        return $where->conjunction === Conjunction::AND;
     }
 
     /**
