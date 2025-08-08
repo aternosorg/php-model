@@ -109,18 +109,13 @@ abstract class Query
                 continue;
             }
 
-            if ($value instanceof Direction) {
-                $this->order[] = new OrderField($key, $value);
-                continue;
-            }
-
             if (is_string($value)) {
                 $value = match (strtoupper($value)) {
                     "ASCENDING", "ASC" => Direction::ASCENDING,
                     "DESCENDING", "DESC" => Direction::DESCENDING,
                     default => throw new InvalidArgumentException('Argument $order contains invalid order direction: ' . $value),
                 };
-            } else {
+            } else if (!($value instanceof Direction)) {
                 throw new InvalidArgumentException('Argument $order contains invalid order direction: ' . $value);
             }
 
