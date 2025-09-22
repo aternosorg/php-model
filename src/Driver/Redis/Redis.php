@@ -67,16 +67,20 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
     /**
      * Connect to redis
      *
-     * @throws RedisException
+     * @throws RedisModelException
      */
     protected function connect(): void
     {
         if (!$this->connection) {
             $this->connection = new \Redis();
-            if (!$this->socket) {
-                $this->connection->connect($this->host, $this->port);
-            } else {
-                $this->connection->connect($this->socket);
+            try {
+                if (!$this->socket) {
+                    $this->connection->connect($this->host, $this->port);
+                } else {
+                    $this->connection->connect($this->socket);
+                }
+            } catch (RedisException $e) {
+                throw RedisModelException::wrapping($e);
             }
         }
     }
@@ -98,7 +102,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws RedisException
+     * @throws RedisModelException
      */
     public function save(ModelInterface $model): bool
     {
@@ -107,7 +111,12 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         }
 
         $this->connect();
-        return $this->connection->set($this->generateCacheKey($model::class, $model->getId()), json_encode($model), $model->getCacheTime());
+        $key = $this->generateCacheKey($model::class, $model->getId());
+        try {
+            return $this->connection->set($key, json_encode($model), $model->getCacheTime());
+        } catch (RedisException $e) {
+            throw RedisModelException::wrapping($e);
+        }
     }
 
     /**
@@ -117,7 +126,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws RedisException
+     * @throws RedisModelException
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
@@ -126,7 +135,11 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         }
 
         $this->connect();
-        $rawData = $this->connection->get($this->generateCacheKey($modelClass, $id));
+        try {
+            $rawData = $this->connection->get($this->generateCacheKey($modelClass, $id));
+        } catch (RedisException $e) {
+            throw RedisModelException::wrapping($e);
+        }
 
         if (!$rawData) {
             return null;
@@ -148,7 +161,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws RedisException
+     * @throws RedisModelException
      */
     public function delete(ModelInterface $model): bool
     {
@@ -157,7 +170,12 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         }
 
         $this->connect();
-        return $this->connection->del($this->generateCacheKey($model::class, $model->getId()));
+        $key = $this->generateCacheKey($model::class, $model->getId());
+        try {
+            return $this->connection->del($key);
+        } catch (RedisException $e) {
+            throw RedisModelException::wrapping($e);
+        }
     }
 
     /**

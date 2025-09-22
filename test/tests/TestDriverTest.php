@@ -14,14 +14,10 @@ use Aternos\Model\Query\SumField;
 use Aternos\Model\Query\WhereCondition;
 use Aternos\Model\Query\WhereGroup;
 use Aternos\Model\Test\Src\TestModel;
-use Exception;
 use PHPUnit\Framework\TestCase;
 
 class TestDriverTest extends TestCase
 {
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         $testData = "ABCDEFGHIJ";
@@ -34,10 +30,6 @@ class TestDriverTest extends TestCase
         }
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testGet(): void
     {
         $model = TestModel::get("1B");
@@ -56,20 +48,12 @@ class TestDriverTest extends TestCase
         $this->assertNull($model);
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testGetNull(): void
     {
         $model = TestModel::get("DOES_NOT_EXIST");
         $this->assertNull($model);
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testDelete(): void
     {
         $model = TestModel::get("1B");
@@ -77,19 +61,12 @@ class TestDriverTest extends TestCase
         $this->assertNull(TestModel::get("1B"));
     }
 
-    /**
-     * @return void
-     */
     public function testDeleteNull(): void
     {
         $model = new TestModel();
         $this->assertFalse($model->delete());
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testSaveNew(): void
     {
         $model = new TestModel();
@@ -103,10 +80,6 @@ class TestDriverTest extends TestCase
         $this->assertEquals(10, $getModel->number);
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testSaveExisting(): void
     {
         $model = TestModel::get("1B");
@@ -548,10 +521,6 @@ class TestDriverTest extends TestCase
         }
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testUpdate(): void
     {
         TestModel::disableRegistry();
@@ -574,10 +543,6 @@ class TestDriverTest extends TestCase
         $this->assertEquals("C", $model->text);
     }
 
-    /**
-     * @return void
-     * @throws Exception
-     */
     public function testDeleteQuery(): void
     {
         TestModel::disableRegistry();
@@ -599,9 +564,6 @@ class TestDriverTest extends TestCase
         $this->assertNull($model);
     }
 
-    /**
-     * @return void
-     */
     protected function tearDown(): void
     {
         TestModel::clearTestEntries();

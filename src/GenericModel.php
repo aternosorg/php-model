@@ -372,7 +372,7 @@ abstract class GenericModel extends BaseModel
      * @param string $id
      * @param bool $update
      * @return static|null
-     * @throws Exception
+     * @throws ModelException
      */
     public static function get(string $id, bool $update = false): ?static
     {
@@ -560,7 +560,7 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
-     * @throws Exception
+     * @throws ModelException
      */
     public function reload(): static
     {
