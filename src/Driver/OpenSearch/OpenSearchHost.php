@@ -40,9 +40,9 @@ class OpenSearchHost
      * @param string $uri
      * @param mixed|null $body
      * @return stdClass
-     * @throws HttpErrorResponseException
-     * @throws HttpTransportException
-     * @throws SerializeException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     public function request(string $method, string $uri, mixed $body = null): stdClass
     {
@@ -78,8 +78,9 @@ class OpenSearchHost
     /**
      * @param ResponseInterface $response
      * @return stdClass
-     * @throws HttpTransportException
-     * @throws SerializeException
+     * @throws HttpTransportException If the response body could not be read
+     * @throws HttpTransportException If the response is not JSON
+     * @throws SerializeException If the response body could not be deserialized
      */
     protected function parseResponse(ResponseInterface $response): stdClass
     {
@@ -100,7 +101,7 @@ class OpenSearchHost
     /**
      * @param mixed $data
      * @return string
-     * @throws SerializeException
+     * @throws SerializeException If the data could not be serialized
      */
     protected function serialize(mixed $data): string
     {
@@ -114,7 +115,8 @@ class OpenSearchHost
     /**
      * @param string $data
      * @return stdClass
-     * @throws SerializeException
+     * @throws SerializeException If the data could not be deserialized
+     * @throws SerializeException If the data is not an object
      */
     protected function deserialize(string $data): stdClass
     {

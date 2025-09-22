@@ -2,9 +2,9 @@
 
 namespace Aternos\Model\Driver\OpenSearch\Exception;
 
-use Exception;
+use Aternos\Model\ModelException;
 
-class OpenSearchException extends Exception
+class OpenSearchException extends ModelException
 {
 
 }

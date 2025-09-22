@@ -9,7 +9,6 @@ use Aternos\Model\ModelInterface;
 use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
-use Exception;
 
 class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 {
@@ -94,7 +93,6 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     /**
      * @param ModelInterface $model
      * @return bool
-     * @throws Exception
      */
     public function delete(ModelInterface $model): bool
     {
@@ -112,7 +110,6 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws Exception
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
@@ -129,7 +126,6 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     /**
      * @param ModelInterface $model
      * @return bool
-     * @throws Exception
      */
     public function save(ModelInterface $model): bool
     {
@@ -146,7 +142,6 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
     /**
      * @param Query $query
      * @return QueryResult
-     * @throws Exception
      */
     public function query(Query $query): QueryResult
     {

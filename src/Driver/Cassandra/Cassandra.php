@@ -121,14 +121,18 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param string $query
      * @return Rows
-     * @throws Exception
+     * @throws CassandraModelException if an error occurs while executing the query
      */
     protected function rawQuery(string $query): Rows
     {
         $this->connect();
 
         $statement = new SimpleStatement($query);
-        return $this->connection->execute($statement, null);
+        try {
+            return $this->connection->execute($statement, null);
+        } catch (Exception $e) {
+            throw CassandraModelException::wrapping($e);
+        }
     }
 
     /**
@@ -136,7 +140,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws Exception
+     * @throws CassandraModelException if an error occurs while executing the query
      */
     public function save(ModelInterface $model): bool
     {
@@ -158,7 +162,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws Exception
+     * @throws CassandraModelException if an error occurs while executing the query
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
@@ -183,7 +187,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws Exception
+     * @throws CassandraModelException if an error occurs while executing the query
      */
     public function delete(ModelInterface $model): bool
     {
@@ -200,7 +204,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
      *
      * @param Query $query
      * @return QueryResult
-     * @throws Exception
+     * @throws CassandraModelException if an error occurs while executing the query
      */
     public function query(Query $query): QueryResult
     {

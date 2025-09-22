@@ -72,10 +72,9 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      * @param string $uri
      * @param mixed|null $body
      * @return stdClass
-     * @throws HttpErrorResponseException
-     * @throws HttpTransportException
-     * @throws SerializeException
-     * @throws OpenSearchException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     protected function request(string $method, string $uri, mixed $body = null): stdClass
     {
@@ -96,6 +95,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
                 throw $e;
             }
         }
+        /** @var OpenSearchException $lastError */
         throw $lastError;
     }
 
@@ -113,7 +113,9 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws OpenSearchException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     public function save(ModelInterface $model): bool
     {
@@ -132,10 +134,9 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws HttpErrorResponseException
-     * @throws HttpTransportException
-     * @throws OpenSearchException
-     * @throws SerializeException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
@@ -151,17 +152,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             throw $e;
         }
 
-        if (!isset($response->_id) || !is_string($response->_id)) {
-            throw new SerializeException("Received invalid document _id from OpenSearch");
-        }
-
-        if (isset($response->_source) && is_object($response->_source)) {
-            $data = get_object_vars($response->_source);
-        } else {
-            $data = [];
-        }
-
-        $data[$modelClass::getIdField()] = $response->_id;
+        $data = $this->getModelData($response, $modelClass);
 
         if ($model) {
             return $model->applyData($data);
@@ -174,7 +165,9 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws OpenSearchException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     public function delete(ModelInterface $model): bool
     {
@@ -208,10 +201,9 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
     /**
      * @param Search $search
      * @return SearchResult
-     * @throws HttpErrorResponseException
-     * @throws HttpTransportException
-     * @throws OpenSearchException
-     * @throws SerializeException
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
      */
     public function search(Search $search): SearchResult
     {
@@ -242,23 +234,32 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
         }
 
         foreach ($response->hits->hits as $resultDocument) {
-            if (!isset($resultDocument->_id) || !is_string($resultDocument->_id)) {
-                throw new SerializeException("Received invalid document _id from OpenSearch");
-            }
-
-            if (isset($resultDocument->_source) && is_object($resultDocument->_source)) {
-                $data = get_object_vars($resultDocument->_source);
-            } else {
-                $data = [];
-            }
-
-            $data[$modelClassName::getIdField()] = $resultDocument->_id;
-
             /** @var ModelInterface $model */
             $model = new $modelClassName();
-            $model->applyData($data);
+            $model->applyData($this->getModelData($resultDocument, $modelClassName));
             $result->add($model);
         }
         return $result;
+    }
+
+    /**
+     * @param stdClass $response
+     * @param class-string<ModelInterface> $modelClass $modelClass
+     * @return array
+     */
+    public function getModelData(stdClass $response, string $modelClass): array
+    {
+        if (!isset($response->_id) || !is_string($response->_id)) {
+            throw new SerializeException("Received invalid document _id from OpenSearch");
+        }
+
+        if (isset($response->_source) && is_object($response->_source)) {
+            $data = get_object_vars($response->_source);
+        } else {
+            $data = [];
+        }
+
+        $data[$modelClass::getIdField()] = $response->_id;
+        return $data;
     }
 }
