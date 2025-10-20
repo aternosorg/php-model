@@ -225,12 +225,12 @@ User::query(new \Aternos\Model\Query\SelectQuery(
         new \Aternos\Model\Query\WhereGroup([
             new \Aternos\Model\Query\WhereCondition("hello", "world"),
             new \Aternos\Model\Query\WhereCondition("foo", "bar")
-        ], \Aternos\Model\Query\WhereGroup:: OR)
+        ], \Aternos\Model\Query\Conjunction::OR)
     ]),
     [
-        new \Aternos\Model\Query\OrderField("field", \Aternos\Model\Query\OrderField::DESCENDING),
-        new \Aternos\Model\Query\OrderField("hello", \Aternos\Model\Query\OrderField::ASCENDING),
-        new \Aternos\Model\Query\OrderField("foo", \Aternos\Model\Query\OrderField::DESCENDING)
+        new \Aternos\Model\Query\OrderField("field", \Aternos\Model\Query\Direction::DESCENDING),
+        new \Aternos\Model\Query\OrderField("hello", \Aternos\Model\Query\Direction::ASCENDING),
+        new \Aternos\Model\Query\OrderField("foo", \Aternos\Model\Query\Direction::DESCENDING)
     ],
     [
         new \Aternos\Model\Query\SelectField("field"), 
