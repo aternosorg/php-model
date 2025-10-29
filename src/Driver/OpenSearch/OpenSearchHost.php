@@ -65,14 +65,36 @@ class OpenSearchHost
 
         $statusCode = $response->getStatusCode();
         if ($statusCode < 200 || $statusCode > 299) {
-            $parsed = null;
-            try {
-                $parsed = $this->parseResponse($response);
-            } catch (Exception) {}
-            throw new HttpErrorResponseException($parsed, "OpenSearch returned status code " . $statusCode, $statusCode);
+            $this->handleErrorResponse($response);
         }
 
         return $this->parseResponse($response);
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return void
+     * @throws HttpErrorResponseException
+     */
+    protected function handleErrorResponse(ResponseInterface $response): void
+    {
+        $statusCode = $response->getStatusCode();
+        try {
+            $parsed = $this->parseResponse($response);
+        } catch (Exception) {
+            throw new HttpErrorResponseException(null, "OpenSearch returned status code " . $statusCode, $statusCode);
+        }
+
+        $type = $parsed->error?->type ?? null;
+        $reason = $parsed->error?->reason ?? null;
+        $message = "OpenSearch returned error " . $statusCode;
+        if ($type !== null) {
+            $message .= " [" . $type . "]";
+        }
+        if ($reason !== null) {
+            $message .= " " . $reason;
+        }
+        throw new HttpErrorResponseException($parsed, $message, $statusCode);
     }
 
     /**
