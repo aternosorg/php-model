@@ -26,7 +26,7 @@ use Cassandra\SimpleStatement;
  */
 class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
 {
-    public const ID = "cassandra";
+    public const string ID = "cassandra";
     protected string $id = self::ID;
 
     /**

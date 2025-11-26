@@ -12,7 +12,7 @@ use Aternos\Model\Query\QueryResult;
 
 class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 {
-    public const ID = "test";
+    public const string ID = "test";
     protected string $id = self::ID;
 
     /**
