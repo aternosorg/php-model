@@ -23,7 +23,7 @@ class ModelCollection implements Iterator, Countable, ArrayAccess
      * @param TModel $model
      * @noinspection PhpDocSignatureInspection
      */
-    public function add(ModelInterface $model)
+    public function add(ModelInterface $model): void
     {
         $this->models[] = $model;
     }

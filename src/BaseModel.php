@@ -106,7 +106,7 @@ abstract class BaseModel implements ModelInterface
     /**
      * Generate an unique identifier for the model
      */
-    protected function generateId()
+    protected function generateId(): void
     {
         $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         $charactersLength = strlen($characters);
