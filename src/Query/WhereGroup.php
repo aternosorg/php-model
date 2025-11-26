@@ -54,7 +54,7 @@ class WhereGroup implements Iterator, Countable
      *
      * @param WhereCondition|WhereGroup $conditionOrGroup
      */
-    public function add(WhereCondition|WhereGroup $conditionOrGroup)
+    public function add(WhereCondition|WhereGroup $conditionOrGroup): void
     {
         $this->group[] = $conditionOrGroup;
     }

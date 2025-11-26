@@ -37,7 +37,7 @@ class DriverRegistry implements DriverRegistryInterface
      *
      * @param DriverInterface $driver
      */
-    public function registerDriver(DriverInterface $driver)
+    public function registerDriver(DriverInterface $driver): void
     {
         $this->drivers[$driver->getId()] = $driver;
     }
@@ -50,7 +50,7 @@ class DriverRegistry implements DriverRegistryInterface
      * @param string $id
      * @param string $class
      */
-    public function registerDriverClass(string $id, string $class)
+    public function registerDriverClass(string $id, string $class): void
     {
         $this->classes[$id] = $class;
     }
