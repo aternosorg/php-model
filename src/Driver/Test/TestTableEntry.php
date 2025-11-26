@@ -3,7 +3,6 @@
 namespace Aternos\Model\Driver\Test;
 
 use Aternos\Model\ModelInterface;
-use Aternos\Model\Query\Field;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\UpdateField;
 use Aternos\Model\Query\WhereCondition;

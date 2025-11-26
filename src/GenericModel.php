@@ -33,7 +33,6 @@ use Aternos\Model\Query\{CountField,
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
-use Exception;
 
 /**
  * Class GenericModel
