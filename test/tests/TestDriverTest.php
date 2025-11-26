@@ -564,7 +564,7 @@ class TestDriverTest extends TestCase
         $this->assertNull($model);
     }
 
-    public function testOrderAfterFilter(): void
+    public function testOrderBeforeLimit(): void
     {
         $result = TestModel::select(order: ["number" => OrderField::DESCENDING], limit: 3);
 
