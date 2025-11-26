@@ -56,10 +56,7 @@ class TestTable
      */
     public function query(Query $query): QueryResult
     {
-        $entries = $this->findEntries($query->getWhere(), $query->getLimit()?->start, $query->getLimit()?->length);
-        if ($order = $query->getOrder()) {
-            $entries = $this->orderEntries($entries, $order);
-        }
+        $entries = $this->findEntries($query->getWhere(), $query->getLimit()?->start, $query->getLimit()?->length, $query->getOrder());
 
         if ($query instanceof SelectQuery) {
             $clonedEntries = [];
@@ -129,9 +126,10 @@ class TestTable
      * @param WhereGroup|null $where
      * @param int|null $offset
      * @param int|null $limit
+     * @param array|null $order
      * @return TestTableEntry[]
      */
-    protected function findEntries(?WhereGroup $where, ?int $offset = null, ?int $limit = null): array
+    protected function findEntries(?WhereGroup $where, ?int $offset = null, ?int $limit = null, ?array $order = null): array
     {
         $entries = [];
         if ($offset === null) {
@@ -141,16 +139,14 @@ class TestTable
             if (!$entry->matchesWhereGroup($where)) {
                 continue;
             }
-            if ($offset > 0) {
-                $offset--;
-                continue;
-            }
             $entries[] = $entry;
-            if ($limit !== null && count($entries) >= $limit) {
-                break;
-            }
         }
-        return $entries;
+
+        if ($order !== null) {
+            $entries = $this->orderEntries($entries, $order);
+        }
+
+        return array_slice($entries, $offset, $limit);
     }
 
     /**
