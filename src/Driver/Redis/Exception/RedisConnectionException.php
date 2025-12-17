@@ -1,13 +1,16 @@
 <?php
 
-namespace Aternos\Model;
+namespace Aternos\Model\Driver\Redis\Exception;
 
 use Throwable;
 
-class WrappingModelException extends ModelException
+/**
+ * Exception that is thrown when a connection to Redis fails
+ */
+class RedisConnectionException extends RedisModelException
 {
     /**
-     * Wrap an existing exception into a ModelException
+     * Wrap an existing redis exception into a RedisConnectionException
      * This is used to adapt exceptions from the driver extensions to a ModelException
      * @param Throwable $exception
      * @return static
@@ -15,10 +18,5 @@ class WrappingModelException extends ModelException
     static function wrapping(Throwable $exception): static
     {
         return new static($exception->getMessage(), $exception->getCode(), $exception);
-    }
-
-    final protected function __construct(string $message, int $code = null, ?Throwable $previous = null)
-    {
-        parent::__construct($message, $code, $previous);
     }
 }
