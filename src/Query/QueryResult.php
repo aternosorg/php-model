@@ -2,17 +2,17 @@
 
 namespace Aternos\Model\Query;
 
-use Aternos\Model\ModelCollectionResult;
+use Aternos\Model\ModelCollection;
 use Aternos\Model\ModelInterface;
 
 /**
  * Class QueryResult
  *
  * @template TModel of ModelInterface
- * @extends ModelCollectionResult<TModel>
+ * @extends ModelCollection<TModel>
  * @package Aternos\Model\Query
  */
-class QueryResult extends ModelCollectionResult
+class QueryResult extends ModelCollection
 {
     /**
      * Raw query string that was executed
@@ -33,12 +33,12 @@ class QueryResult extends ModelCollectionResult
     /**
      * QueryResult constructor.
      *
-     * @param TModel[] $result
+     * @param TModel[] $models
      * @param string|null $queryString
      */
-    public function __construct(array $result = [], ?string $queryString = null)
+    public function __construct(array $models = [], ?string $queryString = null)
     {
-        parent::__construct($result);
+        parent::__construct($models);
         $this->queryString = $queryString;
     }
 

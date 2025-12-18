@@ -18,11 +18,11 @@ class QueryResultCollection extends QueryResult
 
     /**
      * QueryResultCollection constructor.
-     * @param array|QueryResult[] $result
+     * @param array|QueryResult[] $models
      * @param string|null $queryString
      */
-    public function __construct($result = [], ?string $queryString = null)
+    public function __construct($models = [], ?string $queryString = null)
     {
-        parent::__construct($result, $queryString);
+        parent::__construct($models, $queryString);
     }
 }

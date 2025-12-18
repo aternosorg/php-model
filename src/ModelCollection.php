@@ -14,8 +14,18 @@ use Iterator;
  */
 class ModelCollection implements Iterator, Countable, ArrayAccess
 {
-    protected array $models = [];
+    protected array $models;
     protected int $iterator = 0;
+
+    /**
+     * ModelCollection constructor.
+     *
+     * @param TModel[] $models
+     */
+    public function __construct(array $models = [])
+    {
+        $this->models = $models;
+    }
 
     /**
      * Add a model
