@@ -33,13 +33,12 @@ class QueryResult extends ModelCollectionResult
     /**
      * QueryResult constructor.
      *
-     * @param bool $success
      * @param TModel[] $result
      * @param string|null $queryString
      */
-    public function __construct(bool $success, array $result = [], ?string $queryString = null)
+    public function __construct(array $result = [], ?string $queryString = null)
     {
-        parent::__construct($success, $result);
+        parent::__construct($result);
         $this->queryString = $queryString;
     }
 
