@@ -221,7 +221,7 @@ class Cassandra extends Driver implements CRUDAbleInterface, QueryableInterface
 
         $rawQueryResult = $this->rawQuery($queryString);
 
-        $result = new QueryResult((bool)$rawQueryResult);
+        $result = new QueryResult();
         $result->setQueryString($queryString);
         foreach ($rawQueryResult as $resultRow) {
             /** @var class-string<ModelInterface> $modelClass */

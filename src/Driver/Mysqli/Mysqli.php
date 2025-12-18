@@ -239,7 +239,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
         $rawQueryResult = $this->rawQuery($queryString);
 
-        $result = new QueryResult((bool)$rawQueryResult);
+        $result = new QueryResult();
         $result->setQueryString($queryString);
         if ($query instanceof UpdateQuery || $query instanceof DeleteQuery) {
             $result->setAffectedRows(mysqli_affected_rows($this->connection));

@@ -493,7 +493,7 @@ abstract class GenericModel extends BaseModel
         if ($query instanceof SelectQuery || count($results) === 1) {
             return $result;
         } else {
-            return new QueryResultCollection(true, $results);
+            return new QueryResultCollection($results);
         }
     }
 

@@ -219,7 +219,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             throw new SerializeException("Received invalid search response from OpenSearch");
         }
 
-        $result = new SearchResult(true);
+        $result = new SearchResult();
         if (isset($response->took) && is_int($response->took)) {
             $result->setSearchTime($response->took);
         }
