@@ -89,7 +89,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
                 if ($e instanceof HttpTransportException) {
                     continue;
                 }
-                if ($e instanceof HttpErrorResponseException && $e->getCode() >= 500 || in_array($e->getCode(), [404, 408])) {
+                if ($e instanceof HttpErrorResponseException && ($e->getCode() >= 500 || in_array($e->getCode(), [404, 408]))) {
                     continue;
                 }
                 throw $e;
