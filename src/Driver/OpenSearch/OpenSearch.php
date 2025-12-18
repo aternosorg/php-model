@@ -178,7 +178,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             );
         } catch (HttpErrorResponseException $e) {
             if ($e->getCode() === 404) {
-                return false;
+                return true;
             }
             throw $e;
         }
