@@ -30,6 +30,16 @@ class SQLTest extends TestCase
         $this->assertEquals("SELECT * FROM `test`", $this->sql->generate($query));
     }
 
+    public function testSelectEmptyWhere()
+    {
+        $query = new SelectQuery(
+            new WhereGroup(),
+        );
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT * FROM `test`", $this->sql->generate($query));
+    }
+
     public function testSelectWhereCondition()
     {
         $query = new SelectQuery(

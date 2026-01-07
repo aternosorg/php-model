@@ -83,7 +83,7 @@ abstract class Query
      */
     public function getWhere(): WhereGroup|null
     {
-        if ($this->where) {
+        if ($this->where && $this->where->count() > 0) {
             return $this->where;
         }
 
