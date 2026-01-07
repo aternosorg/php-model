@@ -2,12 +2,14 @@
 
 namespace Aternos\Model\Query;
 
+use UnexpectedValueException;
+
 /**
  * Class WhereCondition
  *
  * @package Aternos\Model\Query
  */
-class WhereCondition
+class WhereCondition implements Validatable
 {
     /**
      * Name of the field
@@ -72,5 +74,18 @@ class WhereCondition
     {
         $this->valueRaw = $valueRaw;
         return $this;
+    }
+
+    public function validate(): void
+    {
+        if ($this->operator === "IN" || $this->operator === "NOT IN") {
+            if (!is_array($this->value)) {
+                throw new UnexpectedValueException("Value for IN or NOT IN operator must be an array.");
+            }
+
+            if (count($this->value) === 0) {
+                throw new UnexpectedValueException("Value array for IN or NOT IN operator must not be empty.");
+            }
+        }
     }
 }

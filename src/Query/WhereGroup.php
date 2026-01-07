@@ -9,8 +9,9 @@ use Iterator;
  * Class WhereConditionGroup
  *
  * @package Aternos\Model\Query
+ * @implements Iterator<WhereCondition|WhereGroup>
  */
-class WhereGroup implements Iterator, Countable
+class WhereGroup implements Iterator, Countable, Validatable
 {
     /**
      * Conjunction values
@@ -21,7 +22,7 @@ class WhereGroup implements Iterator, Countable
     /**
      * Multiple WhereGroup or WhereCondition objects
      *
-     * @var array
+     * @var (WhereCondition|WhereGroup)[]
      */
     protected array $group = [];
 
@@ -40,7 +41,7 @@ class WhereGroup implements Iterator, Countable
     /**
      * WhereGroup constructor.
      *
-     * @param array $conditions
+     * @param (WhereCondition|WhereGroup)[] $conditions
      * @param int $conjunction
      */
     public function __construct(array $conditions = [], int $conjunction = self:: AND)
@@ -62,11 +63,18 @@ class WhereGroup implements Iterator, Countable
     /**
      * Get all group elements as array
      *
-     * @return array
+     * @return (WhereCondition|WhereGroup)[]
      */
     public function getAll(): array
     {
         return $this->group;
+    }
+
+    public function validate(): void
+    {
+        foreach ($this->group as $element) {
+            $element->validate();
+        }
     }
 
     /**
