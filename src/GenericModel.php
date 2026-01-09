@@ -18,7 +18,6 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
 };
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
-use Couchbase\QueryException;
 use Aternos\Model\Query\{CountField,
     DeleteQuery,
     GroupField,
@@ -34,7 +33,6 @@ use Aternos\Model\Query\{CountField,
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
-use Exception;
 
 /**
  * Class GenericModel
