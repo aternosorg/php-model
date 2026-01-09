@@ -18,6 +18,7 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
 };
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
+use Couchbase\QueryException;
 use Aternos\Model\Query\{CountField,
     DeleteQuery,
     GroupField,
@@ -463,16 +464,26 @@ abstract class GenericModel extends BaseModel
 
         $result = false;
         $results = [];
+        $lastException = null;
         foreach ($drivers as $queryableDriver) {
             /** @var QueryableInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($queryableDriver);
-            $result = $driver->query($query);
+            try {
+                $result = $driver->query($query);
 
-            if ($query instanceof SelectQuery) {
-                break;
+                if ($query instanceof SelectQuery) {
+                    break;
+                }
+
+                $results[] = $result;
+            } catch (ModelException $e) {
+                $lastException = $e;
             }
+        }
 
-            $results[] = $result;
+        if ($lastException !== null) {
+            /** @var ModelException|null $lastException */
+            throw $lastException;
         }
 
         if ($result === false) {
