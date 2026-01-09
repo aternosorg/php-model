@@ -470,6 +470,7 @@ abstract class GenericModel extends BaseModel
                 $result = $driver->query($query);
 
                 if ($query instanceof SelectQuery) {
+                    $lastException = null;
                     break;
                 }
 
@@ -685,6 +686,7 @@ abstract class GenericModel extends BaseModel
             $driver = static::getDriverRegistry()->getDriver($searchableDriver);
             try {
                 $result = $driver->search($search);
+                $lastException = null;
             } catch (ModelException $e) {
                 $lastException = $e;
             }
