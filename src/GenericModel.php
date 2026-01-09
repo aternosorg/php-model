@@ -681,13 +681,13 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        if ($result === false) {
-            throw new BadMethodCallException("You can't search the model if no searchable driver is available.");
-        }
-
         if ($lastException !== null) {
             /** @var ModelException|null $lastException */
             throw $lastException;
+        }
+
+        if ($result === false) {
+            throw new BadMethodCallException("You can't search the model if no searchable driver is available.");
         }
 
         if (static::$registry) {
