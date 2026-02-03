@@ -4,7 +4,7 @@ namespace Aternos\Model\Query;
 
 class MinField extends SelectField
 {
-    public ?int $function = self::MIN;
+    public ?AggregateFunction $function = AggregateFunction::MIN;
 
     /**
      * MinField constructor.

@@ -5,6 +5,7 @@ namespace Aternos\Model\Driver\Test;
 use Aternos\Model\ModelInterface;
 use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\Query;
@@ -163,7 +164,7 @@ class TestTable
             if ($aValue === $bValue) {
                 continue;
             }
-            if ($orderField->direction === OrderField::ASCENDING) {
+            if ($orderField->direction === Direction::ASCENDING) {
                 return $aValue > $bValue ? 1 : -1;
             } else {
                 return $aValue < $bValue ? 1 : -1;

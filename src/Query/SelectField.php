@@ -9,21 +9,23 @@ namespace Aternos\Model\Query;
  */
 class SelectField extends Field
 {
-    const int COUNT = 0,
-        SUM = 1,
-        AVERAGE = 2,
-        MIN = 3,
-        MAX = 4;
+    /** @deprecated */
+    const AggregateFunction COUNT = AggregateFunction::COUNT;
+    /** @deprecated */
+    const AggregateFunction SUM = AggregateFunction::SUM;
+    /** @deprecated */
+    const AggregateFunction AVERAGE = AggregateFunction::AVERAGE;
+    /** @deprecated */
+    const AggregateFunction MIN = AggregateFunction::MIN;
+    /** @deprecated */
+    const AggregateFunction MAX = AggregateFunction::MAX;
 
     /**
      * @var string|null
      */
     public ?string $alias = null;
 
-    /**
-     * @var int|null
-     */
-    public ?int $function = null;
+    public ?AggregateFunction $function = null;
 
     /**
      * @var bool
@@ -32,19 +34,19 @@ class SelectField extends Field
 
     /**
      * @param string|null $alias
-     * @return SelectField
+     * @return $this
      */
-    public function setAlias(?string $alias): SelectField
+    public function setAlias(?string $alias): static
     {
         $this->alias = $alias;
         return $this;
     }
 
     /**
-     * @param int|null $function
-     * @return SelectField
+     * @param AggregateFunction $function
+     * @return $this
      */
-    public function setFunction(?int $function): SelectField
+    public function setFunction(AggregateFunction $function): static
     {
         $this->function = $function;
         return $this;
@@ -52,9 +54,9 @@ class SelectField extends Field
 
     /**
      * @param bool $raw
-     * @return SelectField
+     * @return $this
      */
-    public function setRaw(bool $raw = true): SelectField
+    public function setRaw(bool $raw = true): static
     {
         $this->raw = $raw;
         return $this;

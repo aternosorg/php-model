@@ -4,7 +4,7 @@ namespace Aternos\Model\Query;
 
 class MaxField extends SelectField
 {
-    public ?int $function = self::MAX;
+    public ?AggregateFunction $function = AggregateFunction::MAX;
 
     /**
      * MaxField constructor.

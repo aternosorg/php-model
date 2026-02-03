@@ -18,6 +18,7 @@ use Aternos\Model\Driver\Features\UpdateQueryableInterface;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
 use Aternos\Model\Driver\Test\TestDriver;
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\GroupField;
@@ -455,7 +456,7 @@ abstract class GenericModel extends BaseModel
         $query->modelClassName = static::class;
 
         if (static::$filters !== null && count(static::$filters) > 0) {
-            $wrappedWhereGroup = new WhereGroup(conjunction: WhereGroup::AND);
+            $wrappedWhereGroup = new WhereGroup(conjunction: Conjunction::AND);
             foreach (static::$filters as $key => $value) {
                 $wrappedWhereGroup->add(new WhereCondition($key, $value));
             }

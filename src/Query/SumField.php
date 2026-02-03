@@ -9,7 +9,7 @@ namespace Aternos\Model\Query;
  */
 class SumField extends SelectField
 {
-    public ?int $function = self::SUM;
+    public ?AggregateFunction $function = AggregateFunction::SUM;
 
     /**
      * Field constructor.

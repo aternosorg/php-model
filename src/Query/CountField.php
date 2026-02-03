@@ -11,7 +11,7 @@ class CountField extends SelectField
 {
     public const string COUNT_FIELD = "count";
 
-    public ?int $function = self::COUNT;
+    public ?AggregateFunction $function = AggregateFunction::COUNT;
     public ?string $alias = self::COUNT_FIELD;
 
     public function __construct()

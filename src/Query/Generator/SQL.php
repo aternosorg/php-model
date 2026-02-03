@@ -2,7 +2,10 @@
 
 namespace Aternos\Model\Query\Generator;
 
-use Aternos\Model\Query\{DeleteQuery,
+use Aternos\Model\Query\{AggregateFunction,
+    Conjunction,
+    DeleteQuery,
+    Direction,
     OrderField,
     Query,
     SelectField,
@@ -140,9 +143,8 @@ class SQL implements QueryGeneratorInterface
             return $field . " " . $where->operator . " " . $value;
         } elseif ($where instanceof WhereGroup) {
             $conjunction = match ($where->conjunction) {
-                WhereGroup:: AND => " AND ",
-                WhereGroup:: OR => " OR ",
-                default => throw new UnexpectedValueException("Invalid conjunction: " . $where->conjunction),
+                Conjunction::AND => " AND ",
+                Conjunction::OR => " OR "
             };
 
             $whereStrings = [];
@@ -172,9 +174,8 @@ class SQL implements QueryGeneratorInterface
         foreach ($orderFields as $orderField) {
             /** @var OrderField $orderField */
             $direction = match ($orderField->direction) {
-                OrderField::ASCENDING => "ASC",
-                OrderField::DESCENDING => "DESC",
-                default => throw new UnexpectedValueException("Invalid direction: " . $orderField->direction),
+                Direction::ASCENDING => "ASC",
+                Direction::DESCENDING => "DESC"
             };
 
             if ($orderField->raw) {
@@ -206,26 +207,14 @@ class SQL implements QueryGeneratorInterface
                 if ($field->raw === true) {
                     $fieldStrings[] = $field->key;
                 } else {
-                    $fieldString = "";
-                    if ($field->function !== null) {
-                        switch ($field->function) {
-                            case SelectField::COUNT:
-                                $fieldString .= "COUNT(";
-                                break;
-                            case SelectField::SUM:
-                                $fieldString .= "SUM(";
-                                break;
-                            case SelectField::AVERAGE:
-                                $fieldString .= "AVG(";
-                                break;
-                            case SelectField::MIN:
-                                $fieldString .= "MIN(";
-                                break;
-                            case SelectField::MAX:
-                                $fieldString .= "MAX(";
-                                break;
-                        }
-                    }
+                    $fieldString = match($field->function) {
+                        AggregateFunction::COUNT => "COUNT(",
+                        AggregateFunction::SUM => "SUM(",
+                        AggregateFunction::AVERAGE => "AVG(",
+                        AggregateFunction::MIN => "MIN(",
+                        AggregateFunction::MAX => "MAX(",
+                        default => ""
+                    };
 
                     if ($field->key !== "*") {
                         $fieldString .= $this->columnEnclosure . $field->key . $this->columnEnclosure;

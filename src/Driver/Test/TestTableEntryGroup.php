@@ -2,6 +2,7 @@
 
 namespace Aternos\Model\Driver\Test;
 
+use Aternos\Model\Query\AggregateFunction;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\SelectField;
 
@@ -88,9 +89,9 @@ class TestTableEntryGroup
                     $aggregatedEntry[$key] = $entry[$field->key] ?? null;
 
                     // init functions
-                    if ($field->function === SelectField::COUNT) {
+                    if ($field->function === AggregateFunction::COUNT) {
                         $aggregatedEntry[$key] = 1;
-                    } elseif ($field->function === SelectField::AVERAGE) {
+                    } elseif ($field->function === AggregateFunction::AVERAGE) {
                         $averageFields[$key] = 1;
                     }
                 }
@@ -102,17 +103,17 @@ class TestTableEntryGroup
                 $entry[$key] = $entry[$field->key] ?? null;
 
                 // handle functions
-                if ($field->function === SelectField::SUM) {
+                if ($field->function === AggregateFunction::SUM) {
                     $aggregatedEntry[$key] += $entry[$field->key] ?? 0;
-                } elseif ($field->function === SelectField::COUNT) {
+                } elseif ($field->function === AggregateFunction::COUNT) {
                     // ++ does not work with ArrayAccess
                     $aggregatedEntry[$key] += 1;
-                } elseif ($field->function === SelectField::AVERAGE) {
+                } elseif ($field->function === AggregateFunction::AVERAGE) {
                     $averageFields[$key]++;
                     $aggregatedEntry[$key] += $entry[$field->key] ?? 0;
-                } elseif ($field->function === SelectField::MIN) {
+                } elseif ($field->function === AggregateFunction::MIN) {
                     $aggregatedEntry[$key] = min($aggregatedEntry[$key] ?? PHP_INT_MAX, $entry[$field->key] ?? PHP_INT_MAX);
-                } elseif ($field->function === SelectField::MAX) {
+                } elseif ($field->function === AggregateFunction::MAX) {
                     $aggregatedEntry[$key] = max($aggregatedEntry[$key] ?? PHP_INT_MIN, $entry[$field->key] ?? PHP_INT_MIN);
                 }
             }
