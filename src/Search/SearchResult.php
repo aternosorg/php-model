@@ -2,16 +2,16 @@
 
 namespace Aternos\Model\Search;
 
-use Aternos\Model\ModelCollectionResult;
+use Aternos\Model\ModelCollection;
 use Aternos\Model\ModelInterface;
 
 /**
  * Class SearchResult
  * @template TModel of ModelInterface
- * @extends ModelCollectionResult<TModel>
+ * @extends ModelCollection<TModel>
  * @package Aternos\Model\Search
  */
-class SearchResult extends ModelCollectionResult
+class SearchResult extends ModelCollection
 {
     protected ?int $searchTime = null;
     protected ?int $totalCount = null;

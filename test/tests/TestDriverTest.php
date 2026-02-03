@@ -347,7 +347,6 @@ class TestDriverTest extends TestCase
     public function testSelectFields(): void
     {
         $models = TestModel::select(fields: ["id", "number"]);
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         $this->assertEquals("1B", $models[1]->id);
         $this->assertNull($models[1]->text);
@@ -366,7 +365,6 @@ class TestDriverTest extends TestCase
     public function testSelectSum(): void
     {
         $result = TestModel::select(fields: [new SumField("number")]);
-        $this->assertTrue($result->wasSuccessful());
         $this->assertEquals(45, $result[0]->number);
 
         // test if data wasn't changed
@@ -383,7 +381,6 @@ class TestDriverTest extends TestCase
             (new SelectField("number"))
                 ->setAlias("average")
                 ->setFunction(SelectField::AVERAGE)]);
-        $this->assertTrue($result->wasSuccessful());
         $this->assertEquals(4.5, $result[0]->getField("average"));
     }
 
@@ -396,7 +393,6 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $models = TestModel::select(group: ["number"]);
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
     }
 
@@ -409,7 +405,6 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $models = TestModel::select(fields: [new CountField(), new SelectField("number")], group: ["number"]);
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         foreach ($models as $model) {
             if ($model->number === 1) {
@@ -433,7 +428,6 @@ class TestDriverTest extends TestCase
             new SelectField("number")],
             group: ["number"]
         );
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         foreach ($models as $model) {
             if ($model->number === 5) {
@@ -460,7 +454,6 @@ class TestDriverTest extends TestCase
             new SelectField("text"),
         ], group: ["text"]);
 
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         foreach ($models as $model) {
             if ($model->text === "A") {
@@ -485,7 +478,6 @@ class TestDriverTest extends TestCase
             new SelectField("text"),
         ], group: ["text"]);
 
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         foreach ($models as $model) {
             if ($model->text === "A") {
@@ -510,7 +502,6 @@ class TestDriverTest extends TestCase
             new SelectField("text"),
         ], group: ["text"]);
 
-        $this->assertTrue($models->wasSuccessful());
         $this->assertCount(10, $models);
         foreach ($models as $model) {
             if ($model->text === "A") {
@@ -534,7 +525,6 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $result = TestModel::update(["text" => "C"], ["text" => "B"]);
-        $this->assertTrue($result->wasSuccessful());
         $this->assertEquals(2, $result->getAffectedRows());
 
         $model = TestModel::get("1B");
@@ -555,7 +545,6 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $result = TestModel::query(new DeleteQuery(["text" => "B"]));
-        $this->assertTrue($result->wasSuccessful());
         $this->assertEquals(2, $result->getAffectedRows());
 
         $model = TestModel::get("1B");

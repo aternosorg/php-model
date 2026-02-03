@@ -462,18 +462,27 @@ abstract class GenericModel extends BaseModel
 
         $result = false;
         $results = [];
+        $lastException = null;
         foreach ($drivers as $queryableDriver) {
             /** @var QueryableInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($queryableDriver);
-            $result = $driver->query($query);
+            try {
+                $result = $driver->query($query);
 
-            if ($result->wasSuccessful() && $query instanceof SelectQuery) {
-                break;
-            }
+                if ($query instanceof SelectQuery) {
+                    $lastException = null;
+                    break;
+                }
 
-            if (!$query instanceof SelectQuery) {
                 $results[] = $result;
+            } catch (ModelException $e) {
+                $lastException = $e;
             }
+        }
+
+        if ($lastException !== null) {
+            /** @var ModelException|null $lastException */
+            throw $lastException;
         }
 
         if ($result === false) {
@@ -481,7 +490,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (static::$registry) {
-            if ($query instanceof SelectQuery && $result->wasSuccessful() && $query->shouldSaveResultsToRegistry()) {
+            if ($query instanceof SelectQuery && $query->shouldSaveResultsToRegistry()) {
                 foreach ($result as $model) {
                     if ($model->getId() === null) {
                         continue;
@@ -494,7 +503,7 @@ abstract class GenericModel extends BaseModel
         if ($query instanceof SelectQuery || count($results) === 1) {
             return $result;
         } else {
-            return new QueryResultCollection(true, $results);
+            return new QueryResultCollection($results);
         }
     }
 
@@ -512,6 +521,7 @@ abstract class GenericModel extends BaseModel
      * @param array|GroupField[]|string[]|null $group
      * @param bool $saveResultsToRegistry Whether results of this query should be saved in the model registry.
      * @return QueryResult<static>|static[]
+     * @throws ModelException
      * @noinspection PhpDocSignatureInspection
      */
     public static function select(null|WhereCondition|array|WhereGroup $where = null,
@@ -526,14 +536,12 @@ abstract class GenericModel extends BaseModel
 
     /**
      * @param WhereCondition|array|WhereGroup|null $where
-     * @return int|null
+     * @return int
+     * @throws ModelException
      */
-    public static function count(null|WhereCondition|array|WhereGroup $where = null): ?int
+    public static function count(null|WhereCondition|array|WhereGroup $where = null): int
     {
         $result = static::select(where: $where, fields: [new CountField()]);
-        if (!$result->wasSuccessful()) {
-            return null;
-        }
         if (count($result) === 0) {
             return 0;
         }
@@ -665,20 +673,28 @@ abstract class GenericModel extends BaseModel
      *
      * @param Search $search
      * @return SearchResult<static>
+     * @throws ModelException
      */
     public static function search(Search $search): SearchResult
     {
         $search->setModelClassName(static::class);
 
         $result = false;
+        $lastException = null;
         foreach (static::getSearchableDrivers() as $searchableDriver) {
             /** @var SearchableInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($searchableDriver);
-            $result = $driver->search($search);
-
-            if ($result->wasSuccessful()) {
-                break;
+            try {
+                $result = $driver->search($search);
+                $lastException = null;
+            } catch (ModelException $e) {
+                $lastException = $e;
             }
+        }
+
+        if ($lastException !== null) {
+            /** @var ModelException|null $lastException */
+            throw $lastException;
         }
 
         if ($result === false) {
@@ -686,7 +702,7 @@ abstract class GenericModel extends BaseModel
         }
 
         if (static::$registry) {
-            if ($result->wasSuccessful() && count($result) > 0) {
+            if (count($result) > 0) {
                 foreach ($result as $model) {
                     if ($model->getId() === null) {
                         continue;

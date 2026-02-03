@@ -117,7 +117,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      * @throws MysqlConnectionFailedException if connecting to the mysql database fails
      * @throws MysqlException if a mysql error occurs while executing the query
      */
-    protected function rawQuery(string $query): mysqli_result|bool
+    protected function rawQuery(string $query): mysqli_result|true
     {
         $this->connect();
         $result = mysqli_query($this->connection, $query);
@@ -239,7 +239,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
         $rawQueryResult = $this->rawQuery($queryString);
 
-        $result = new QueryResult((bool)$rawQueryResult);
+        $result = new QueryResult();
         $result->setQueryString($queryString);
         if ($query instanceof UpdateQuery || $query instanceof DeleteQuery) {
             $result->setAffectedRows(mysqli_affected_rows($this->connection));

@@ -66,7 +66,7 @@ class TestTable
             $entries = $this->groupAndAggregateEntries($clonedEntries, $query->getGroup(), $query->getFields());
         }
 
-        $queryResult = new QueryResult(true);
+        $queryResult = new QueryResult();
         foreach ($entries as $entry) {
             if ($query instanceof SelectQuery) {
                 /** @var class-string<ModelInterface> $modelClass */
