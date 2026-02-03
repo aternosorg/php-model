@@ -28,7 +28,6 @@ and use them in your project or submit them to be added to the library.
 Currently included drivers are:
 
 * [Redis](src/Driver/Redis/Redis.php)
-* [Cassandra](src/Driver/Cassandra/Cassandra.php)
 * [Mysqli](src/Driver/Mysqli/Mysqli.php)
 * [OpenSearch](src/Driver/OpenSearch/OpenSearch.php)
 

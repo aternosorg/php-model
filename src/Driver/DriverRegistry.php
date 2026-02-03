@@ -2,7 +2,6 @@
 
 namespace Aternos\Model\Driver;
 
-use Aternos\Model\Driver\Cassandra\Cassandra;
 use Aternos\Model\Driver\OpenSearch\OpenSearch;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
@@ -20,7 +19,6 @@ class DriverRegistry implements DriverRegistryInterface
      * @var array|string[]
      */
     protected array $classes = [
-        Cassandra::ID => Cassandra::class,
         OpenSearch::ID => OpenSearch::class,
         Mysqli::ID => Mysqli::class,
         Redis::ID => Redis::class,
