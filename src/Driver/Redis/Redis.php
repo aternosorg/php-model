@@ -23,7 +23,7 @@ use RedisException;
  */
 class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
 {
-    public const ID = "redis";
+    public const string ID = "redis";
     protected string $id = self::ID;
 
     /**

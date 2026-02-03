@@ -12,8 +12,8 @@ class OrderField
     /**
      * Direction constants
      */
-    const ASCENDING = 0;
-    const DESCENDING = 1;
+    const int ASCENDING = 0;
+    const int DESCENDING = 1;
 
     /**
      * Field name to order by
