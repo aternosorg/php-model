@@ -4,7 +4,6 @@ namespace Aternos\Model\Query;
 
 use Aternos\Model\ModelInterface;
 use InvalidArgumentException;
-use UnexpectedValueException;
 
 /**
  * Class Query

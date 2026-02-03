@@ -54,10 +54,12 @@ class WhereGroup implements Iterator, Countable, Validatable
      * Add an element to the group
      *
      * @param WhereCondition|WhereGroup $conditionOrGroup
+     * @return $this
      */
-    public function add(WhereCondition|WhereGroup $conditionOrGroup)
+    public function add(WhereCondition|WhereGroup $conditionOrGroup): static
     {
         $this->group[] = $conditionOrGroup;
+        return $this;
     }
 
     /**

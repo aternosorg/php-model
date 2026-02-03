@@ -2,8 +2,8 @@
 
 namespace Aternos\Model\Driver;
 
-use Aternos\Model\Driver\OpenSearch\OpenSearch;
 use Aternos\Model\Driver\Mysqli\Mysqli;
+use Aternos\Model\Driver\OpenSearch\OpenSearch;
 use Aternos\Model\Driver\Redis\Redis;
 use Aternos\Model\Driver\Test\TestDriver;
 use InvalidArgumentException;
@@ -34,10 +34,12 @@ class DriverRegistry implements DriverRegistryInterface
      * Register a driver object by ID
      *
      * @param DriverInterface $driver
+     * @return $this
      */
-    public function registerDriver(DriverInterface $driver)
+    public function registerDriver(DriverInterface $driver): static
     {
         $this->drivers[$driver->getId()] = $driver;
+        return $this;
     }
 
     /**
@@ -47,10 +49,12 @@ class DriverRegistry implements DriverRegistryInterface
      *
      * @param string $id
      * @param string $class
+     * @return $this
      */
-    public function registerDriverClass(string $id, string $class)
+    public function registerDriverClass(string $id, string $class): static
     {
         $this->classes[$id] = $class;
+        return $this;
     }
 
     /**

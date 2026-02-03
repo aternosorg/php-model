@@ -5,7 +5,6 @@ namespace Aternos\Model;
 use Aternos\Model\Driver\DriverInterface;
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\DriverRegistryInterface;
-use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Driver\Features\{CacheableInterface,
     DeletableInterface,
     DeleteQueryableInterface,
@@ -14,10 +13,10 @@ use Aternos\Model\Driver\Features\{CacheableInterface,
     SavableInterface,
     SearchableInterface,
     SelectQueryableInterface,
-    UpdateQueryableInterface
-};
+    UpdateQueryableInterface};
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
+use Aternos\Model\Driver\Test\TestDriver;
 use Aternos\Model\Query\{CountField,
     DeleteQuery,
     GroupField,
@@ -28,8 +27,7 @@ use Aternos\Model\Query\{CountField,
     SelectQuery,
     UpdateQuery,
     WhereCondition,
-    WhereGroup
-};
+    WhereGroup};
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;

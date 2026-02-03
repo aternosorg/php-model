@@ -2,13 +2,14 @@
 
 namespace Aternos\Model\Driver\Test;
 
+use ArrayAccess;
 use Aternos\Model\ModelInterface;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\UpdateField;
 use Aternos\Model\Query\WhereCondition;
 use Aternos\Model\Query\WhereGroup;
 
-class TestTableEntry implements \ArrayAccess
+class TestTableEntry implements ArrayAccess
 {
     public function __construct(protected array $data)
     {

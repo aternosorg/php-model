@@ -45,6 +45,7 @@ class SQL implements QueryGeneratorInterface
      * Callback function to escape values
      *
      * @var callable|string
+     * @noinspection SpellCheckingInspection
      */
     public $escapeFunction = "addslashes";
 
