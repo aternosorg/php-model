@@ -82,7 +82,7 @@ class SelectQuery extends Query
     public function groupBy(array $fields): static
     {
         $this->group = null;
-        foreach ($fields as $key => $field) {
+        foreach ($fields as $field) {
             if ($field instanceof GroupField) {
                 $this->group[] = $field;
             } else if (is_string($field)) {
