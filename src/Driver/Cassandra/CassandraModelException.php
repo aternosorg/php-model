@@ -2,10 +2,10 @@
 
 namespace Aternos\Model\Driver\Cassandra;
 
-use Aternos\Model\WrappingModelException;
+use Aternos\Model\ModelException;
 use Throwable;
 
-class CassandraModelException extends WrappingModelException
+class CassandraModelException extends ModelException
 {
     /**
      * Wrap an existing exception into a CassandraModelException

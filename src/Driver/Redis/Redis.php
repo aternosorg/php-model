@@ -5,6 +5,9 @@ namespace Aternos\Model\Driver\Redis;
 use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CacheableInterface;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
+use Aternos\Model\Driver\Redis\Exception\RedisConnectionException;
+use Aternos\Model\Driver\Redis\Exception\RedisModelException;
+use Aternos\Model\Driver\Redis\Exception\RedisQueryException;
 use Aternos\Model\ModelInterface;
 use RedisException;
 
@@ -80,7 +83,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
                     $this->connection->connect($this->socket);
                 }
             } catch (RedisException $e) {
-                throw RedisModelException::wrapping($e);
+                throw RedisConnectionException::wrapping($e);
             }
         }
     }
@@ -113,10 +116,12 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         $this->connect();
         $key = $this->generateCacheKey($model::class, $model->getId());
         try {
-            return $this->connection->set($key, json_encode($model), $model->getCacheTime());
+            $this->connection->set($key, json_encode($model), $model->getCacheTime());
+            RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisModelException::wrapping($e);
+            throw RedisConnectionException::wrapping($e);
         }
+        return true;
     }
 
     /**
@@ -137,8 +142,9 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         $this->connect();
         try {
             $rawData = $this->connection->get($this->generateCacheKey($modelClass, $id));
+            RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisModelException::wrapping($e);
+            throw RedisConnectionException::wrapping($e);
         }
 
         if (!$rawData) {
@@ -172,10 +178,12 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
         $this->connect();
         $key = $this->generateCacheKey($model::class, $model->getId());
         try {
-            return $this->connection->del($key);
+            $this->connection->del($key);
+            RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisModelException::wrapping($e);
+            throw RedisConnectionException::wrapping($e);
         }
+        return true;
     }
 
     /**
