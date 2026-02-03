@@ -5,6 +5,7 @@ namespace Aternos\Model\Driver\OpenSearch;
 use Aternos\Model\Driver\Driver;
 use Aternos\Model\Driver\Features\CRUDAbleInterface;
 use Aternos\Model\Driver\Features\SearchableInterface;
+use Aternos\Model\Driver\Features\SearchCountableInterface;
 use Aternos\Model\Driver\OpenSearch\Authentication\OpenSearchAuthenticationInterface;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpErrorResponseException;
 use Aternos\Model\Driver\OpenSearch\Exception\HttpTransportException;
@@ -28,7 +29,7 @@ use stdClass;
  *
  * @package Aternos\Model\Driver\Search
  */
-class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterface
+class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterface, SearchCountableInterface
 {
     public const string ID = "opensearch";
     protected string $id = self::ID;
@@ -239,6 +240,30 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             $result->add($model);
         }
         return $result;
+    }
+
+    /**
+     * @param Search $search
+     * @return int
+     * @throws HttpErrorResponseException If the response status code is not 2xx
+     * @throws HttpTransportException If an error happens while the http client processes the request
+     * @throws SerializeException If an error happens during (de-)serialization
+     */
+    public function searchCount(Search $search): int
+    {
+        /** @var class-string<ModelInterface> $modelClassName */
+        $modelClassName = $search->getModelClassName();
+
+        $response = $this->request(
+            "GET",
+            $this->buildUrl($modelClassName::getName(), "_count"),
+            $search->getSearchQuery()
+        );
+        if (!isset($response->count) || !is_int($response->count)) {
+            throw new SerializeException("Received invalid count response from OpenSearch");
+        }
+
+        return $response->count;
     }
 
     /**

@@ -5,29 +5,30 @@ namespace Aternos\Model;
 use Aternos\Model\Driver\DriverInterface;
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\DriverRegistryInterface;
-use Aternos\Model\Driver\Features\{CacheableInterface,
-    DeletableInterface,
-    DeleteQueryableInterface,
-    GettableInterface,
-    QueryableInterface,
-    SavableInterface,
-    SearchableInterface,
-    SelectQueryableInterface,
-    UpdateQueryableInterface};
+use Aternos\Model\Driver\Features\CacheableInterface;
+use Aternos\Model\Driver\Features\DeletableInterface;
+use Aternos\Model\Driver\Features\DeleteQueryableInterface;
+use Aternos\Model\Driver\Features\GettableInterface;
+use Aternos\Model\Driver\Features\QueryableInterface;
+use Aternos\Model\Driver\Features\SavableInterface;
+use Aternos\Model\Driver\Features\SearchableInterface;
+use Aternos\Model\Driver\Features\SearchCountableInterface;
+use Aternos\Model\Driver\Features\SelectQueryableInterface;
+use Aternos\Model\Driver\Features\UpdateQueryableInterface;
 use Aternos\Model\Driver\Mysqli\Mysqli;
 use Aternos\Model\Driver\Redis\Redis;
 use Aternos\Model\Driver\Test\TestDriver;
-use Aternos\Model\Query\{CountField,
-    DeleteQuery,
-    GroupField,
-    Limit,
-    Query,
-    QueryResult,
-    QueryResultCollection,
-    SelectQuery,
-    UpdateQuery,
-    WhereCondition,
-    WhereGroup};
+use Aternos\Model\Query\CountField;
+use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\GroupField;
+use Aternos\Model\Query\Limit;
+use Aternos\Model\Query\Query;
+use Aternos\Model\Query\QueryResult;
+use Aternos\Model\Query\QueryResultCollection;
+use Aternos\Model\Query\SelectQuery;
+use Aternos\Model\Query\UpdateQuery;
+use Aternos\Model\Query\WhereCondition;
+use Aternos\Model\Query\WhereGroup;
 use Aternos\Model\Search\Search;
 use Aternos\Model\Search\SearchResult;
 use BadMethodCallException;
@@ -232,6 +233,22 @@ abstract class GenericModel extends BaseModel
         $drivers = [];
         foreach (static::$drivers as $driver) {
             if (static::getDriverRegistry()->isDriverInstanceOf($driver, SearchableInterface::class)) {
+                $drivers[] = $driver;
+            }
+        }
+        return $drivers;
+    }
+
+    /**
+     * Get all search-countable drivers from static::$drivers
+     *
+     * @return class-string<SearchCountableInterface>[]
+     */
+    protected static function getSearchCountableDrivers(): array
+    {
+        $drivers = [];
+        foreach (static::$drivers as $driver) {
+            if (static::getDriverRegistry()->isDriverInstanceOf($driver, SearchCountableInterface::class)) {
                 $drivers[] = $driver;
             }
         }
@@ -708,6 +725,41 @@ abstract class GenericModel extends BaseModel
                     ModelRegistry::getInstance()->save($model);
                 }
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Count how many instances of the model match this search
+     *
+     * @param Search $search
+     * @return int
+     */
+    public static function searchCount(Search $search): int
+    {
+        $search->setModelClassName(static::class);
+
+        $result = false;
+        $lastException = null;
+        foreach (static::getSearchCountableDrivers() as $searchableDriver) {
+            /** @var SearchCountableInterface $driver */
+            $driver = static::getDriverRegistry()->getDriver($searchableDriver);
+            try {
+                $result = $driver->searchCount($search);
+                $lastException = null;
+            } catch (ModelException $e) {
+                $lastException = $e;
+            }
+        }
+
+        if ($lastException !== null) {
+            /** @var ModelException|null $lastException */
+            throw $lastException;
+        }
+
+        if ($result === false) {
+            throw new BadMethodCallException("You can't search the model if no search-countable driver is available.");
         }
 
         return $result;
