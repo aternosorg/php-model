@@ -9,9 +9,9 @@ namespace Aternos\Model\Query;
  */
 class OrderField
 {
-    /** @deprecated  */
+    /** @deprecated */
     const Direction ASCENDING = Direction::ASCENDING;
-    /** @deprecated  */
+    /** @deprecated */
     const Direction DESCENDING = Direction::DESCENDING;
 
     /**
