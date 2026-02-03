@@ -19,7 +19,7 @@
     "source": "https://github.com/aternosorg/php-model"
   },
   "require": {
-    "php": ">=8.3",
+    "php": ">=8.4",
     "ext-json": "*",
     "psr/http-client": "^1.0",
     "psr/http-factory": "^1.1"
