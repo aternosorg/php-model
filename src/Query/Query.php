@@ -4,6 +4,7 @@ namespace Aternos\Model\Query;
 
 use Aternos\Model\ModelInterface;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 /**
  * Class Query
@@ -72,6 +73,7 @@ abstract class Query
         } else if ($where instanceof WhereGroup) {
             $this->where = $where;
         }
+        $this->where?->validate();
 
         return $this;
     }
