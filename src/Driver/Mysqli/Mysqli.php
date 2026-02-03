@@ -10,8 +10,10 @@ use Aternos\Model\{Driver\Driver,
     Query\Generator\SQL,
     Query\Query,
     Query\QueryResult,
-    Query\UpdateQuery};
+    Query\UpdateQuery
+};
 use mysqli_result;
+use mysqli_sql_exception;
 
 /**
  * Class Mysqli
@@ -75,6 +77,8 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      */
     protected ?\mysqli $connection = null;
 
+    protected int $connectionRetries = 1;
+
     /**
      * Mysqli constructor.
      *
@@ -97,16 +101,26 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * Connect to database
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
+     * @throws MysqliConnectionException if connecting to the mysql database fails
      */
     protected function connect(): void
     {
-        if (!$this->connection || !@mysqli_ping($this->connection)) {
-            $this->connection = mysqli_connect($this->host, $this->username, $this->password, $this->database, $this->port, $this->socket);
-            if (!$this->connection) {
-                throw new MysqlConnectionFailedException(new MysqlException($this->connection));
-            }
+        if ($this->connection) {
+            return;
         }
+
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        try {
+            $this->connection = new \mysqli($this->host, $this->username, $this->password, $this->database, $this->port, $this->socket);
+        } catch (mysqli_sql_exception $e) {
+            throw MysqliConnectionException::fromException($e);
+        }
+    }
+
+    protected function reconnect(): void
+    {
+        $this->connection = null;
+        $this->connect();
     }
 
     /**
@@ -114,15 +128,65 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param string $query
      * @return bool|mysqli_result
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
-     * @throws MysqlException if a mysql error occurs while executing the query
+     * @throws MysqliConnectionException if connecting to the mysql database fails
+     * @throws MysqliException if a mysql error occurs while executing the query
      */
     protected function rawQuery(string $query): mysqli_result|true
     {
         $this->connect();
-        $result = mysqli_query($this->connection, $query);
-        MysqlException::checkConnection($this->connection);
-        return $result;
+        $retries = $this->connectionRetries;
+        while (true) {
+            try {
+                return $this->connection->query($query);
+            } catch (mysqli_sql_exception $e) {
+                // no more retries left
+                if ($retries <= 0) {
+                    throw MysqliException::fromException($e);
+                }
+
+                // connection error, try to reconnect and retry
+                if ($e->getCode() === 2006 || $e->getCode() === 2013) {
+                    $this->reconnect();
+                    $retries--;
+                    continue;
+                }
+
+                // other error, throw exception
+                throw MysqliException::fromException($e);
+            }
+        }
+    }
+
+    /**
+     * Escape a string for use in a mysql query
+     *
+     * @param string $data
+     * @return string
+     */
+    protected function escape(string $data): string
+    {
+        $this->connect();
+        $retries = $this->connectionRetries;
+        while (true) {
+            try {
+                return $this->connection->real_escape_string($data);
+            } catch (mysqli_sql_exception $e) {
+                // no more retries left
+                if ($retries <= 0) {
+                    throw MysqliException::fromException($e);
+                }
+
+                // connection error, try to reconnect and retry
+                if ($e->getCode() === 2006 || $e->getCode() === 2013) {
+                    $this->reconnect();
+                    $retries--;
+                    continue;
+                }
+
+                // other error, throw exception
+                throw MysqliException::fromException($e);
+            }
+        }
     }
 
     /**
@@ -130,8 +194,8 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
-     * @throws MysqlException if a mysql error occurs while executing the query
+     * @throws MysqliConnectionException if connecting to the mysql database fails
+     * @throws MysqliException if a mysql error occurs while executing the query
      */
     public function save(ModelInterface $model): bool
     {
@@ -149,7 +213,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
             } else if (is_null($value)) {
                 $values[] = "NULL";
             } else {
-                $values[] = "'" . mysqli_real_escape_string($this->connection, $value) . "'";
+                $values[] = "'" . $this->escape($value) . "'";
             }
         }
 
@@ -160,7 +224,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
             } else if (is_null($modelValue)) {
                 $updates[] = "`" . $column . "`=NULL";
             } else {
-                $updates[] = "`" . $column . "`='" . mysqli_real_escape_string($this->connection, $modelValue) . "'";
+                $updates[] = "`" . $column . "`='" . $this->escape($modelValue) . "'";
             }
         }
 
@@ -177,22 +241,22 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      * @param mixed $id
      * @param ModelInterface|null $model
      * @return ModelInterface|null
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
-     * @throws MysqlException if a mysql error occurs while executing the query
+     * @throws MysqliConnectionException if connecting to the mysql database fails
+     * @throws MysqliException if a mysql error occurs while executing the query
      */
     public function get(string $modelClass, mixed $id, ?ModelInterface $model = null): ?ModelInterface
     {
         $this->connect();
         $table = $modelClass::getName();
 
-        $escapedId = mysqli_real_escape_string($this->connection, $id);
+        $escapedId = $this->escape($id);
         $query = "SELECT * FROM `" . $table . "` WHERE `" . $modelClass::getIdField() . "` = '" . $escapedId . "'";
         $result = $this->rawQuery($query);
-        if (!$result || mysqli_num_rows($result) === 0) {
+        if (!$result || $result->num_rows === 0) {
             return null;
         }
 
-        $row = mysqli_fetch_assoc($result);
+        $row = $result->fetch_assoc();
         if ($model) {
             return $model->applyData($row);
         }
@@ -204,15 +268,15 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param ModelInterface $model
      * @return bool
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
-     * @throws MysqlException if a mysql error occurs while executing the query
+     * @throws MysqliConnectionException if connecting to the mysql database fails
+     * @throws MysqliException if a mysql error occurs while executing the query
      */
     public function delete(ModelInterface $model): bool
     {
         $this->connect();
         $table = $model::getName();
 
-        $id = mysqli_real_escape_string($this->connection, $model->getId());
+        $id = $this->escape($model->getId());
         $query = "DELETE FROM `" . $table . "` WHERE `" . $model->getIdField() . "` = '" . $id . "'";
         $this->rawQuery($query);
 
@@ -224,16 +288,14 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      *
      * @param Query $query
      * @return QueryResult
-     * @throws MysqlConnectionFailedException if connecting to the mysql database fails
-     * @throws MysqlException if a mysql error occurs while executing the query
+     * @throws MysqliConnectionException if connecting to the mysql database fails
+     * @throws MysqliException if a mysql error occurs while executing the query
      */
     public function query(Query $query): QueryResult
     {
         $this->connect();
 
-        $generator = new SQL(function ($value) {
-            return mysqli_real_escape_string($this->connection, $value);
-        });
+        $generator = new SQL($this->escape(...));
 
         $queryString = $generator->generate($query);
 
@@ -242,7 +304,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
         $result = new QueryResult();
         $result->setQueryString($queryString);
         if ($query instanceof UpdateQuery || $query instanceof DeleteQuery) {
-            $result->setAffectedRows(mysqli_affected_rows($this->connection));
+            $result->setAffectedRows($this->connection->affected_rows);
             return $result;
         }
 
@@ -250,7 +312,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
             return $result;
         }
 
-        while ($row = mysqli_fetch_assoc($rawQueryResult)) {
+        while ($row = $rawQueryResult->fetch_assoc()) {
             /** @var class-string<ModelInterface> $modelClass */
             $modelClass = $query->modelClassName;
             $model = $modelClass::getModelFromData($row);
@@ -264,7 +326,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param string|null $host
-     * @return Mysqli
+     * @return $this
      */
     public function setHost(?string $host): Mysqli
     {
@@ -274,7 +336,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param int|null $port
-     * @return Mysqli
+     * @return $this
      */
     public function setPort(?int $port): Mysqli
     {
@@ -284,7 +346,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param string|null $username
-     * @return Mysqli
+     * @return $this
      */
     public function setUsername(?string $username): Mysqli
     {
@@ -294,7 +356,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param string|null $password
-     * @return Mysqli
+     * @return $this
      */
     public function setPassword(?string $password): Mysqli
     {
@@ -304,7 +366,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param string|null $socket
-     * @return Mysqli
+     * @return $this
      */
     public function setSocket(?string $socket): Mysqli
     {
@@ -314,11 +376,21 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 
     /**
      * @param string $database
-     * @return Mysqli
+     * @return $this
      */
     public function setDatabase(string $database): Mysqli
     {
         $this->database = $database;
+        return $this;
+    }
+
+    /**
+     * @param int $connectionRetries
+     * @return $this
+     */
+    public function setConnectionRetries(int $connectionRetries): static
+    {
+        $this->connectionRetries = $connectionRetries;
         return $this;
     }
 }
