@@ -28,7 +28,6 @@
     "phpunit/phpunit": "^12.3"
   },
   "suggest": {
-    "ext-cassandra": "To use the Cassandra NoSQL driver",
     "ext-mysqli": "To use the Mysqli Relational driver",
     "ext-redis": "To use the Redis Cache driver",
     "shyim/opensearch-php-dsl": "OpenSearch DSL query builder"
