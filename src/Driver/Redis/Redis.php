@@ -83,7 +83,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
                     $this->connection->connect($this->socket);
                 }
             } catch (RedisException $e) {
-                throw RedisConnectionException::wrapping($e);
+                throw RedisConnectionException::fromException($e);
             }
         }
     }
@@ -119,7 +119,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
             $this->connection->set($key, json_encode($model), $model->getCacheTime());
             RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisConnectionException::wrapping($e);
+            throw RedisConnectionException::fromException($e);
         }
         return true;
     }
@@ -144,7 +144,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
             $rawData = $this->connection->get($this->generateCacheKey($modelClass, $id));
             RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisConnectionException::wrapping($e);
+            throw RedisConnectionException::fromException($e);
         }
 
         if (!$rawData) {
@@ -181,7 +181,7 @@ class Redis extends Driver implements CRUDAbleInterface, CacheableInterface
             $this->connection->del($key);
             RedisQueryException::checkConnection($this->connection);
         } catch (RedisException $e) {
-            throw RedisConnectionException::wrapping($e);
+            throw RedisConnectionException::fromException($e);
         }
         return true;
     }

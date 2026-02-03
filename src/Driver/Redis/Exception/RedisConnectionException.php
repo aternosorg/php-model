@@ -15,7 +15,7 @@ class RedisConnectionException extends RedisModelException
      * @param Throwable $exception
      * @return static
      */
-    static function wrapping(Throwable $exception): static
+    static function fromException(Throwable $exception): static
     {
         return new static($exception->getMessage(), $exception->getCode(), $exception);
     }
