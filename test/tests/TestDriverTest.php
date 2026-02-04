@@ -4,11 +4,13 @@ namespace Aternos\Model\Test\Tests;
 
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\Test\TestDriver;
+use Aternos\Model\Query\AggregateFunction;
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
+use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\MaxField;
 use Aternos\Model\Query\MinField;
-use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\SelectField;
 use Aternos\Model\Query\SumField;
 use Aternos\Model\Query\WhereCondition;
@@ -117,7 +119,7 @@ class TestDriverTest extends TestCase
         $models = TestModel::select(new WhereGroup([
             new WhereCondition("number", 1),
             new WhereCondition("number", 2)
-        ], WhereGroup::OR));
+        ], Conjunction::OR));
         $this->assertCount(2, $models);
         $this->assertEquals("1B", $models[0]->id);
         $this->assertEquals("B", $models[0]->text);
@@ -310,7 +312,7 @@ class TestDriverTest extends TestCase
 
     public function testSelectOrder(): void
     {
-        $models = TestModel::select(order: ["number" => OrderField::DESCENDING]);
+        $models = TestModel::select(order: ["number" => Direction::DESCENDING]);
         $this->assertCount(10, $models);
         $this->assertEquals("9J", $models[0]->id);
         $this->assertEquals("J", $models[0]->text);
@@ -380,7 +382,7 @@ class TestDriverTest extends TestCase
         $result = TestModel::select(fields: [
             (new SelectField("number"))
                 ->setAlias("average")
-                ->setFunction(SelectField::AVERAGE)]);
+                ->setFunction(AggregateFunction::AVERAGE)]);
         $this->assertEquals(4.5, $result[0]->getField("average"));
     }
 
@@ -449,7 +451,7 @@ class TestDriverTest extends TestCase
         $models = TestModel::select(fields: [
             (new SelectField("number"))
                 ->setAlias("average")
-                ->setFunction(SelectField::AVERAGE),
+                ->setFunction(AggregateFunction::AVERAGE),
             new SelectField("number"),
             new SelectField("text"),
         ], group: ["text"]);
@@ -555,7 +557,7 @@ class TestDriverTest extends TestCase
 
     public function testOrderBeforeLimit(): void
     {
-        $result = TestModel::select(order: ["number" => OrderField::DESCENDING], limit: 3);
+        $result = TestModel::select(order: ["number" => Direction::DESCENDING], limit: 3);
 
         $this->assertEquals(9, $result[0]->number);
         $this->assertEquals(8, $result[1]->number);

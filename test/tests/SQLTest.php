@@ -2,6 +2,8 @@
 
 namespace Aternos\Model\Test\Tests;
 
+use Aternos\Model\Query\AggregateFunction;
+use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\Generator\SQL;
 use Aternos\Model\Query\Limit;
@@ -152,7 +154,7 @@ class SQLTest extends TestCase
             new WhereGroup([
                 new WhereCondition('number', 1, '>'),
                 new WhereCondition('number', 0, '<'),
-            ], WhereGroup::OR),
+            ], Conjunction::OR),
         );
         $query->modelClassName = TestModel::class;
 
@@ -189,7 +191,7 @@ class SQLTest extends TestCase
     public function testSelectCount()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::COUNT),
+            (new SelectField('number'))->setFunction(AggregateFunction::COUNT),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -199,7 +201,7 @@ class SQLTest extends TestCase
     public function testSelectCountStar()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('*'))->setFunction(SelectField::COUNT),
+            (new SelectField('*'))->setFunction(AggregateFunction::COUNT),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -209,7 +211,7 @@ class SQLTest extends TestCase
     public function testSelectSum()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::SUM),
+            (new SelectField('number'))->setFunction(AggregateFunction::SUM),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -219,7 +221,7 @@ class SQLTest extends TestCase
     public function testSelectSumAs()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::SUM)->setAlias('sum'),
+            (new SelectField('number'))->setFunction(AggregateFunction::SUM)->setAlias('sum'),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -229,7 +231,7 @@ class SQLTest extends TestCase
     public function testSelectAVG()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::AVERAGE),
+            (new SelectField('number'))->setFunction(AggregateFunction::AVERAGE),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -239,7 +241,7 @@ class SQLTest extends TestCase
     public function testSelectMin()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::MIN),
+            (new SelectField('number'))->setFunction(AggregateFunction::MIN),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -249,7 +251,7 @@ class SQLTest extends TestCase
     public function testSelectMinAs()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::MIN)->setAlias('minNumber'),
+            (new SelectField('number'))->setFunction(AggregateFunction::MIN)->setAlias('minNumber'),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -259,7 +261,7 @@ class SQLTest extends TestCase
     public function testSelectMax()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::MAX),
+            (new SelectField('number'))->setFunction(AggregateFunction::MAX),
         ]);
         $query->modelClassName = TestModel::class;
 
@@ -269,7 +271,7 @@ class SQLTest extends TestCase
     public function testSelectMaxAs()
     {
         $query = new SelectQuery(fields: [
-            (new SelectField('number'))->setFunction(SelectField::MAX)->setAlias('maxNumber'),
+            (new SelectField('number'))->setFunction(AggregateFunction::MAX)->setAlias('maxNumber'),
         ]);
         $query->modelClassName = TestModel::class;
 

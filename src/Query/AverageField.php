@@ -9,5 +9,5 @@ namespace Aternos\Model\Query;
  */
 class AverageField extends SelectField
 {
-    public ?int $function = self::AVERAGE;
+    public ?AggregateFunction $function = AggregateFunction::AVERAGE;
 }
