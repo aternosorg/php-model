@@ -28,6 +28,10 @@ use mysqli_sql_exception;
 class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
 {
     public const string ID = "mysqli";
+
+    /** @var int[] */
+    protected const array CONNECTION_ERROR_CODES = [2006, 2013];
+
     protected string $id = self::ID;
 
     /**
@@ -77,8 +81,6 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
      */
     protected ?\mysqli $connection = null;
 
-    protected int $connectionRetries = 1;
-
     /**
      * Mysqli constructor.
      *
@@ -124,6 +126,17 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     }
 
     /**
+     * @return RetryCollection
+     */
+    protected function getRetryCollection(): RetryCollection
+    {
+        return new RetryCollection([
+            new RetryGroup(static::CONNECTION_ERROR_CODES, 1), // connection
+            new RetryGroup([1213], 3) // deadlock
+        ]);
+    }
+
+    /**
      * Execute a mysql query
      *
      * @param string $query
@@ -134,24 +147,19 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     protected function rawQuery(string $query): mysqli_result|true
     {
         $this->connect();
-        $retries = $this->connectionRetries;
+        $retries = $this->getRetryCollection();
         while (true) {
             try {
                 return $this->connection->query($query);
             } catch (mysqli_sql_exception $e) {
-                // no more retries left
-                if ($retries <= 0) {
-                    throw MysqliException::fromException($e);
-                }
-
-                // connection error, try to reconnect and retry
-                if ($e->getCode() === 2006 || $e->getCode() === 2013) {
-                    $this->reconnect();
-                    $retries--;
+                if ($retries->canRetry($e->getCode())) {
+                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES)) {
+                        $this->reconnect();
+                    }
+                    $this->handleRetriedException($e);
                     continue;
                 }
 
-                // other error, throw exception
                 throw MysqliException::fromException($e);
             }
         }
@@ -166,27 +174,31 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     protected function escape(string $data): string
     {
         $this->connect();
-        $retries = $this->connectionRetries;
+        $retries = $this->getRetryCollection();
         while (true) {
             try {
                 return $this->connection->real_escape_string($data);
             } catch (mysqli_sql_exception $e) {
-                // no more retries left
-                if ($retries <= 0) {
-                    throw MysqliException::fromException($e);
-                }
-
-                // connection error, try to reconnect and retry
-                if ($e->getCode() === 2006 || $e->getCode() === 2013) {
-                    $this->reconnect();
-                    $retries--;
+                if ($retries->canRetry($e->getCode())) {
+                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES)) {
+                        $this->reconnect();
+                    }
+                    $this->handleRetriedException($e);
                     continue;
                 }
 
-                // other error, throw exception
                 throw MysqliException::fromException($e);
             }
         }
+    }
+
+    /**
+     * @param mysqli_sql_exception $exception
+     * @return void
+     */
+    protected function handleRetriedException(mysqli_sql_exception $exception): void
+    {
+        // can be used to log retried exceptions
     }
 
     /**
@@ -381,16 +393,6 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
     public function setDatabase(string $database): Mysqli
     {
         $this->database = $database;
-        return $this;
-    }
-
-    /**
-     * @param int $connectionRetries
-     * @return $this
-     */
-    public function setConnectionRetries(int $connectionRetries): static
-    {
-        $this->connectionRetries = $connectionRetries;
         return $this;
     }
 }
