@@ -59,7 +59,7 @@ class RetryGroup
     }
 
     /**
-     * @param array $statusCodes
+     * @param int[] $statusCodes
      * @return bool
      */
     public function matchesStatusCodes(array $statusCodes): bool
