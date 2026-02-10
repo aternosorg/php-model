@@ -27,9 +27,9 @@ class RetryCollection
      */
     public function removeGroup(array $statusCodes): static
     {
-        $this->groups = array_filter($this->groups, function (RetryGroup $group) use ($statusCodes) {
+        $this->groups = array_values(array_filter($this->groups, function (RetryGroup $group) use ($statusCodes) {
             return !$group->matchesStatusCodes($statusCodes);
-        });
+        }));
         return $this;
     }
 

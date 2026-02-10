@@ -153,7 +153,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
                 return $this->connection->query($query);
             } catch (mysqli_sql_exception $e) {
                 if ($retries->canRetry($e->getCode())) {
-                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES)) {
+                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES, true)) {
                         $this->reconnect();
                     }
                     $this->handleRetriedException($e);
@@ -180,7 +180,7 @@ class Mysqli extends Driver implements CRUDAbleInterface, CRUDQueryableInterface
                 return $this->connection->real_escape_string($data);
             } catch (mysqli_sql_exception $e) {
                 if ($retries->canRetry($e->getCode())) {
-                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES)) {
+                    if (in_array($e->getCode(), static::CONNECTION_ERROR_CODES, true)) {
                         $this->reconnect();
                     }
                     $this->handleRetriedException($e);
