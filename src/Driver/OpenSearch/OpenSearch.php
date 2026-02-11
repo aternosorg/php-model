@@ -233,6 +233,10 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
             }
         }
 
+        if (isset($response->aggregations) && is_object($response->aggregations)) {
+            $result->setAggregations($response->aggregations);
+        }
+
         foreach ($response->hits->hits as $resultDocument) {
             /** @var ModelInterface $model */
             $model = new $modelClassName();
