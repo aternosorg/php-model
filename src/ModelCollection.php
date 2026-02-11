@@ -146,6 +146,8 @@ class ModelCollection implements Iterator, Countable, ArrayAccess
     }
 
     /**
+     * Get the models in this collection as an array
+     *
      * @return TModel[]
      */
     public function getModels(): array
