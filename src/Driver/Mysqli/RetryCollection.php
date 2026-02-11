@@ -22,7 +22,7 @@ class RetryCollection
     }
 
     /**
-     * @param array $statusCodes
+     * @param int[] $statusCodes
      * @return $this
      */
     public function removeGroup(array $statusCodes): static
