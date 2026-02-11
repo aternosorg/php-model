@@ -14,6 +14,9 @@ use Iterator;
  */
 class ModelCollection implements Iterator, Countable, ArrayAccess
 {
+    /**
+     * @var TModel[]
+     */
     protected array $models;
     protected int $iterator = 0;
 
@@ -142,4 +145,11 @@ class ModelCollection implements Iterator, Countable, ArrayAccess
         unset($this->models[$offset]);
     }
 
+    /**
+     * @return TModel[]
+     */
+    public function getModels(): array
+    {
+        return $this->models;
+    }
 }
