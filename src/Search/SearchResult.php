@@ -16,6 +16,7 @@ class SearchResult extends ModelCollection
     protected ?int $searchTime = null;
     protected ?int $totalCount = null;
     protected ?CountRelation $totalCountRelation = null;
+    protected ?object $aggregations = null;
 
     /**
      * @return int|null
@@ -68,6 +69,27 @@ class SearchResult extends ModelCollection
     public function setTotalCountRelation(?CountRelation $totalCountRelation): static
     {
         $this->totalCountRelation = $totalCountRelation;
+        return $this;
+    }
+
+    /**
+     * Aggregations returned by OpenSearch, if any.
+     * The structure of this object depends on the aggregations defined in the search query.
+     *
+     * @return object|null
+     */
+    public function getAggregations(): ?object
+    {
+        return $this->aggregations;
+    }
+
+    /**
+     * @param object|null $aggregations
+     * @return $this
+     */
+    public function setAggregations(?object $aggregations): static
+    {
+        $this->aggregations = $aggregations;
         return $this;
     }
 }
