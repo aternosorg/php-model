@@ -2,6 +2,7 @@
 
 namespace Aternos\Model\Query;
 
+use Aternos\Model\Driver\DriverInterface;
 use Aternos\Model\ModelCollection;
 use Aternos\Model\ModelInterface;
 
@@ -14,6 +15,8 @@ use Aternos\Model\ModelInterface;
  */
 class QueryResult extends ModelCollection
 {
+    protected ?DriverInterface $driver = null;
+
     /**
      * Raw query string that was executed
      *
@@ -82,5 +85,23 @@ class QueryResult extends ModelCollection
             $this->affectedRows = $affectedRows;
         }
         return $this;
+    }
+
+    /**
+     * @param DriverInterface $driver
+     * @return $this
+     */
+    public function setDriver(DriverInterface $driver): static
+    {
+        $this->driver = $driver;
+        return $this;
+    }
+
+    /**
+     * @return DriverInterface|null
+     */
+    public function getDriver(): ?DriverInterface
+    {
+        return $this->driver;
     }
 }

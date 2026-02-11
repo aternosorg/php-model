@@ -480,10 +480,11 @@ abstract class GenericModel extends BaseModel
         $results = [];
         $lastException = null;
         foreach ($drivers as $queryableDriver) {
-            /** @var QueryableInterface $driver */
+            /** @var QueryableInterface|DriverInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($queryableDriver);
             try {
                 $result = $driver->query($query);
+                $result->setDriver($driver);
 
                 if ($query instanceof SelectQuery) {
                     $lastException = null;
