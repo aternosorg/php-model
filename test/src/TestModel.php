@@ -2,7 +2,9 @@
 
 namespace Aternos\Model\Test\Src;
 
-class TestModel extends \Aternos\Model\GenericModel
+use Aternos\Model\GenericModel;
+
+class TestModel extends GenericModel
 {
     public mixed $id;
     public ?string $text = null;

@@ -132,7 +132,7 @@ class TestDriver extends Driver implements CRUDAbleInterface, CRUDQueryableInter
         $table = $this->getTable($model::getName());
         $entry = $table->getById($model->getId(), $model::getIdField());
         if (!$entry) {
-            $table->addEntry((new TestTableEntry(get_object_vars($model))));
+            $table->addEntry(new TestTableEntry(get_object_vars($model)));
             return true;
         }
         $entry->applyFromModel($model);

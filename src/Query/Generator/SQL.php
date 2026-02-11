@@ -14,7 +14,6 @@ use Aternos\Model\Query\{AggregateFunction,
     UpdateQuery,
     WhereCondition,
     WhereGroup};
-use UnexpectedValueException;
 
 /**
  * Class SQL

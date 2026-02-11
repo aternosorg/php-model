@@ -380,7 +380,7 @@ class TestDriverTest extends TestCase
     public function testSelectAverage(): void
     {
         $result = TestModel::select(fields: [
-            (new SelectField("number"))
+            new SelectField("number")
                 ->setAlias("average")
                 ->setFunction(AggregateFunction::AVERAGE)]);
         $this->assertEquals(4.5, $result[0]->getField("average"));
@@ -426,7 +426,7 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $models = TestModel::select(fields: [
-            (new SumField("number"))->setAlias("sum"),
+            new SumField("number")->setAlias("sum"),
             new SelectField("number")],
             group: ["number"]
         );
@@ -449,7 +449,7 @@ class TestDriverTest extends TestCase
         $model->save();
 
         $models = TestModel::select(fields: [
-            (new SelectField("number"))
+            new SelectField("number")
                 ->setAlias("average")
                 ->setFunction(AggregateFunction::AVERAGE),
             new SelectField("number"),

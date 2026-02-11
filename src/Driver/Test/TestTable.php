@@ -203,12 +203,7 @@ class TestTable
      */
     public function getById(mixed $id, string $idField = "id"): ?TestTableEntry
     {
-        foreach ($this->entries as $entry) {
-            if ($entry->hasId($id, $idField)) {
-                return $entry;
-            }
-        }
-        return null;
+        return array_find($this->entries, fn($entry) => $entry->hasId($id, $idField));
     }
 
     /**
