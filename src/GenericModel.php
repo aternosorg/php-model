@@ -23,9 +23,9 @@ use Aternos\Model\Query\CountField;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\Limit;
+use Aternos\Model\Query\MultiQueryResult;
 use Aternos\Model\Query\Query;
 use Aternos\Model\Query\QueryResult;
-use Aternos\Model\Query\QueryResultCollection;
 use Aternos\Model\Query\SelectQuery;
 use Aternos\Model\Query\UpdateQuery;
 use Aternos\Model\Query\WhereCondition;
@@ -480,10 +480,11 @@ abstract class GenericModel extends BaseModel
         $results = [];
         $lastException = null;
         foreach ($drivers as $queryableDriver) {
-            /** @var QueryableInterface $driver */
+            /** @var QueryableInterface|DriverInterface $driver */
             $driver = static::getDriverRegistry()->getDriver($queryableDriver);
             try {
                 $result = $driver->query($query);
+                $result->setDriver($driver);
 
                 if ($query instanceof SelectQuery) {
                     $lastException = null;
@@ -519,7 +520,7 @@ abstract class GenericModel extends BaseModel
         if ($query instanceof SelectQuery || count($results) === 1) {
             return $result;
         } else {
-            return new QueryResultCollection($results);
+            return new MultiQueryResult()->addQueryResults($results);
         }
     }
 
