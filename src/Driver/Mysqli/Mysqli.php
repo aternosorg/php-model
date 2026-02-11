@@ -10,8 +10,7 @@ use Aternos\Model\{Driver\Driver,
     Query\Generator\SQL,
     Query\Query,
     Query\QueryResult,
-    Query\UpdateQuery
-};
+    Query\UpdateQuery};
 use mysqli_result;
 use mysqli_sql_exception;
 

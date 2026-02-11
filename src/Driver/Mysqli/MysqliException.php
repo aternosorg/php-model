@@ -3,7 +3,6 @@
 namespace Aternos\Model\Driver\Mysqli;
 
 use Aternos\Model\ModelException;
-use mysqli;
 use mysqli_sql_exception;
 use Throwable;
 

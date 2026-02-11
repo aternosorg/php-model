@@ -48,12 +48,7 @@ class TestTableEntryGroup
      */
     public function matches(TestTableEntry $entry): bool
     {
-        foreach ($this->conditions as $key => $value) {
-            if ($entry[$key] !== $value) {
-                return false;
-            }
-        }
-        return true;
+        return array_all($this->conditions, fn($value, $key) => $entry[$key] === $value);
     }
 
     /**
