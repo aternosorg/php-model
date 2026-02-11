@@ -28,7 +28,7 @@ class MultiQueryResult extends QueryResult
     }
 
     /**
-     * @param array $queryResults
+     * @param QueryResult[] $queryResults
      * @return $this
      */
     public function addQueryResults(array $queryResults): static
