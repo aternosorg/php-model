@@ -666,6 +666,39 @@ class TestDriverTest extends TestCase
         $this->assertEquals(null, $result[7]->text);
     }
 
+    public function testSelectDistinctWithNullAlias(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+        TestModel::addTestEntry([
+            "id" => "101",
+            "text" => null,
+            "number" => 101
+        ]);
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields([
+            new SelectField("text")->setAlias("text_alias")
+        ]));
+
+        $this->assertEquals(8, $result->count());
+        $this->assertEquals("A", $result[0]->getField("text_alias"));
+        $this->assertEquals("B", $result[1]->getField("text_alias"));
+        $this->assertEquals("C", $result[2]->getField("text_alias"));
+        $this->assertEquals("D", $result[3]->getField("text_alias"));
+        $this->assertEquals("E", $result[4]->getField("text_alias"));
+        $this->assertEquals("F", $result[5]->getField("text_alias"));
+        $this->assertEquals("G", $result[6]->getField("text_alias"));
+        $this->assertEquals(null, $result[7]->getField("text_alias"));
+    }
+
     protected function tearDown(): void
     {
         TestModel::clearTestEntries();

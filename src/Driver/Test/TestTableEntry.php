@@ -98,7 +98,7 @@ class TestTableEntry implements ArrayAccess
      * @param SelectField[]|null $fields
      * @return array
      */
-    public function getDataForFields(?array $fields, bool $includeNull = false): array
+    public function getDataForFields(?array $fields): array
     {
         if ($fields === null) {
             return $this->data;
@@ -106,7 +106,7 @@ class TestTableEntry implements ArrayAccess
         $data = [];
         foreach ($fields as $field) {
             $key = $field->alias ?? $field->key;
-            if (isset($this->data[$key]) || $includeNull) {
+            if (isset($this->data[$key])) {
                 $data[$key] = $this->data[$key];
             }
         }

@@ -151,6 +151,7 @@ class TestTable
         ?array      $fields = null,
     ): array
     {
+        /** @var TestTableEntry[] $entries */
         $entries = [];
         if ($offset === null) {
             $offset = 0;
@@ -160,11 +161,12 @@ class TestTable
                 continue;
             }
 
-            if ($distinct) {
+            if ($distinct && $fields) {
                 foreach ($entries as $item) {
                     $same = true;
-                    foreach ($entry->getDataForFields($fields, true) as $key => $value) {
-                        if ($item->getField($key) !== $value) {
+                    foreach ($fields as $field) {
+                        $key = $field->key;
+                        if ($item->getField($key) !== $entry->getField($key)) {
                             $same = false;
                             break;
                         }
