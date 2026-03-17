@@ -699,6 +699,40 @@ class TestDriverTest extends TestCase
         $this->assertEquals(null, $result[7]->getField("text_alias"));
     }
 
+    public function testSelectDistinctWithAggregateAndGroup(): void
+    {
+        TestModel::clearTestEntries();
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+        $query = new SelectQuery()
+            ->distinct()
+            ->fields([
+                "text",
+                new CountField(),
+            ])
+            ->groupBy(["text"]);
+        $result = TestModel::query($query);
+        // There should be one row per distinct text value (A–G).
+        $this->assertEquals(7, $result->count());
+        $countsByText = [];
+        foreach ($result as $row) {
+            $countsByText[$row->text] = $row->getField(CountField::COUNT_FIELD);
+        }
+        $this->assertEquals(2, $countsByText["A"]);
+        $this->assertEquals(1, $countsByText["B"]);
+        $this->assertEquals(2, $countsByText["C"]);
+        $this->assertEquals(3, $countsByText["D"]);
+        $this->assertEquals(2, $countsByText["E"]);
+        $this->assertEquals(1, $countsByText["F"]);
+        $this->assertEquals(1, $countsByText["G"]);
+    }
+
     protected function tearDown(): void
     {
         TestModel::clearTestEntries();
