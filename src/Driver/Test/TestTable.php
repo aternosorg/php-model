@@ -72,7 +72,25 @@ class TestTable
             if ($query instanceof SelectQuery) {
                 /** @var class-string<ModelInterface> $modelClass */
                 $modelClass = $query->modelClassName;
-                $model = $modelClass::getModelFromData($entry->getDataForFields($query->getFields()));
+                $entryData = $entry->getDataForFields($query->getFields());
+                $model = $modelClass::getModelFromData($entryData);
+
+                if ($query->isDistinct()) {
+                    foreach ($queryResult as $item) {
+                        $same = true;
+                        foreach ($entryData as $key => $value) {
+                            if ($item->getField($key) !== $model->getField($key)) {
+                                $same = false;
+                                break;
+                            }
+                        }
+
+                        if ($same) {
+                            continue 2;
+                        }
+                    }
+                }
+
                 $queryResult->add($model);
             }
             if ($query instanceof UpdateQuery) {

@@ -73,6 +73,10 @@ class SQL implements QueryGeneratorInterface
         if ($query instanceof SelectQuery) {
             $queryString .= "SELECT";
 
+            if ($query->isDistinct()) {
+                $queryString .= " DISTINCT";
+            }
+
             if ($query->getFields()) {
                 $queryString .= " " . $this->generateFields($query);
             } else {

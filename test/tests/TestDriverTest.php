@@ -12,6 +12,7 @@ use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\MaxField;
 use Aternos\Model\Query\MinField;
 use Aternos\Model\Query\SelectField;
+use Aternos\Model\Query\SelectQuery;
 use Aternos\Model\Query\SumField;
 use Aternos\Model\Query\WhereCondition;
 use Aternos\Model\Query\WhereGroup;
@@ -562,6 +563,35 @@ class TestDriverTest extends TestCase
         $this->assertEquals(9, $result[0]->number);
         $this->assertEquals(8, $result[1]->number);
         $this->assertEquals(7, $result[2]->number);
+    }
+
+    public function testSelectDistinct(): void
+    {
+        $result = TestModel::query(new SelectQuery()->distinct());
+
+        $this->assertEquals(10, $result->count());
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertEquals($i, $result[$i]->number);
+        }
+    }
+
+    public function testSelectDistinctField(): void
+    {
+        $testData = "FGHIJABCDE";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["number"]));
+
+        $this->assertEquals(10, $result->count());
+        for ($i = 0; $i < 10; $i++) {
+            $this->assertEquals($i, $result[$i]->number);
+        }
     }
 
     protected function tearDown(): void
