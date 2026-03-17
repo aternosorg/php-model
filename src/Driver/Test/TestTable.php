@@ -6,7 +6,6 @@ use Aternos\Model\ModelInterface;
 use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\Direction;
-use Aternos\Model\Query\Field;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\Query;
@@ -58,15 +57,7 @@ class TestTable
      */
     public function query(Query $query): QueryResult
     {
-        $distinct = $query instanceof SelectQuery && $query->isDistinct();
-        $entries = $this->findEntries(
-            $query->getWhere(),
-            $query->getLimit()?->start,
-            $query->getLimit()?->length,
-            $query->getOrder(),
-            $distinct,
-            $query->getFields(),
-        );
+        $entries = $this->findEntries($query->getWhere());
 
         if ($query instanceof SelectQuery) {
             $clonedEntries = [];
@@ -74,7 +65,36 @@ class TestTable
                 $clonedEntries[] = clone $entry;
             }
             $entries = $this->groupAndAggregateEntries($clonedEntries, $query->getGroup(), $query->getFields());
+
+            if ($query->isDistinct() && $query->getFields()) {
+                $distinctEntries = [];
+                foreach ($entries as $entry) {
+                    foreach ($distinctEntries as $distinctEntry) {
+                        $same = true;
+                        foreach ($query->getFields() as $field) {
+                            $key = $field->key;
+                            if ($distinctEntry->getField($key) !== $entry->getField($key)) {
+                                $same = false;
+                                break;
+                            }
+                        }
+
+                        if ($same) {
+                            continue 2;
+                        }
+                    }
+
+                    $distinctEntries[] = clone $entry;
+                }
+                $entries = $distinctEntries;
+            }
         }
+
+        if ($query->getOrder() !== null) {
+            $entries = $this->orderEntries($entries, $query->getOrder());
+        }
+
+        $entries = array_slice($entries, $query->getLimit()?->start ?? 0, $query->getLimit()?->length);
 
         $queryResult = new QueryResult();
         foreach ($entries as $entry) {
@@ -135,57 +155,21 @@ class TestTable
 
     /**
      * @param WhereGroup|null $where
-     * @param int|null $offset
-     * @param int|null $limit
-     * @param array|null $order
-     * @param bool $distinct
-     * @param Field[]|null $fields
      * @return TestTableEntry[]
      */
-    protected function findEntries(
-        ?WhereGroup $where,
-        ?int        $offset = null,
-        ?int        $limit = null,
-        ?array      $order = null,
-        bool        $distinct = false,
-        ?array      $fields = null,
-    ): array
+    protected function findEntries(?WhereGroup $where): array
     {
         /** @var TestTableEntry[] $entries */
         $entries = [];
-        if ($offset === null) {
-            $offset = 0;
-        }
         foreach ($this->entries as $entry) {
             if (!$entry->matchesWhereGroup($where)) {
                 continue;
             }
 
-            if ($distinct && $fields) {
-                foreach ($entries as $item) {
-                    $same = true;
-                    foreach ($fields as $field) {
-                        $key = $field->key;
-                        if ($item->getField($key) !== $entry->getField($key)) {
-                            $same = false;
-                            break;
-                        }
-                    }
-
-                    if ($same) {
-                        continue 2;
-                    }
-                }
-            }
-
             $entries[] = $entry;
         }
 
-        if ($order !== null) {
-            $entries = $this->orderEntries($entries, $order);
-        }
-
-        return array_slice($entries, $offset, $limit);
+        return $entries;
     }
 
     /**
