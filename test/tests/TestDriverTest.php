@@ -567,17 +567,9 @@ class TestDriverTest extends TestCase
 
     public function testSelectDistinct(): void
     {
-        $result = TestModel::query(new SelectQuery()->distinct());
+        TestModel::clearTestEntries();
 
-        $this->assertEquals(10, $result->count());
-        for ($i = 0; $i < 10; $i++) {
-            $this->assertEquals($i, $result[$i]->number);
-        }
-    }
-
-    public function testSelectDistinctField(): void
-    {
-        $testData = "FGHIJABCDE";
+        $testData = "AABCCDDDEEFG";
         foreach (str_split($testData) as $i => $char) {
             TestModel::addTestEntry([
                 "id" => $i . $char,
@@ -586,12 +578,38 @@ class TestDriverTest extends TestCase
             ]);
         }
 
-        $result = TestModel::query(new SelectQuery()->distinct()->fields(["number"]));
+        $result = TestModel::query(new SelectQuery()->distinct());
 
-        $this->assertEquals(10, $result->count());
-        for ($i = 0; $i < 10; $i++) {
+        $this->assertEquals(12, $result->count());
+        for ($i = 0; $i < 12; $i++) {
             $this->assertEquals($i, $result[$i]->number);
+            $this->assertEquals($testData[$i], $result[$i]->text);
         }
+    }
+
+    public function testSelectDistinctField(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["text"]));
+
+        $this->assertEquals(7, $result->count());
+        $this->assertEquals("A", $result[0]->text);
+        $this->assertEquals("B", $result[1]->text);
+        $this->assertEquals("C", $result[2]->text);
+        $this->assertEquals("D", $result[3]->text);
+        $this->assertEquals("E", $result[4]->text);
+        $this->assertEquals("F", $result[5]->text);
+        $this->assertEquals("G", $result[6]->text);
     }
 
     protected function tearDown(): void
