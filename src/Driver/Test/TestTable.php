@@ -72,7 +72,7 @@ class TestTable
                     foreach ($distinctEntries as $distinctEntry) {
                         $same = true;
                         foreach ($query->getFields() as $field) {
-                            $key = $field->key;
+                            $key = $field->alias ?? $field->key;
                             if ($distinctEntry->getField($key) !== $entry->getField($key)) {
                                 $same = false;
                                 break;

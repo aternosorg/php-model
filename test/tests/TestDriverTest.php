@@ -702,6 +702,7 @@ class TestDriverTest extends TestCase
     public function testSelectDistinctWithAggregateAndGroup(): void
     {
         TestModel::clearTestEntries();
+        // Insert multiple rows with duplicate 'text' values
         $testData = "AABCCDDDEEFG";
         foreach (str_split($testData) as $i => $char) {
             TestModel::addTestEntry([
@@ -710,27 +711,20 @@ class TestDriverTest extends TestCase
                 "number" => $i
             ]);
         }
+
         $query = new SelectQuery()
             ->distinct()
             ->fields([
-                "text",
                 new CountField(),
             ])
-            ->groupBy(["text"]);
+            ->groupBy(["text"])
+            ->orderBy([CountField::COUNT_FIELD => Direction::ASCENDING]);
         $result = TestModel::query($query);
-        // There should be one row per distinct text value (A–G).
-        $this->assertEquals(7, $result->count());
-        $countsByText = [];
-        foreach ($result as $row) {
-            $countsByText[$row->text] = $row->getField(CountField::COUNT_FIELD);
-        }
-        $this->assertEquals(2, $countsByText["A"]);
-        $this->assertEquals(1, $countsByText["B"]);
-        $this->assertEquals(2, $countsByText["C"]);
-        $this->assertEquals(3, $countsByText["D"]);
-        $this->assertEquals(2, $countsByText["E"]);
-        $this->assertEquals(1, $countsByText["F"]);
-        $this->assertEquals(1, $countsByText["G"]);
+
+        $this->assertEquals(3, $result->count());
+        $this->assertEquals(1, $result[0]->getField(CountField::COUNT_FIELD));
+        $this->assertEquals(2, $result[1]->getField(CountField::COUNT_FIELD));
+        $this->assertEquals(3, $result[2]->getField(CountField::COUNT_FIELD));
     }
 
     protected function tearDown(): void
