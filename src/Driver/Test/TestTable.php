@@ -6,6 +6,7 @@ use Aternos\Model\ModelInterface;
 use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\DeleteQuery;
 use Aternos\Model\Query\Direction;
+use Aternos\Model\Query\Field;
 use Aternos\Model\Query\GroupField;
 use Aternos\Model\Query\OrderField;
 use Aternos\Model\Query\Query;
@@ -57,7 +58,15 @@ class TestTable
      */
     public function query(Query $query): QueryResult
     {
-        $entries = $this->findEntries($query->getWhere(), $query->getLimit()?->start, $query->getLimit()?->length, $query->getOrder());
+        $distinct = $query instanceof SelectQuery && $query->isDistinct();
+        $entries = $this->findEntries(
+            $query->getWhere(),
+            $query->getLimit()?->start,
+            $query->getLimit()?->length,
+            $query->getOrder(),
+            $distinct,
+            $query->getFields(),
+        );
 
         if ($query instanceof SelectQuery) {
             $clonedEntries = [];
@@ -74,23 +83,6 @@ class TestTable
                 $modelClass = $query->modelClassName;
                 $entryData = $entry->getDataForFields($query->getFields());
                 $model = $modelClass::getModelFromData($entryData);
-
-                if ($query->isDistinct()) {
-                    foreach ($queryResult as $item) {
-                        $same = true;
-                        foreach ($entryData as $key => $value) {
-                            if ($item->getField($key) !== $model->getField($key)) {
-                                $same = false;
-                                break;
-                            }
-                        }
-
-                        if ($same) {
-                            continue 2;
-                        }
-                    }
-                }
-
                 $queryResult->add($model);
             }
             if ($query instanceof UpdateQuery) {
@@ -146,9 +138,18 @@ class TestTable
      * @param int|null $offset
      * @param int|null $limit
      * @param array|null $order
+     * @param bool $distinct
+     * @param Field[]|null $fields
      * @return TestTableEntry[]
      */
-    protected function findEntries(?WhereGroup $where, ?int $offset = null, ?int $limit = null, ?array $order = null): array
+    protected function findEntries(
+        ?WhereGroup $where,
+        ?int        $offset = null,
+        ?int        $limit = null,
+        ?array      $order = null,
+        bool        $distinct = false,
+        ?array      $fields = null,
+    ): array
     {
         $entries = [];
         if ($offset === null) {
@@ -158,6 +159,23 @@ class TestTable
             if (!$entry->matchesWhereGroup($where)) {
                 continue;
             }
+
+            if ($distinct) {
+                foreach ($entries as $item) {
+                    $same = true;
+                    foreach ($entry->getDataForFields($fields) as $key => $value) {
+                        if ($item->getField($key) !== $entry->getField($key)) {
+                            $same = false;
+                            break;
+                        }
+                    }
+
+                    if ($same) {
+                        continue 2;
+                    }
+                }
+            }
+
             $entries[] = $entry;
         }
 

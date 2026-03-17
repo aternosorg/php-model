@@ -612,6 +612,29 @@ class TestDriverTest extends TestCase
         $this->assertEquals("G", $result[6]->text);
     }
 
+    public function testSelectDistinctBeforeLimit(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["text"])->limit(5));
+
+        $this->assertEquals(5, $result->count());
+        $this->assertEquals("A", $result[0]->text);
+        $this->assertEquals("B", $result[1]->text);
+        $this->assertEquals("C", $result[2]->text);
+        $this->assertEquals("D", $result[3]->text);
+        $this->assertEquals("E", $result[4]->text);
+    }
+
     protected function tearDown(): void
     {
         TestModel::clearTestEntries();
