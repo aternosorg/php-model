@@ -163,8 +163,8 @@ class TestTable
             if ($distinct) {
                 foreach ($entries as $item) {
                     $same = true;
-                    foreach ($entry->getDataForFields($fields) as $key => $value) {
-                        if ($item->getField($key) !== $entry->getField($key)) {
+                    foreach ($entry->getDataForFields($fields, true) as $key => $value) {
+                        if ($item->getField($key) !== $value) {
                             $same = false;
                             break;
                         }
