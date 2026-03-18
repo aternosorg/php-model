@@ -101,8 +101,7 @@ class TestTable
             if ($query instanceof SelectQuery) {
                 /** @var class-string<ModelInterface> $modelClass */
                 $modelClass = $query->modelClassName;
-                $entryData = $entry->getDataForFields($query->getFields());
-                $model = $modelClass::getModelFromData($entryData);
+                $model = $modelClass::getModelFromData($entry->getDataForFields($query->getFields()));
                 $queryResult->add($model);
             }
             if ($query instanceof UpdateQuery) {
