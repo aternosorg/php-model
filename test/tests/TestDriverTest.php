@@ -12,6 +12,7 @@ use Aternos\Model\Query\Direction;
 use Aternos\Model\Query\MaxField;
 use Aternos\Model\Query\MinField;
 use Aternos\Model\Query\SelectField;
+use Aternos\Model\Query\SelectQuery;
 use Aternos\Model\Query\SumField;
 use Aternos\Model\Query\WhereCondition;
 use Aternos\Model\Query\WhereGroup;
@@ -562,6 +563,168 @@ class TestDriverTest extends TestCase
         $this->assertEquals(9, $result[0]->number);
         $this->assertEquals(8, $result[1]->number);
         $this->assertEquals(7, $result[2]->number);
+    }
+
+    public function testSelectDistinct(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct());
+
+        $this->assertEquals(12, $result->count());
+        for ($i = 0; $i < 12; $i++) {
+            $this->assertEquals($i, $result[$i]->number);
+            $this->assertEquals($testData[$i], $result[$i]->text);
+        }
+    }
+
+    public function testSelectDistinctField(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["text"]));
+
+        $this->assertEquals(7, $result->count());
+        $this->assertEquals("A", $result[0]->text);
+        $this->assertEquals("B", $result[1]->text);
+        $this->assertEquals("C", $result[2]->text);
+        $this->assertEquals("D", $result[3]->text);
+        $this->assertEquals("E", $result[4]->text);
+        $this->assertEquals("F", $result[5]->text);
+        $this->assertEquals("G", $result[6]->text);
+    }
+
+    public function testSelectDistinctBeforeLimit(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["text"])->limit(5));
+
+        $this->assertEquals(5, $result->count());
+        $this->assertEquals("A", $result[0]->text);
+        $this->assertEquals("B", $result[1]->text);
+        $this->assertEquals("C", $result[2]->text);
+        $this->assertEquals("D", $result[3]->text);
+        $this->assertEquals("E", $result[4]->text);
+    }
+
+    public function testSelectDistinctWithNull(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+        TestModel::addTestEntry([
+            "id" => "101",
+            "text" => null,
+            "number" => 101
+        ]);
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields(["text"]));
+
+        $this->assertEquals(8, $result->count());
+        $this->assertEquals("A", $result[0]->text);
+        $this->assertEquals("B", $result[1]->text);
+        $this->assertEquals("C", $result[2]->text);
+        $this->assertEquals("D", $result[3]->text);
+        $this->assertEquals("E", $result[4]->text);
+        $this->assertEquals("F", $result[5]->text);
+        $this->assertEquals("G", $result[6]->text);
+        $this->assertEquals(null, $result[7]->text);
+    }
+
+    public function testSelectDistinctWithNullAlias(): void
+    {
+        TestModel::clearTestEntries();
+
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+        TestModel::addTestEntry([
+            "id" => "101",
+            "text" => null,
+            "number" => 101
+        ]);
+
+        $result = TestModel::query(new SelectQuery()->distinct()->fields([
+            new SelectField("text")->setAlias("text_alias")
+        ]));
+
+        $this->assertEquals(8, $result->count());
+        $this->assertEquals("A", $result[0]->getField("text_alias"));
+        $this->assertEquals("B", $result[1]->getField("text_alias"));
+        $this->assertEquals("C", $result[2]->getField("text_alias"));
+        $this->assertEquals("D", $result[3]->getField("text_alias"));
+        $this->assertEquals("E", $result[4]->getField("text_alias"));
+        $this->assertEquals("F", $result[5]->getField("text_alias"));
+        $this->assertEquals("G", $result[6]->getField("text_alias"));
+        $this->assertEquals(null, $result[7]->getField("text_alias"));
+    }
+
+    public function testSelectDistinctWithAggregateAndGroup(): void
+    {
+        TestModel::clearTestEntries();
+        // Insert multiple rows with duplicate 'text' values
+        $testData = "AABCCDDDEEFG";
+        foreach (str_split($testData) as $i => $char) {
+            TestModel::addTestEntry([
+                "id" => $i . $char,
+                "text" => $char,
+                "number" => $i
+            ]);
+        }
+
+        $query = new SelectQuery()
+            ->distinct()
+            ->fields([
+                new CountField(),
+            ])
+            ->groupBy(["text"])
+            ->orderBy([CountField::COUNT_FIELD => Direction::ASCENDING]);
+        $result = TestModel::query($query);
+
+        $this->assertEquals(3, $result->count());
+        $this->assertEquals(1, $result[0]->getField(CountField::COUNT_FIELD));
+        $this->assertEquals(2, $result[1]->getField(CountField::COUNT_FIELD));
+        $this->assertEquals(3, $result[2]->getField(CountField::COUNT_FIELD));
     }
 
     protected function tearDown(): void

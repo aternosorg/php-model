@@ -310,6 +310,14 @@ class SQLTest extends TestCase
         $this->assertEquals("SELECT * FROM `test` GROUP BY `number`, `text`", $this->sql->generate($query));
     }
 
+    public function testSelectDistinct()
+    {
+        $query = new SelectQuery()->distinct();
+        $query->modelClassName = TestModel::class;
+
+        $this->assertEquals("SELECT DISTINCT * FROM `test`", $this->sql->generate($query));
+    }
+
     public function testDelete()
     {
         $query = new DeleteQuery();
