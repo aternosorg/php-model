@@ -337,7 +337,8 @@ abstract class GenericModel extends BaseModel
 
     /**
      * Check if the registry is enabled
-     * @return bool true if the registry is enabled
+     *
+     * @return bool
      */
     public static function isRegistryEnabled(): bool
     {
