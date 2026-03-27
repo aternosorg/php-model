@@ -336,6 +336,16 @@ abstract class GenericModel extends BaseModel
     }
 
     /**
+     * Check if the registry is enabled
+     *
+     * @return bool
+     */
+    public static function isRegistryEnabled(): bool
+    {
+        return static::$registry;
+    }
+
+    /**
      *
      *
      * @return void
