@@ -4,6 +4,8 @@ namespace Aternos\Model\Test\Tests;
 
 use Aternos\Model\Driver\DriverRegistry;
 use Aternos\Model\Driver\Test\TestDriver;
+use Aternos\Model\GenericModel;
+use Aternos\Model\ModelRegistry;
 use Aternos\Model\Query\AggregateFunction;
 use Aternos\Model\Query\Conjunction;
 use Aternos\Model\Query\CountField;
@@ -23,6 +25,7 @@ class TestDriverTest extends TestCase
 {
     protected function setUp(): void
     {
+        GenericModel::enableRegistry();
         $testData = "ABCDEFGHIJ";
         foreach (str_split($testData) as $i => $char) {
             TestModel::addTestEntry([
@@ -725,6 +728,31 @@ class TestDriverTest extends TestCase
         $this->assertEquals(1, $result[0]->getField(CountField::COUNT_FIELD));
         $this->assertEquals(2, $result[1]->getField(CountField::COUNT_FIELD));
         $this->assertEquals(3, $result[2]->getField(CountField::COUNT_FIELD));
+    }
+
+    public function testGetWithRegistry(): void
+    {
+        $id = "0A";
+        $this->assertNull(ModelRegistry::getInstance()->get(TestModel::class, $id));
+
+        $item = TestModel::get($id);
+        $this->assertInstanceOf(TestModel::class, $item);
+        $this->assertEquals($item->getId(), $id);
+        $this->assertSame($item, ModelRegistry::getInstance()->get(TestModel::class, $id));
+
+        $item2 = TestModel::get($id, update: true);
+        $this->assertInstanceOf(TestModel::class, $item2);
+        $this->assertEquals($item2->getId(), $id);
+        $this->assertNotSame($item, $item2);
+        $this->assertSame($item2, ModelRegistry::getInstance()->get(TestModel::class, $id));
+        $this->assertNotSame($item, ModelRegistry::getInstance()->get(TestModel::class, $id));
+
+        $item3 = TestModel::get($id, update: true, saveToRegistry: false);
+        $this->assertInstanceOf(TestModel::class, $item3);
+        $this->assertEquals($item3->getId(), $id);
+        $this->assertNotSame($item, $item3);
+        $this->assertNotSame($item2, $item3);
+        $this->assertSame($item2, ModelRegistry::getInstance()->get(TestModel::class, $id));
     }
 
     protected function tearDown(): void
