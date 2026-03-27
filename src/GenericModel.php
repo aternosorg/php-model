@@ -388,6 +388,7 @@ abstract class GenericModel extends BaseModel
      * @param bool $update always fetch from the database, even if item is cached in the registry.
      * @param bool $saveToRegistry save the resulting model to the registry (if enabled)
      * @return static|null
+     * @throws ModelException
      */
     public static function get(string $id, bool $update = false, bool $saveToRegistry = true): ?static
     {
