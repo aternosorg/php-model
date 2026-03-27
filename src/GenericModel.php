@@ -385,25 +385,22 @@ abstract class GenericModel extends BaseModel
      * Get a model by id
      *
      * @param string $id
-     * @param bool $update
+     * @param bool $update always fetch from the database, even if item is cached in the registry.
+     * @param bool $saveToRegistry save the resulting model to the registry (if enabled)
      * @return static|null
-     * @throws ModelException
      */
-    public static function get(string $id, bool $update = false): ?static
+    public static function get(string $id, bool $update = false, bool $saveToRegistry = true): ?static
     {
         $registry = ModelRegistry::getInstance();
         $driverRegistry = static::getDriverRegistry();
 
         // try to get the model from the registry
-        if (static::$registry) {
+        if (static::$registry && !$update) {
             if ($registryModel = $registry->get(static::class, $id)) {
                 if (!($registryModel instanceof static)) {
                     return null;
                 }
-                $model = $registryModel;
-                if (!$update) {
-                    return $model;
-                }
+                return $registryModel;
             }
         }
 
@@ -437,7 +434,7 @@ abstract class GenericModel extends BaseModel
             }
         }
 
-        if (static::$registry) {
+        if (static::$registry && $saveToRegistry) {
             $registry->save($model);
         }
 
