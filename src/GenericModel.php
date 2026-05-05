@@ -625,15 +625,16 @@ abstract class GenericModel extends BaseModel
     /**
      * Save the model changes
      *
+     * @param bool $saveToRegistry save the model to the registry (if enabled)
      * @return bool
      */
-    public function save(): bool
+    public function save(bool $saveToRegistry = true): bool
     {
         // new model, generate id and save in registry
         if (!$this->getId()) {
             $this->generateId();
 
-            if (static::$registry) {
+            if (static::$registry && $saveToRegistry) {
                 ModelRegistry::getInstance()->save($this);
             }
         }

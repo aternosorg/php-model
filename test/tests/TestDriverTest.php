@@ -755,6 +755,25 @@ class TestDriverTest extends TestCase
         $this->assertSame($item2, ModelRegistry::getInstance()->get(TestModel::class, $id));
     }
 
+    public function testSaveWithRegistry(): void
+    {
+        $item = new TestModel();
+        $this->assertNull($item->getId());
+
+        $item->save(false);
+        $this->assertNull(ModelRegistry::getInstance()->get(TestModel::class, $item->id));
+
+        // Models are only added to the registry when they are saved for the first time
+        $item->save();
+        $this->assertNull(ModelRegistry::getInstance()->get(TestModel::class, $item->id));
+
+        // Reset id to create a new model
+        $item->setId(null);
+
+        $item->save();
+        $this->assertSame($item, ModelRegistry::getInstance()->get(TestModel::class, $item->id));
+    }
+
     protected function tearDown(): void
     {
         TestModel::clearTestEntries();
