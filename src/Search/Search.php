@@ -11,22 +11,35 @@ use Aternos\Model\ModelInterface;
 class Search
 {
     /**
-     * @var string|null
+     * The class name of the model to search
+     * @var class-string<ModelInterface>|null
      */
     protected ?string $modelClassName = null;
 
     /**
+     * The search query
      * @var array
      */
     protected array $searchQuery = [];
 
     /**
+     * Additional parameters for the search
+     * @var string[]
+     */
+    protected array $parameters = [];
+
+    /**
      * Search constructor.
      * @param array $searchQuery
+     * @param array $parameters
      */
-    public function __construct(array $searchQuery = [])
+    public function __construct(
+        array $searchQuery = [],
+        array $parameters = [],
+    )
     {
         $this->searchQuery = $searchQuery;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -38,7 +51,15 @@ class Search
     }
 
     /**
-     * @param string|null $modelClassName
+     * @return string[]
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param class-string<ModelInterface>|null $modelClassName
      * @return Search
      */
     public function setModelClassName(?string $modelClassName): Search

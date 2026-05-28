@@ -110,6 +110,21 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
     }
 
     /**
+     * Build a URL with query parameters
+     * @param string[] $path
+     * @param string[] $parameters
+     * @return string
+     */
+    protected function buildParameterizedUrl(array $path, array $parameters = []): string
+    {
+        $url = $this->buildUrl(...$path);
+        if (!empty($parameters)) {
+            $url .= "?" . http_build_query($parameters);
+        }
+        return $url;
+    }
+
+    /**
      * Save the model
      *
      * @param ModelInterface $model
@@ -212,7 +227,7 @@ class OpenSearch extends Driver implements CRUDAbleInterface, SearchableInterfac
 
         $response = $this->request(
             "GET",
-            $this->buildUrl($modelClassName::getName(), "_search"),
+            $this->buildParameterizedUrl([$modelClassName::getName(), "_search"], $search->getParameters()),
             $search->getSearchQuery()
         );
         if (!isset($response->hits) || !is_object($response->hits) || !isset($response->hits->hits) || !is_array($response->hits->hits)) {
