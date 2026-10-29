@@ -16,8 +16,11 @@ class RedisQueryException extends RedisModelException
      */
     public static function checkConnection(Redis $redis): void
     {
+        // getLastError() returns null if there is no error (or false if there is no connection)
         $error = $redis->getLastError();
-        if ($error !== false) {
+        if (is_string($error)) {
+            // the error is kept until it's cleared, so it would be reported again for the next query
+            $redis->clearLastError();
             throw new static("Redis Query Error: " . $error);
         }
     }
