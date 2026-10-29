@@ -456,7 +456,7 @@ abstract class GenericModel extends BaseModel
      * Query the model
      *
      * @param Query $query
-     * @return QueryResult<static>|static[]
+     * @return QueryResult<static>
      * @noinspection PhpDocSignatureInspection
      */
     public static function query(Query $query): QueryResult
@@ -545,7 +545,7 @@ abstract class GenericModel extends BaseModel
      * @param array|int|Limit|null $limit
      * @param array|GroupField[]|string[]|null $group
      * @param bool $saveResultsToRegistry Whether results of this query should be saved in the model registry.
-     * @return QueryResult<static>|static[]
+     * @return QueryResult<static>
      * @throws ModelException
      * @noinspection PhpDocSignatureInspection
      */
@@ -580,7 +580,7 @@ abstract class GenericModel extends BaseModel
      * @param array|null|WhereCondition|WhereGroup $where
      * @param array|null $order
      * @param array|int|Limit|null $limit
-     * @return QueryResult<static>|static[]
+     * @return QueryResult<static>
      * @noinspection PhpDocSignatureInspection
      */
     public static function update(null|array                           $fields = null,
@@ -682,7 +682,7 @@ abstract class GenericModel extends BaseModel
      * dataset
      *
      * @param array $data
-     * @return QueryResult<static>|static[]
+     * @return QueryResult<static>
      * @noinspection PhpDocSignatureInspection
      */
     public function set(array $data): QueryResult
