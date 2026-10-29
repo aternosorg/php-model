@@ -10,6 +10,8 @@ use Iterator;
  * Class ModelCollection
  *
  * @template TModel of ModelInterface
+ * @implements Iterator<int, TModel>
+ * @implements ArrayAccess<int, TModel>
  * @package Aternos\Model
  */
 class ModelCollection implements Iterator, Countable, ArrayAccess
