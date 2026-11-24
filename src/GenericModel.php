@@ -83,7 +83,7 @@ abstract class GenericModel extends BaseModel
      *
      * Caches etc. first, database after that, search etc. at the end
      *
-     * @var class-string<DriverInterface>[]
+     * @var string[]
      */
     protected static array $drivers = [
         Redis::ID,
@@ -95,7 +95,7 @@ abstract class GenericModel extends BaseModel
      *
      * Set this to null to use the reverse order of static::$drivers which implement SavableInterface
      *
-     * @var class-string<SavableInterface>[]|null
+     * @var string[]|null
      */
     protected static ?array $saveDrivers = null;
 
@@ -104,7 +104,7 @@ abstract class GenericModel extends BaseModel
      *
      * Set this to null to use the reverse order of static::$drivers which implement DeletableInterface
      *
-     * @var class-string<DeletableInterface>[]|null
+     * @var string[]|null
      */
     protected static ?array $deleteDrivers = null;
 
@@ -131,7 +131,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all gettable drivers from static::$drivers
      *
-     * @return class-string<GettableInterface>[]
+     * @return string[]
      */
     protected static function getGettableDrivers(): array
     {
@@ -147,7 +147,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all select queryable drivers from static::$drivers
      *
-     * @return class-string<SelectQueryableInterface>[]
+     * @return string[]
      */
     protected static function getSelectQueryableDrivers(): array
     {
@@ -163,7 +163,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all savable drivers from static::$saveDrivers or static::$drivers
      *
-     * @return class-string<SavableInterface>[]
+     * @return string[]
      */
     protected static function getSavableDrivers(): array
     {
@@ -179,7 +179,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all update queryable drivers from static::$saveDrivers or static::$drivers
      *
-     * @return class-string<UpdateQueryableInterface>[]
+     * @return string[]
      */
     protected static function getUpdateQueryableDrivers(): array
     {
@@ -195,7 +195,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all savable drivers from static::$deleteDrivers or static::$drivers
      *
-     * @return class-string<DeletableInterface>[]
+     * @return string[]
      */
     protected static function getDeletableDrivers(): array
     {
@@ -211,7 +211,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all delete queryable drivers from static::$deleteDrivers or static::$drivers
      *
-     * @return class-string<DeleteQueryableInterface>[]
+     * @return string[]
      */
     protected static function getDeleteQueryableDrivers(): array
     {
@@ -227,7 +227,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all searchable drivers from static::$drivers
      *
-     * @return class-string<SearchableInterface>[]
+     * @return string[]
      */
     protected static function getSearchableDrivers(): array
     {
@@ -243,7 +243,7 @@ abstract class GenericModel extends BaseModel
     /**
      * Get all search-countable drivers from static::$drivers
      *
-     * @return class-string<SearchCountableInterface>[]
+     * @return string[]
      */
     protected static function getSearchCountableDrivers(): array
     {
